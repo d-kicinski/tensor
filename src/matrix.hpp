@@ -1,9 +1,16 @@
 #pragma once
 
 #include <vector>
-template <typename Type> class Matrix {
-    std::vector<std::vector<Type>> _array;
+namespace space {
 
+template <typename Type> class Matrix {
   public:
-    Matrix(int m, int n) { _array.resize(m, std::vector<Type>(n)); }
+    typedef std::vector<Type> Vector;
+    typedef std::vector<Vector> MatrixType;
+    MatrixType _matrix;
+
+    Matrix(int m, int n) { _matrix.resize(m, std::vector<Type>(n)); }
+    explicit Matrix(MatrixType const & matrix) { _matrix(matrix); }
+    Matrix(std::initializer_list<Vector> initializer) { _matrix = initializer; }
 };
+}; // namespace matrix
