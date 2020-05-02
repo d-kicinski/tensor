@@ -54,12 +54,12 @@ TEST_CASE("Constructs by assigment")
     REQUIRE(m1[{0, 1}] == 1);
 }
 
-//TEST_CASE("operator==")
-//{
-//    Matrix<int> m1 = {{1, 1}, {1, 1}};
-//    Matrix<int> m2 = {{1, 1}, {1, 1}};
-//    REQUIRE(m1 == m2);
-//}
+TEST_CASE("operator==")
+{
+    Matrix<int> m1 = {{1, 1}, {1, 1}};
+    Matrix<int> m2 = {{1, 1}, {1, 1}};
+    REQUIRE(m1 == m2);
+}
 
 // TEST_CASE("Static initialize with zeros")
 //{

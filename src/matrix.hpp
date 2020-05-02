@@ -41,6 +41,13 @@ template <typename Type = float> class Matrix {
         return this(initializer);
     }
 
+    bool operator==(const Matrix &rhs) const
+    {
+        return std::tie(_data, _shape) == std::tie(rhs._data, rhs._shape);
+    }
+
+    bool operator!=(const Matrix &rhs) const { return !(rhs == *this); }
+
     auto operator[](int index) -> Vector
     {
         if (index >= _shape[0]) {
