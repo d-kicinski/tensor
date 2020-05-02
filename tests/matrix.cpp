@@ -4,17 +4,20 @@
 using namespace space;
 using namespace std;
 
-TEST_CASE("Construct") {
+TEST_CASE("Construct")
+{
     Matrix<int> matrix(3, 3);
     REQUIRE(matrix.shape() == vector{3, 3});
 }
 
-TEST_CASE("Construct using list_initialization") {
+TEST_CASE("Construct using list_initialization")
+{
     Matrix<int> matrix{{0, 0}, {1, 1}, {2, 2}};
     REQUIRE(matrix.shape() == vector{3, 2});
 }
 
-TEST_CASE("Bracket operator") {
+TEST_CASE("Bracket operator")
+{
     Matrix<int> matrix{{0, 0}, {1, 1}, {2, 2}};
     REQUIRE(matrix[0] == vector{0, 0});
     REQUIRE(matrix[1] == vector{1, 1});
@@ -25,7 +28,8 @@ TEST_CASE("Bracket operator") {
     REQUIRE(matrix[2][0] == 2);
 }
 
-TEST_CASE("Random access via bracket operator") {
+TEST_CASE("Random access via bracket operator")
+{
     Matrix<int> matrix{{0, 0}, {1, 1}, {2, 2}};
     REQUIRE(matrix[{0, 0}] == 0);
     REQUIRE(matrix[{0, 1}] == 0);

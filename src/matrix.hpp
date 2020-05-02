@@ -13,12 +13,15 @@ template <typename Type = float> class Matrix {
     Vector _data;
     ShapeVector _shape{};
 
-    Matrix(int m, int n) {
+    Matrix(int m, int n)
+    {
         _shape = {m, n};
         _data.resize(m * n);
     };
     explicit Matrix(Vector const &data) { _data(data); }
-    Matrix(std::initializer_list<Vector> initializer) {
+
+    Matrix(std::initializer_list<Vector> initializer)
+    {
         int m = initializer.size();
         int n = -1;
 
@@ -43,11 +46,12 @@ template <typename Type = float> class Matrix {
         return Vector(begin, end);
     }
 
-    Type &operator[](std::vector<int> const &position) {
+    auto operator[](std::vector<int> const &position) -> Type &
+    {
         auto index = position[0] * _shape[1] + position[1];
         return _data[index];
     }
 
-    [[nodiscard]] ShapeVector const &shape() const { return _shape; }
+    [[nodiscard]] auto shape() const -> ShapeVector const & { return _shape; }
 };
 }; // namespace space
