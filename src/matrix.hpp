@@ -36,7 +36,13 @@ template <typename Type = float> class Matrix {
         _shape = {m, n};
     }
 
-    Vector operator[](int index) {
+    auto operator=(std::initializer_list<Vector> initializer) -> Matrix &
+    {
+        return this(initializer);
+    }
+
+    auto operator[](int index) -> Vector
+    {
         if (index >= _shape[0]) {
             throw IndexOutOfRangeException(index);
         }

@@ -47,11 +47,23 @@ TEST_CASE("Random access via bracket operator")
     REQUIRE(matrix[{2, 1}] == 100);
 }
 
-//
-// TEST_CASE("operator==") {
-//    Tensor1D<int> v1{1, 1, 1, 1};
-//    Tensor1D<int> v2{1, 1, 1, 1};
-//    REQUIRE(v1 == v2);
+TEST_CASE("Constructs by assigment")
+{
+    Matrix<int> m1 = {{1, 1}};
+    REQUIRE(m1[{0, 0}] == 1);
+    REQUIRE(m1[{0, 1}] == 1);
+}
+
+//TEST_CASE("operator==")
+//{
+//    Matrix<int> m1 = {{1, 1}, {1, 1}};
+//    Matrix<int> m2 = {{1, 1}, {1, 1}};
+//    REQUIRE(m1 == m2);
+//}
+
+// TEST_CASE("Static initialize with zeros")
+//{
+//    Matrix m = Matrix<int>::zeros(2, 2);
 //}
 
 // TEST_CASE("operator+") {
