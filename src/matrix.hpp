@@ -8,10 +8,18 @@ namespace space {
 template <typename Type = float> class Matrix {
   public:
     typedef std::vector<Type> Vector;
+    typedef typename Vector::iterator iterator;
+    typedef typename Vector::const_iterator const_iterator;
     typedef std::vector<int> ShapeVector;
 
     Vector _data;
     ShapeVector _shape{};
+
+    auto begin() -> iterator { return std::begin(_data); }
+    auto begin() const -> const_iterator { return std::cbegin(_data); }
+
+    auto end() -> iterator { return std::end(_data); }
+    auto end() const -> const_iterator { return std::cend(_data); }
 
     Matrix(int m, int n)
     {
@@ -36,9 +44,18 @@ template <typename Type = float> class Matrix {
         _shape = {m, n};
     }
 
-    auto operator=(std::initializer_list<Vector> initializer) -> Matrix &
+    auto operator=(std::initializer_list<Vector> initializer) -> Matrix
     {
-        return this(initializer);
+        return std::move(*this(initializer));
+    }
+
+    static auto zeros(int m, int n) -> Matrix { return std::move(Matrix(m, n)); }
+
+    static auto ones(int m, int n) -> Matrix
+    {
+        Matrix matrix(m, n);
+        std::fill(std::begin(matrix), std::end(matrix), 1);
+        return std::move(matrix);
     }
 
     bool operator==(const Matrix &rhs) const

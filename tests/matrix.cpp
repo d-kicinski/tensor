@@ -61,10 +61,19 @@ TEST_CASE("operator==")
     REQUIRE(m1 == m2);
 }
 
-// TEST_CASE("Static initialize with zeros")
-//{
-//    Matrix m = Matrix<int>::zeros(2, 2);
-//}
+TEST_CASE("Static initialize with zeros")
+{
+    auto m1 = Matrix<int>::zeros(2, 2);
+    auto m2 = Matrix<int>::zeros(2, 2);
+    REQUIRE(m1 == m2);
+}
+
+TEST_CASE("Static initialize with ones")
+{
+    auto m1 = Matrix<int>::ones(2, 2);
+    Matrix<int> m2 = {{1, 1}, {1, 1}};
+    REQUIRE(m1 == m2);
+}
 
 // TEST_CASE("operator+") {
 //    Tensor1D<int> v1{1, 1, 1, 1};
