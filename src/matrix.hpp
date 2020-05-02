@@ -10,7 +10,7 @@ template <typename Type = float> class Matrix {
     typedef std::vector<Type> Vector;
     typedef typename Vector::iterator iterator;
     typedef typename Vector::const_iterator const_iterator;
-    typedef std::vector<int> ShapeVector;
+    typedef std::vector<unsigned int> ShapeVector;
 
     Vector _data;
     ShapeVector _shape{};
@@ -21,7 +21,7 @@ template <typename Type = float> class Matrix {
     auto end() -> iterator { return std::end(_data); }
     auto end() const -> const_iterator { return std::cend(_data); }
 
-    Matrix(int m, int n)
+    Matrix(unsigned int m, unsigned int n)
     {
         _shape = {m, n};
         _data.resize(m * n);
@@ -41,7 +41,7 @@ template <typename Type = float> class Matrix {
             }
             _data.insert(std::end(_data), std::begin(element), std::end(element));
         }
-        _shape = {m, n};
+        _shape = {static_cast<unsigned int>(m), static_cast<unsigned int>(n)};
     }
 
     auto operator=(std::initializer_list<Vector> initializer) -> Matrix

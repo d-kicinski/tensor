@@ -7,13 +7,13 @@ using namespace std;
 TEST_CASE("Construct")
 {
     Matrix<int> matrix(3, 3);
-    REQUIRE(matrix.shape() == vector{3, 3});
+    REQUIRE(matrix.shape() == vector<unsigned int>{3, 3});
 }
 
 TEST_CASE("Construct using list_initialization")
 {
     Matrix<int> matrix{{0, 0}, {1, 1}, {2, 2}};
-    REQUIRE(matrix.shape() == vector{3, 2});
+    REQUIRE(matrix.shape() == vector<unsigned int>{3, 2});
 }
 
 TEST_CASE("Bracket operator")
