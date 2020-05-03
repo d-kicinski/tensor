@@ -1,8 +1,12 @@
 #pragma once
 
 #include "exceptions.hpp"
+#include <algorithm>
 #include <array>
+#include <chrono>
+#include <numeric>
 #include <vector>
+
 namespace space {
 
 template <typename Type = float> class Matrix {
@@ -26,6 +30,14 @@ template <typename Type = float> class Matrix {
         _shape = {m, n};
         _data.resize(m * n);
     };
+
+    Matrix(ShapeVector shape)
+    {
+        _shape = std::move(shape);
+        _data.resize(std::accumulate(std::begin(shape), std::end(shape), 0,
+                                     std::multiplies<>()));
+    };
+
     explicit Matrix(Vector const &data) { _data(data); }
 
     Matrix(std::initializer_list<Vector> initializer)
@@ -82,6 +94,19 @@ template <typename Type = float> class Matrix {
         return _data[index];
     }
 
-    [[nodiscard]] auto shape() const -> ShapeVector const & { return _shape; }
+    auto shape() const -> ShapeVector const & { return _shape; }
+
+    auto data() const -> Vector const & { return _data;}
+
+    friend auto operator+(Matrix const &lhs, Matrix const &rhs) -> Matrix
+    {
+        if (lhs.shape() != rhs.shape()) {
+            throw InvalidShapeException();
+        }
+        Matrix result(lhs);
+        std::transform(std::begin(lhs), std::end(lhs), std::begin(lhs), std::begin(result), std::plus<Type>());
+        return result;
+    }
 };
+
 }; // namespace space

@@ -10,6 +10,12 @@ TEST_CASE("Construct")
     REQUIRE(matrix.shape() == vector<unsigned int>{3, 3});
 }
 
+TEST_CASE("Construct with initializer list")
+{
+    Matrix<int> matrix{3, 3};
+    REQUIRE(matrix.shape() == vector<unsigned int>{3, 3});
+}
+
 TEST_CASE("Construct using list_initialization")
 {
     Matrix<int> matrix{{0, 0}, {1, 1}, {2, 2}};
@@ -75,8 +81,11 @@ TEST_CASE("Static initialize with ones")
     REQUIRE(m1 == m2);
 }
 
-// TEST_CASE("operator+") {
-//    Tensor1D<int> v1{1, 1, 1, 1};
-//    Tensor1D<int> v2{1, 1, 1, 1};
-//    Tensor1D<int> v3 = v1 + v2;
-//}
+ TEST_CASE("operator+") {
+    Matrix<int> m1 = {{1, 1}};
+    Matrix<int> m2 = {{1, 1}};
+    Matrix<int> m3 = m1 + m2;
+
+    Matrix<int> expected = {{2, 2}};
+    REQUIRE(expected == m3);
+}
