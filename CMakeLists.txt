@@ -6,10 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(lib/Catch2)
 add_subdirectory(lib/fmt)
 add_subdirectory(lib/GSL)
+add_subdirectory(lib/range-v3)
 
 add_library(algorithms STATIC
-        src/matrix.hpp
-        src/exceptions.hpp)
+        src/matrix.cpp
+        src/matrixiterator.cpp
+        src/exceptions.hpp
+        src/matrixview.cpp src/matrixview.hpp)
 set_target_properties(algorithms PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(algorithms
         INTERFACE
@@ -18,7 +21,9 @@ target_include_directories(algorithms
         )
 target_link_libraries(algorithms
         fmt::fmt
-        Microsoft.GSL::GSL)
+        Microsoft.GSL::GSL
+        range-v3::range-v3
+        )
 
 add_executable(tests
         tests/test_matrix.cpp
