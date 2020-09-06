@@ -14,7 +14,7 @@ add_library(algorithms STATIC
         src/exceptions.hpp
         src/matrixview.cpp src/matrixview.hpp
         src/flatarray.hpp
-        )
+        src/dimensions.hpp)
 set_target_properties(algorithms PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(algorithms
         INTERFACE
@@ -29,7 +29,7 @@ target_link_libraries(algorithms
 
 add_executable(tests
         tests/test_matrix.cpp
-        tests/main_catch2.cpp tests/test_plain_arrays.cpp tests/test_flatarray.cpp)
+        tests/main_catch2.cpp tests/test_plain_arrays.cpp tests/test_flatarray.cpp tests/test_dimensions.cpp)
 target_link_libraries(tests algorithms Catch2::Catch2)
 
 include(lib/Catch2/contrib/Catch.cmake)
