@@ -1,5 +1,7 @@
 #include <cstddef>
 
+#include "dimensions.hpp"
+
 /**
  *
  * @tparam Element is the type of array element
@@ -14,7 +16,7 @@ class FlatArray {
     using size_type = size_t;
     using dimension_index = int;
 
-    template<typename...Sizes>
+    template<typename ...Sizes>
     FlatArray(size_type first, Sizes... rest) {
         // allocate memory before set_sizes
        _dimensions = new size_type[Dim];
@@ -26,6 +28,15 @@ class FlatArray {
        for (size_type i = 0; i < _data_size; i++) {
            _data[i] = Element();
        }
+       _owner = true;
+    }
+
+    FlatArray(Dimensions const & sizes, Element* data) {
+        _dimensions = new size_type [Dim];
+        std::copy(sizes.dimensions, sizes.dimensions + Dim, _dimensions);
+        _data_size = sizes.data_size;
+        _owner = false;
+        _data = data;
     }
 
   private:
@@ -36,7 +47,7 @@ class FlatArray {
     // all the elements; their number is _data_size
     Element * _data;
 
-    bool _owner = true;
+    bool _owner;
 
     template <typename... Sizes>
     void set_sizes(dimension_index pos, size_type first, Sizes...rest) {
