@@ -78,8 +78,8 @@ auto Matrix::ones(int m, int n) -> Matrix
     return std::move(matrix);
 }
 
-auto Matrix::operator=(std::initializer_list<Vector> initializer) -> Matrix
-{
-    //    return std::move(*thisinitializer));
-}
+//auto Matrix::operator=(std::initializer_list<Vector> initializer) -> Matrix
+//{
+//    //    return std::move(*thisinitializer));
+//}
 } // namespace space
