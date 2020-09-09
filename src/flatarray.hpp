@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "dimensions.hpp"
+#include "exceptions.hpp"
 
 /**
  *
@@ -45,6 +46,22 @@ class FlatArray {
     template <typename ...Indices>
     Element & operator()(size_type first, Indices... rest) {
         return _data[get_index(0, 0, first, rest...)];
+    }
+
+    template <typename ...Sizes>
+    void resize(Sizes... sizes) {
+        if constexpr (AllocationFlag) {
+            if (_owner) {
+                set_sizes(0, sizes...);
+                delete [] _data;
+                _data = new Element();
+                for (int i = 0; i < _data_size; ++i) {
+                    _data[i] = Element();
+                }
+            } else
+                throw space::FlatArrayException();
+        } else
+            throw space::FlatArrayException();
     }
 
   private:
