@@ -62,4 +62,19 @@ class FlatArray {
            set_sizes(pos+1, rest...);
        }
     }
+
+    template<typename... Indices>
+    size_type get_index(dimension_index pos, size_type prev_index, size_type first, Indices... rest) {
+        size_type index =  (prev_index * _dimensions[pos]) + first;
+        if constexpr (sizeof...(rest) > 0) {
+            get_index(pos + 1, index, rest...);
+        } else {
+           return index;
+        }
+    }
+
+    template <typename Indices>
+    Element & operator()(size_type first, Indices rest) {
+        return _data[get_index(0, 0, first, rest)];
+    }
 };
