@@ -43,9 +43,28 @@ class FlatArray {
         _owner = false;
     }
 
+    // getting a reference to a subarray
+    // wtf with Dim + 1 and AllocationFlag2?
+    template <bool AllocationFlag2>
+    FlatArray( FlatArray<Element, Dim + 1, AllocationFlag2> const & array, size_type index) {
+        _data_size = array._data_size / array._dimensions[0];
+        _dimensions = array._dimensions + 1;
+        size_type m = 1;
+        for (dimension_index i = 0; i < Dim; ++i) {
+            m *= _dimensions[i];
+        }
+        _data = array._data + index * m;
+    }
+
     template <typename ...Indices>
-    Element & operator()(size_type first, Indices... rest) {
-        return _data[get_index(0, 0, first, rest...)];
+    decltype(auto) operator()(size_type first, Indices... rest) {
+        if constexpr (sizeof...(Indices) == Dim - 1) {
+            return _data[get_index(0, 0, first, rest...)];
+        } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
+            return FlatArray<Element, Dim -1, false>(*this, first);
+        } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
+           return FlatArray<Element, Dim - 1, false>(*this, first)(rest...);
+        }
     }
 
     template <typename ...Sizes>
