@@ -25,6 +25,7 @@ class FlatArray {
        _data = new Element[_data_size];
 
        // use default init for all elements
+       // btw, calling default constructor is default behaviour of cpp
        for (size_type i = 0; i < _data_size; i++) {
            _data[i] = Element();
        }
@@ -32,11 +33,11 @@ class FlatArray {
     }
 
     FlatArray(Dimensions const & sizes, Element* data) {
-        _dimensions = new size_type [Dim];
+        _data = data;
+        _dimensions = new size_type[Dim];
         std::copy(sizes.dimensions, sizes.dimensions + Dim, _dimensions);
         _data_size = sizes.data_size;
         _owner = false;
-        _data = data;
     }
 
   private:
