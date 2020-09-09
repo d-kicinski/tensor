@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <iostream>
 
 #include "dimensions.hpp"
 
@@ -12,6 +13,7 @@
 
 template <typename Element, int Dim, bool AllocationFlag = true>
 class FlatArray {
+
   public:
     using size_type = size_t;
     using dimension_index = int;
@@ -38,6 +40,11 @@ class FlatArray {
         std::copy(sizes.dimensions, sizes.dimensions + Dim, _dimensions);
         _data_size = sizes.data_size;
         _owner = false;
+    }
+
+    template <typename ...Indices>
+    Element & operator()(size_type first, Indices... rest) {
+        return _data[get_index(0, 0, first, rest...)];
     }
 
   private:
@@ -73,8 +80,16 @@ class FlatArray {
         }
     }
 
-    template <typename Indices>
-    Element & operator()(size_type first, Indices rest) {
-        return _data[get_index(0, 0, first, rest)];
-    }
 };
+
+template <typename Element, int Dim>
+void print_flat_array(FlatArray<Element, Dim> &flat_array)
+{
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            std::cout << "(" << i << "," << j << ")=" << flat_array(i, j) << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
