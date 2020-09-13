@@ -60,7 +60,7 @@ TEST_CASE("Constructs by assigment")
     REQUIRE(m1[{0, 1}] == 1);
 }
 
-TEST_CASE("operator==")
+TEST_CASE("space::matrix::operator==")
 {
     Matrix m1 = {{1, 1}, {1, 1}};
     Matrix m2 = {{1, 1}, {1, 1}};
