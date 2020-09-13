@@ -14,30 +14,27 @@ template <typename ValueType> auto initialized_array(size_t size, ValueType valu
 TEST_CASE("simple initialization")
 {
     FlatArray<float, 3> flat_array(2, 2, 1);
-    FlatArray<float, 1> flat_array2(2, 2, 1);
+    REQUIRE(flat_array.shape() == std::vector{2, 2, 1});
 }
 
 TEST_CASE("not the owner of the data")
 {
     std::vector<std::string> vector{"Foo", "Bar", "0", "Spam", "Spam", "1"};
     FlatArray<std::string, 2> array{Dimensions{2, 3}, vector.data()};
+    REQUIRE(array.shape() == std::vector{2, 3});
 }
 
 TEST_CASE("indexing multidimensional array")
 {
-    float const expected_value = 2.0;
-    float *array = initialized_array(6, expected_value);
-    FlatArray<float, 2> flat_array{Dimensions{2, 3}, array};
+    int const expected_value = 2;
+    int *array = initialized_array(6, 0);
+    FlatArray<int, 2> flat_array(Dimensions{2, 3}, array);
 
     array[0] = expected_value;
-    print(flat_array);
-
     REQUIRE(expected_value == array[0]);
     REQUIRE(expected_value == flat_array(0, 0));
 
     array[2 * 3 - 1] = expected_value;
-    print(flat_array);
-
     REQUIRE(expected_value == array[2 * 3 - 1]);
     REQUIRE(expected_value == flat_array(1, 2));
 }

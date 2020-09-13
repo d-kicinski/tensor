@@ -73,7 +73,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         _owner = true;
     }
 
-    FlatArray(Dimensions const &sizes, Element *data)
+    FlatArray(Dimensions const & sizes, Element *data)
     {
         _data = data;
         _dimensions = new size_type[Dim];
@@ -111,6 +111,8 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
             return FlatArray<Element, Dim - 1, false>(*this, first);
         } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
             return FlatArray<Element, Dim - 1, false>(*this, first)(rest...);
+        } else {
+            throw space::FlatArrayException("operator()");
         }
     }
 
@@ -190,7 +192,6 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         } else {
             return index;
         }
-        return -1;
     }
 };
 
