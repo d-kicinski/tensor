@@ -75,3 +75,14 @@ TEST_CASE("operator==")
     REQUIRE((array_different_value != array));
     REQUIRE((array_different_shape != array));
 }
+
+TEST_CASE("basic iterator")
+{
+   int array[6] = {0, 1, 2, 3, 4, 5};
+   FlatArray<int, 1> flat_array(Dimensions{1}, array);
+   int expected_element = 0;
+   for (auto element: flat_array) {
+       REQUIRE(expected_element == element);
+       ++expected_element;
+   }
+}
