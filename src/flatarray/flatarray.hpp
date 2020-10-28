@@ -1,97 +1,14 @@
+#pragma once
+
 #include <cstddef>
 #include <iostream>
 
 #include "dimensions.hpp"
 #include "exceptions.hpp"
+#include "iterator.hpp"
 
 // Forward declaration
 template <typename Element, int Dim, bool AllocationFlag> class FlatArray;
-
-template <typename Element, int Dim, bool AllocationFlag>
-auto print(FlatArray<Element, Dim, AllocationFlag> &flat_array) -> void
-{
-    for (int i = 0; i < 2; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            std::cout << "(" << i << "," << j << ")=" << flat_array(i, j) << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-template <typename Element> auto print(std::vector<Element> vector) -> void
-{
-    for (auto e : vector) {
-        std::cout << e << " ";
-    }
-    std::cout << std::endl;
-}
-
-template <typename Element> auto print(Element *vector, size_t size)
-{
-    for (int i = 0; i < size; ++i) {
-        std::cout << *(vector + i) << " ";
-    }
-    std::cout << std::endl;
-}
-
-template <typename Element, bool direction> class IteratorClass {
-    Element *_element;
-    std::size_t _index;
-
-  public:
-    typedef std::forward_iterator_tag iterator_category;
-
-    IteratorClass(Element *element, std::size_t index) : _element(element), _index(index) {}
-
-    auto operator++() -> IteratorClass &
-    {
-        if (direction) {
-            ++_index;
-        } else {
-            --_index;
-        }
-        return *this;
-    }
-
-    auto operator++(int) -> IteratorClass
-    {
-        std::size_t temp = _index;
-        ++(*this);
-        return IteratorClass(_element, temp);
-    }
-
-    auto operator*() -> Element & { return _element[_index]; }
-
-    auto operator*() const -> Element const & { return _element[_index]; }
-
-    auto operator->() -> Element * { return &_element[_index]; }
-
-    friend auto operator==(IteratorClass const & lhs, IteratorClass const & rhs) -> bool {
-        // comparing addresses because I can't assume Element will have operator== implemented
-        return &(lhs._element[lhs._index]) == &(rhs._element[rhs._index]);
-    }
-
-    friend auto operator!=(IteratorClass const & lhs, IteratorClass const & rhs) -> bool {
-        return &(lhs._element[lhs._index]) != &(rhs._element[rhs._index]);
-    }
-
-    static auto begin(Element * element, std::size_t length) -> IteratorClass {
-        if (direction) {
-           return IteratorClass(element, 0);
-        } else {
-            return IteratorClass(element, length - 1);
-        }
-    }
-
-    static auto end(Element * element, std::size_t length) -> IteratorClass {
-        if (direction) {
-            return IteratorClass(element, length);
-        } else {
-            return IteratorClass(element, static_cast<std::size_t>(-1));
-        }
-    }
-};
 
 /**
  *
@@ -107,10 +24,74 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     using size_type = size_t;
     using dimension_index = int;
 
-    auto data_size() -> size_type { return _data_size; }
-    auto data() -> Element * { return _data; };
-    auto owner() -> bool { return _owner; };
-    auto dimensions() -> size_type * { return _dimensions; };
+    auto data_size() const -> size_type { return _data_size; }
+    auto data() const -> Element * { return _data; };
+    auto owner() const -> bool { return _owner; };
+    auto dimensions() const -> size_type * { return _dimensions; };
+
+    FlatArray()
+    {
+        _dimensions = new size_type[Dim];
+        _data_size = 0;
+        _data = nullptr;
+    }
+
+//    ~FlatArray()
+//    {
+//        if constexpr (AllocationFlag) {
+//            delete[] _dimensions;
+//            if (_owner) {
+//                delete _data;
+//            }
+//        }
+//    }
+
+    FlatArray(std::initializer_list<Element> list)
+    {
+        _dimensions = new size_type[Dim];
+        _data_size = 0;
+        _data = nullptr;
+
+        if (list.size() == 0) {
+            return;
+        }
+        _data_size = list.size();
+        _dimensions[0] = _data_size;
+        _data = new Element[_data_size];
+        size_type i = 0;
+        for (Element const & element: list) {
+           _data[i++]  = element;
+        }
+    }
+
+    FlatArray(std::initializer_list<FlatArray<Element, Dim - 1>> list)
+    {
+        _dimensions = new size_type[Dim];
+        if (list.size() == 0) {
+           _data_size = 0;
+           _data = nullptr;
+           return;
+        }
+
+        size_type first_dim = list.size();
+        size_type counter = 0;
+        for (FlatArray<Element, Dim - 1> const & e : list)
+        {
+            if (counter == 0) {
+                _dimensions[0] = first_dim;
+                std::copy(e.dimensions(), e.dimensions() + Dim - 1, _dimensions + 1);
+            }
+            counter += e.data_size();
+        }
+        _data_size = counter;
+        _data = new Element[_data_size];
+
+        Element * data_end = _data;
+        for (FlatArray<Element, Dim -  1> const & e : list)
+        {
+            data_end = std::copy(e._data, e._data + e._data_size, data_end);
+        }
+    }
 
     template <typename... Sizes> FlatArray(size_type first, Sizes... rest)
     {
@@ -138,7 +119,6 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     }
 
     // getting a reference to a subarray
-    // wtf with Dim + 1 and AllocationFlag2?
     template <bool AllocationFlag2>
     FlatArray(FlatArray<Element, Dim + 1, AllocationFlag2> array, size_type index)
     {
@@ -151,12 +131,11 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         _data = array.data() + index * m;
     }
 
-
-    using iterator = IteratorClass<Element, true>;
+    using iterator = IteratorClass<Element>;
     auto begin() -> iterator { iterator::begin(data(), data_size()); }
     auto end() -> iterator { iterator::end(data(), data_size()); }
 
-    using const_iterator = IteratorClass<Element, true>;
+    using const_iterator = IteratorClass<Element>;
     auto begin() const -> const_iterator { iterator::begin(data(), data_size()); }
     auto end() const -> const_iterator { iterator::end(data(), data_size()); }
 
@@ -190,14 +169,14 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         }
     }
 
-    auto operator==(FlatArray<Element, Dim, AllocationFlag> other) -> bool
+    auto operator==(FlatArray<Element, Dim, AllocationFlag> other) const -> bool
     {
-        if (_data_size != other._data_size) {
+        if (_data_size != other.data_size()) {
             return false;
         }
 
         for (int i = 0; i < _data_size; ++i) {
-            if (other[i] != _data[i]) {
+            if (other.data()[i] != _data[i]) {
                 return false;
             }
         }
@@ -233,7 +212,12 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     // all the elements; their number is _data_size
     Element *_data;
 
-    bool _owner;
+    bool _owner = true;
+
+    friend class FlatArray<Element, Dim - 1, true>;
+    friend class FlatArray<Element, Dim - 1, false>;
+    friend class FlatArray<Element, Dim + 1, true>;
+    friend class FlatArray<Element, Dim + 1, false>;
 
     template <typename... Sizes>
     auto set_sizes(dimension_index pos, size_type first, Sizes... rest) -> void

@@ -1,4 +1,4 @@
-#include "flatarray.hpp"
+#include "flatarray/flatarray.hpp"
 #include <catch2/catch.hpp>
 #include <iostream>
 
@@ -22,6 +22,26 @@ TEST_CASE("not the owner of the data")
     std::vector<std::string> vector{"Foo", "Bar", "0", "Spam", "Spam", "1"};
     FlatArray<std::string, 2> array{Dimensions{2, 3}, vector.data()};
     REQUIRE(array.shape() == std::vector{2, 3});
+}
+
+TEST_CASE("simple initializer_list")
+{
+    FlatArray<int, 1> array = {0, 1, 2, 3};
+    REQUIRE(array.shape() == std::vector{4});
+    REQUIRE(array.data_size() == 4);
+    REQUIRE(array.data()[3] == 3);
+}
+
+TEST_CASE("nested initializer_list")
+{
+    FlatArray<int, 2> array = {{0, 1},
+                               {2, 3}};
+    REQUIRE(array.shape() == std::vector{2, 2});
+    REQUIRE(array.data_size() == 4);
+    REQUIRE(array.data()[0] == 0);
+    REQUIRE(array.data()[1] == 1);
+    REQUIRE(array.data()[2] == 2);
+    REQUIRE(array.data()[3] == 3);
 }
 
 TEST_CASE("indexing multidimensional array")
@@ -56,7 +76,6 @@ TEST_CASE("shape: scalar")
 TEST_CASE("operator[]")
 {
     FlatArray<int, 2> matrix{Dimensions{2, 3}, initialized_array(6, 1)};
-    print(matrix.dimensions(), 2);
 
     FlatArray<int, 1, false> array = matrix[0];
     std::vector<int> expected_shape{3};

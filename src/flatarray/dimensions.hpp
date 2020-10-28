@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 
 class Dimensions {
   public:
@@ -9,14 +10,14 @@ class Dimensions {
     size_type *dimensions;
     size_type data_size;
 
-    template<typename ...Sizes>
-    Dimensions(size_type first, Sizes... rest) {
+    template <typename... Sizes> Dimensions(size_type first, Sizes... rest)
+    {
         dimensions = new size_type[sizeof...(rest) + 1];
         set_sizes(0, first, rest...);
     }
 
-    template <typename... Sizes>
-    void set_sizes(dimension_index pos, size_type first, Sizes...rest) {
+    template <typename... Sizes> void set_sizes(dimension_index pos, size_type first, Sizes... rest)
+    {
         if (pos == 0) {
             data_size = 1;
         }
@@ -24,7 +25,7 @@ class Dimensions {
         data_size *= first;
 
         if constexpr (sizeof...(rest) > 0) {
-            set_sizes(pos+1, rest...);
+            set_sizes(pos + 1, rest...);
         }
     }
 };
