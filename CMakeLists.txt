@@ -1,21 +1,22 @@
 cmake_minimum_required(VERSION 3.12)
 project(TensorOps LANGUAGES CXX)
-set(LIBRARY_NAME tensorops)
+set(LIBRARY_NAME tensor)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 add_subdirectory(lib/Catch2)
 add_subdirectory(lib/fmt)
 
-option(USE_BLAS OFF)
-option(TENSOROPS_ENABLE_COVERAGE OFF)
+option(TENSOR_USE_BLAS "" OFF)
+option(TENSOR_ENABLE_COVERAGE OFF)
 
-add_library(${LIBRARY_NAME} STATIC
+add_library(${LIBRARY_NAME} SHARED
         src/exceptions.hpp
-        src/flatarray/flatarray.hpp
-        src/flatarray/iterator.hpp
-        src/flatarray/dimensions.hpp
-        src/flatarray/ops.hpp)
+        src/tensor/ts.hpp
+        src/tensor/tensor.hpp
+        src/tensor/iterator.hpp
+        src/tensor/dimensions.hpp
+        src/tensor/ops.hpp)
 set_target_properties(${LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(${LIBRARY_NAME}
         INTERFACE
@@ -26,29 +27,34 @@ target_include_directories(${LIBRARY_NAME}
 target_link_libraries(${LIBRARY_NAME}
         fmt::fmt)
 
-if(USE_BLAS)
+if(TENSOR_USE_BLAS)
+    message("Using BLAS for matrix operations.")
     find_package(BLAS REQUIRED)
     target_compile_definitions(${LIBRARY_NAME} PUBLIC USE_BLAS)
     target_link_libraries(${LIBRARY_NAME}
             ${BLAS_LIBRARIES})
-
 endif()
 
-add_executable(tests
-        tests/main_catch2.cpp
-        tests/flatarray/test_flatarray.cpp
-        tests/flatarray/test_dimensions.cpp
-        tests/flatarray/test_dot.cpp)
-target_link_libraries(tests ${LIBRARY_NAME} Catch2::Catch2)
 
-include(lib/Catch2/contrib/Catch.cmake)
-enable_testing()
-catch_discover_tests(tests)
+# Enable tests only if project is not imported via add_subdirectory()
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    add_executable(tests
+            tests/main_catch2.cpp
+            tests/tensor/test_flatarray.cpp
+            tests/tensor/test_dimensions.cpp
+            tests/tensor/test_dot.cpp)
+    target_link_libraries(tests ${LIBRARY_NAME} Catch2::Catch2)
 
-if (TENSOROPS_ENABLE_COVERAGE)
-    set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
-    find_package(codecov)
-    add_coverage(tests)
-    list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
-    coverage_evaluate()
-endif ()
+    include(lib/Catch2/contrib/Catch.cmake)
+    enable_testing()
+    catch_discover_tests(tests)
+
+    if (TENSOR_ENABLE_COVERAGE)
+        set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
+        find_package(codecov)
+        add_coverage(tests)
+        list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
+        coverage_evaluate()
+    endif ()
+endif()
+
