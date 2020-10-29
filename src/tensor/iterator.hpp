@@ -1,5 +1,6 @@
 #pragma once
 
+namespace ts {
 
 template <typename Element> class IteratorClass {
     Element *_element;
@@ -46,3 +47,5 @@ template <typename Element> class IteratorClass {
         return IteratorClass(element, length);
     }
 };
+
+}

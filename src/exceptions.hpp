@@ -4,7 +4,7 @@
 #include <string>
 #include <utility>
 
-namespace space {
+namespace ts {
 
 class InvalidShapeException : std::exception {
     [[nodiscard]] const char *what() const noexcept override { return "Invalid shapes"; }
@@ -23,12 +23,13 @@ class IndexOutOfRangeException : std::exception {
     int _index;
     std::string _message;
 };
-class FlatArrayException : std::exception {
+class TensorException : std::exception {
   public:
     std::string _message;
-    FlatArrayException() : FlatArrayException("cannot resize a non-owner") {}
-    FlatArrayException(std::string message) : _message(std::move(message)) {}
+    TensorException() : TensorException("cannot resize a non-owner") {}
+    explicit TensorException(std::string message) : _message(std::move(message)) {}
 
     [[nodiscard]] const char *what() const noexcept override { return _message.data(); }
 };
-} // namespace space
+
+} // namespace ts

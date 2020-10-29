@@ -1,8 +1,10 @@
 #pragma once
-#include "flatarray.hpp"
+#include "tensor.hpp"
 
-using Matrix = FlatArray<float, 2>;
-using Vector = FlatArray<float, 1>;
+namespace ts {
+
+using Matrix = Tensor<float, 2>;
+using Vector = Tensor<float, 1>;
 
 auto dot(Matrix A, Vector x) -> Vector
 {
@@ -36,4 +38,6 @@ auto dot(Matrix A, Matrix B) -> Matrix
         }
     }
     return C;
+}
+
 }

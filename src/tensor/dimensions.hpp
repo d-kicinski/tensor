@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+namespace ts {
+
 class Dimensions {
   public:
     using size_type = size_t;
@@ -29,3 +31,5 @@ class Dimensions {
         }
     }
 };
+
+}

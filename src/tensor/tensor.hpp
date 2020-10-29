@@ -8,8 +8,10 @@
 #include "exceptions.hpp"
 #include "iterator.hpp"
 
+namespace ts {
+
 // Forward declaration
-template <typename Element, int Dim, bool AllocationFlag> class FlatArray;
+template <typename Element, int Dim, bool AllocationFlag> class Tensor;
 
 /**
  *
@@ -19,7 +21,7 @@ template <typename Element, int Dim, bool AllocationFlag> class FlatArray;
  *  are allocated or referenced
  */
 
-template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray {
+template <typename Element, int Dim, bool AllocationFlag = true> class Tensor {
 
   public:
     using size_type = size_t;
@@ -30,25 +32,25 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     auto owner() const -> bool { return _owner; };
     auto dimensions() const -> size_type * { return _dimensions; };
 
-    FlatArray()
+    Tensor()
     {
         _dimensions = new size_type[Dim];
         _data_size = 0;
         _data = nullptr;
     }
 
-    ~FlatArray()
+    ~Tensor()
     {
-// TODO: this causes SEGFAULT :/
-//        if constexpr (AllocationFlag) {
-//            delete[] _dimensions;
-//            if (_owner) {
-//                delete _data;
-//            }
-//        }
+        // TODO: this causes SEGFAULT :/
+        //        if constexpr (AllocationFlag) {
+        //            delete[] _dimensions;
+        //            if (_owner) {
+        //                delete _data;
+        //            }
+        //        }
     }
 
-    FlatArray(std::initializer_list<Element> list)
+    Tensor(std::initializer_list<Element> list)
     {
         _dimensions = new size_type[Dim];
         _data_size = 0;
@@ -61,24 +63,23 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         _dimensions[0] = _data_size;
         _data = new Element[_data_size];
         size_type i = 0;
-        for (Element const & element: list) {
-           _data[i++]  = element;
+        for (Element const &element : list) {
+            _data[i++] = element;
         }
     }
 
-    FlatArray(std::initializer_list<FlatArray<Element, Dim - 1>> list)
+    Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list)
     {
         _dimensions = new size_type[Dim];
         if (list.size() == 0) {
-           _data_size = 0;
-           _data = nullptr;
-           return;
+            _data_size = 0;
+            _data = nullptr;
+            return;
         }
 
         size_type first_dim = list.size();
         size_type counter = 0;
-        for (FlatArray<Element, Dim - 1> const & e : list)
-        {
+        for (Tensor<Element, Dim - 1> const &e : list) {
             if (counter == 0) {
                 _dimensions[0] = first_dim;
                 std::copy(e.dimensions(), e.dimensions() + Dim - 1, _dimensions + 1);
@@ -88,14 +89,13 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         _data_size = counter;
         _data = new Element[_data_size];
 
-        Element * data_end = _data;
-        for (FlatArray<Element, Dim -  1> const & e : list)
-        {
+        Element *data_end = _data;
+        for (Tensor<Element, Dim - 1> const &e : list) {
             data_end = std::copy(e._data, e._data + e._data_size, data_end);
         }
     }
 
-    template <typename... Sizes> FlatArray(size_type first, Sizes... rest)
+    template <typename... Sizes> Tensor(size_type first, Sizes... rest)
     {
         // allocate memory before set_sizes
         _dimensions = new size_type[Dim];
@@ -111,7 +111,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         _owner = true;
     }
 
-    FlatArray(Dimensions const &sizes, Element *data)
+    Tensor(Dimensions const &sizes, Element *data)
     {
         _data = data;
         _dimensions = new size_type[Dim];
@@ -122,7 +122,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
 
     // getting a reference to a subarray
     template <bool AllocationFlag2>
-    FlatArray(FlatArray<Element, Dim + 1, AllocationFlag2> array, size_type index)
+    Tensor(Tensor<Element, Dim + 1, AllocationFlag2> array, size_type index)
     {
         _data_size = array.data_size() / array.dimensions()[0];
         _dimensions = array.dimensions() + 1;
@@ -155,11 +155,11 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         if constexpr (sizeof...(Indices) == Dim - 1) {
             return _data[get_index(0, 0, first, rest...)];
         } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
-            return FlatArray<Element, Dim - 1, false>(*this, first);
+            return Tensor<Element, Dim - 1, false>(*this, first);
         } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
-            return FlatArray<Element, Dim - 1, false>(*this, first)(rest...);
+            return Tensor<Element, Dim - 1, false>(*this, first)(rest...);
         } else {
-            throw space::FlatArrayException("operator()");
+            throw TensorException("operator()");
         }
     }
 
@@ -168,7 +168,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         if constexpr (Dim == 1) {
             return _data[i];
         } else {
-            return FlatArray<Element, Dim - 1, false>(*this, i);
+            return Tensor<Element, Dim - 1, false>(*this, i);
         }
     }
 
@@ -177,11 +177,11 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         if constexpr (Dim == 1) {
             return _data[i];
         } else {
-            return FlatArray<Element, Dim - 1, false>(*this, i);
+            return Tensor<Element, Dim - 1, false>(*this, i);
         }
     }
 
-    auto operator==(FlatArray<Element, Dim, AllocationFlag> other) const -> bool
+    auto operator==(Tensor<Element, Dim, AllocationFlag> other) const -> bool
     {
         if (_data_size != other.data_size()) {
             return false;
@@ -195,22 +195,20 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         return true;
     }
 
-    auto operator!=(FlatArray<Element, Dim, AllocationFlag> const &other) -> bool
+    auto operator!=(Tensor<Element, Dim, AllocationFlag> const &other) -> bool
     {
         return !(*this == other);
     }
 
-    auto operator=(FlatArray const & x) -> FlatArray &
+    auto operator=(Tensor const &x) -> Tensor &
     {
-        if constexpr (AllocationFlag)
-        {
-            if (_data_size != x.data_size())
-            {
-                if (!_owner)
-                {
+        if constexpr (AllocationFlag) {
+            if (_data_size != x.data_size()) {
+                if (!_owner) {
                     std::ostringstream ss;
-                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size << " size2: " << x.m_dataSize;
-                    throw space::FlatArrayException(ss.str());
+                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
+                       << " size2: " << x.m_dataSize;
+                    throw TensorException(ss.str());
                 }
                 delete[] _data;
                 _data_size = x.data_size();
@@ -219,9 +217,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
 
             std::copy(x.data(), x.data() + _data_size, _data);
             std::copy(x.dimensions(), x.dimensions() + Dim, _dimensions);
-        }
-        else
-        {
+        } else {
             _dimensions = x.dimensions();
             _data_size = x.data_size();
             _data = x.data();
@@ -229,18 +225,15 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         return *this;
     }
 
-    template <bool copy2>
-    auto operator=(FlatArray<Element, Dim, copy2> const & x) -> FlatArray &
+    template <bool copy2> auto operator=(Tensor<Element, Dim, copy2> const &x) -> Tensor &
     {
-        if constexpr (AllocationFlag)
-        {
-            if (_data_size != x.m_dataSize)
-            {
-                if (!_owner)
-                {
+        if constexpr (AllocationFlag) {
+            if (_data_size != x.m_dataSize) {
+                if (!_owner) {
                     std::ostringstream ss;
-                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size << " size2: " << x.m_dataSize;
-                    throw space::FlatArrayException(ss.str());
+                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
+                       << " size2: " << x.m_dataSize;
+                    throw TensorException(ss.str());
                 }
                 delete[] _data;
                 _data_size = x.m_dataSize;
@@ -249,9 +242,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
 
             std::copy(x.m_data, x.m_data + _data_size, _data);
             std::copy(x.m_dimensions, x.m_dimensions + Dim, _dimensions);
-        }
-        else
-        {
+        } else {
             _dimensions = x.dimensions();
             _data_size = x.data_size();
             _data = x.data();
@@ -270,9 +261,9 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
                     _data[i] = Element();
                 }
             } else
-                throw space::FlatArrayException();
+                throw TensorException();
         } else
-            throw space::FlatArrayException();
+            throw TensorException();
     }
 
   private:
@@ -285,10 +276,10 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
 
     bool _owner = true;
 
-    friend class FlatArray<Element, Dim - 1, true>;
-    friend class FlatArray<Element, Dim - 1, false>;
-    friend class FlatArray<Element, Dim + 1, true>;
-    friend class FlatArray<Element, Dim + 1, false>;
+    friend class Tensor<Element, Dim - 1, true>;
+    friend class Tensor<Element, Dim - 1, false>;
+    friend class Tensor<Element, Dim + 1, true>;
+    friend class Tensor<Element, Dim + 1, false>;
 
     template <typename... Sizes>
     auto set_sizes(dimension_index pos, size_type first, Sizes... rest) -> void
@@ -316,3 +307,5 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         }
     }
 };
+
+}  // namespace ts

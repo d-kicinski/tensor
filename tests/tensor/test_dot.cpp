@@ -1,7 +1,8 @@
 #include <catch2/catch.hpp>
 
-#include "flatarray/ops.hpp"
+#include "tensor/ops.hpp"
 
+using namespace ts;
 
 TEST_CASE("dot: Matrix[2, 3] X Vector[3]")
 {
