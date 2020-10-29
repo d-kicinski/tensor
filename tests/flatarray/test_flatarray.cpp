@@ -5,7 +5,7 @@
 template <typename ValueType> auto initialized_array(size_t size, ValueType value) -> ValueType *
 {
     auto *array = new ValueType[size];
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < size; i++) {
         array[i] = value;
     }
     return array;
@@ -73,7 +73,7 @@ TEST_CASE("shape: scalar")
     REQUIRE(expected_shape == matrix.shape());
 }
 
-TEST_CASE("operator[]")
+TEST_CASE("bracket operator")
 {
     FlatArray<int, 2> matrix{Dimensions{2, 3}, initialized_array(6, 1)};
 
