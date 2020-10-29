@@ -135,12 +135,12 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     }
 
     using iterator = IteratorClass<Element>;
-    auto begin() -> iterator { iterator::begin(data(), data_size()); }
-    auto end() -> iterator { iterator::end(data(), data_size()); }
+    auto begin() -> iterator { return iterator::begin(data(), data_size()); }
+    auto end() -> iterator { return iterator::end(data(), data_size()); }
 
     using const_iterator = IteratorClass<Element>;
-    auto begin() const -> const_iterator { iterator::begin(data(), data_size()); }
-    auto end() const -> const_iterator { iterator::end(data(), data_size()); }
+    auto begin() const -> const_iterator { return iterator::begin(data(), data_size()); }
+    auto end() const -> const_iterator { return iterator::end(data(), data_size()); }
 
     auto shape() -> std::vector<int>
     {
@@ -310,7 +310,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     {
         size_type index = (prev_index * _dimensions[pos]) + first;
         if constexpr (sizeof...(rest) > 0) {
-            get_index(pos + 1, index, rest...);
+            return get_index(pos + 1, index, rest...);
         } else {
             return index;
         }
