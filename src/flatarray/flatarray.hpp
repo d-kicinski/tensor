@@ -37,15 +37,16 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
         _data = nullptr;
     }
 
-//    ~FlatArray()
-//    {
+    ~FlatArray()
+    {
+// TODO: this causes SEGFAULT :/
 //        if constexpr (AllocationFlag) {
 //            delete[] _dimensions;
 //            if (_owner) {
 //                delete _data;
 //            }
 //        }
-//    }
+    }
 
     FlatArray(std::initializer_list<Element> list)
     {
@@ -163,6 +164,15 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     }
 
     auto operator[](size_type i) -> decltype(auto)
+    {
+        if constexpr (Dim == 1) {
+            return _data[i];
+        } else {
+            return FlatArray<Element, Dim - 1, false>(*this, i);
+        }
+    }
+
+    auto operator[](size_type i) const -> decltype(auto)
     {
         if constexpr (Dim == 1) {
             return _data[i];
