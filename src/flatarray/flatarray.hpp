@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <sstream>
 
 #include "dimensions.hpp"
 #include "exceptions.hpp"
@@ -129,6 +130,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
             m *= _dimensions[i];
         }
         _data = array.data() + index * m;
+        _owner = false;
     }
 
     using iterator = IteratorClass<Element>;
@@ -186,6 +188,65 @@ template <typename Element, int Dim, bool AllocationFlag = true> class FlatArray
     auto operator!=(FlatArray<Element, Dim, AllocationFlag> const &other) -> bool
     {
         return !(*this == other);
+    }
+
+    auto operator=(FlatArray const & x) -> FlatArray &
+    {
+        if constexpr (AllocationFlag)
+        {
+            if (_data_size != x.data_size())
+            {
+                if (!_owner)
+                {
+                    std::ostringstream ss;
+                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size << " size2: " << x.m_dataSize;
+                    throw space::FlatArrayException(ss.str());
+                }
+                delete[] _data;
+                _data_size = x.data_size();
+                _data = new Element[data_size()];
+            }
+
+            std::copy(x.data(), x.data() + _data_size, _data);
+            std::copy(x.dimensions(), x.dimensions() + Dim, _dimensions);
+        }
+        else
+        {
+            _dimensions = x.dimensions();
+            _data_size = x.data_size();
+            _data = x.data();
+        }
+        return *this;
+    }
+
+    template <bool copy2>
+    auto operator=(FlatArray<Element, Dim, copy2> const & x) -> FlatArray &
+    {
+        if constexpr (AllocationFlag)
+        {
+            if (_data_size != x.m_dataSize)
+            {
+                if (!_owner)
+                {
+                    std::ostringstream ss;
+                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size << " size2: " << x.m_dataSize;
+                    throw space::FlatArrayException(ss.str());
+                }
+                delete[] _data;
+                _data_size = x.m_dataSize;
+                _data = new Element[_data_size];
+            }
+
+            std::copy(x.m_data, x.m_data + _data_size, _data);
+            std::copy(x.m_dimensions, x.m_dimensions + Dim, _dimensions);
+        }
+        else
+        {
+            _dimensions = x.dimensions();
+            _data_size = x.data_size();
+            _data = x.data();
+        }
+        return *this;
     }
 
     template <typename... Sizes> auto resize(Sizes... sizes) -> void
