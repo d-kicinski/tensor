@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.12)
 project(TensorOps LANGUAGES CXX)
 set(LIBRARY_NAME tensorops)
 set(CMAKE_CXX_STANDARD 17)
