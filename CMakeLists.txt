@@ -6,8 +6,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 add_subdirectory(lib/Catch2)
 add_subdirectory(lib/fmt)
-add_subdirectory(lib/GSL)
-add_subdirectory(lib/range-v3)
 
 option(USE_BLAS OFF)
 option(TENSOROPS_ENABLE_COVERAGE OFF)
@@ -26,10 +24,7 @@ target_include_directories(${LIBRARY_NAME}
         )
 
 target_link_libraries(${LIBRARY_NAME}
-        fmt::fmt
-        Microsoft.GSL::GSL
-        range-v3::range-v3)
-
+        fmt::fmt)
 
 if(USE_BLAS)
     find_package(BLAS REQUIRED)
