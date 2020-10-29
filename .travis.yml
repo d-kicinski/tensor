@@ -32,7 +32,7 @@ before_script:
     # Use Debug builds for running Valgrind and building examples
   - cmake -H. -BBuild-Debug -DCMAKE_BUILD_TYPE=Debug -Wdev -DTENSOROPS_ENABLE_COVERAGE=${COVERAGE}  -DCMAKE_CXX_STANDARD=${CPP_STANDARD} -DCMAKE_CXX_STANDARD_REQUIRED=On -DCMAKE_CXX_EXTENSIONS=OFF
   # Don't bother with release build for coverage build
-  - cmake -H. -BBuild-Release -DCMAKE_BUILD_TYPE=Release -Wdev -DCMAKE_CXX_STANDARD=${CPP_STANDARD} -DCMAKE_CXX_STANDARD_REQUIRED=On -DCMAKE_CXX_EXTENSIONS=OFF -DCATCH_DEVELOPMENT_BUILD=ON
+  - cmake -H. -BBuild-Release -DCMAKE_BUILD_TYPE=Release -Wdev -DCMAKE_CXX_STANDARD=${CPP_STANDARD} -DCMAKE_CXX_STANDARD_REQUIRED=On -DCMAKE_CXX_EXTENSIONS=OFF
 
 
 script:
@@ -46,7 +46,7 @@ script:
       make lcov
       bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
     fi
-  - # Go to release build
+  # Go to release build
   - cd ../Build-Release
   - make -j 2
   - CTEST_OUTPUT_ON_FAILURE=1 ctest -j 2
