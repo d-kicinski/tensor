@@ -13,6 +13,10 @@ namespace ts {
 // Forward declaration
 template <typename Element, int Dim, bool AllocationFlag> class Tensor;
 
+// Convenient typedefs
+typedef Tensor<float, 2, true> Matrix;
+typedef Tensor<float, 1, true> Vector;
+
 /**
  *
  * @tparam Element is the type of array element

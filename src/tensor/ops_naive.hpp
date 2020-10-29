@@ -1,10 +1,8 @@
 #pragma once
+
 #include "tensor.hpp"
 
 namespace ts {
-
-using Matrix = Tensor<float, 2>;
-using Vector = Tensor<float, 1>;
 
 auto dot(Matrix A, Vector x) -> Vector
 {

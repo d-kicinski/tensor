@@ -5,9 +5,6 @@
 
 namespace ts {
 
-using Matrix = Tensor<float, 2>;
-using Vector = Tensor<float, 1>;
-
 auto dot(Matrix A, Vector X) -> Vector
 {
     Vector Y(A.shape()[0]);
