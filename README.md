@@ -7,6 +7,9 @@ own naive implementations. The design goal is to create a numpy alike interface 
 with multidimensional arrays packaged in a simple, relatively lightweight, library that
 could be used on many different platforms like android phones and microcontrollers.
 
+#### How to use
+If you're using cmake see [tensor-example](https://github.com/dawidkski/tensor-example) for example usage.
+
 #### Usage
 Create multidimensional tensor:
 ```c++
