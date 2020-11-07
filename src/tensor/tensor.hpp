@@ -5,17 +5,14 @@
 #include <sstream>
 
 #include "dimensions.hpp"
-#include "exceptions.hpp"
 #include "iterator.hpp"
+#include "ops.hpp"
+#include "exceptions.hpp"
+
+#include "tensor_forward.hpp"
 
 namespace ts {
 
-// Forward declaration
-template <typename Element, int Dim, bool AllocationFlag> class Tensor;
-
-// Convenient typedefs
-typedef Tensor<float, 2, true> Matrix;
-typedef Tensor<float, 1, true> Vector;
 
 /**
  *
@@ -25,7 +22,7 @@ typedef Tensor<float, 1, true> Vector;
  *  are allocated or referenced
  */
 
-template <typename Element, int Dim, bool AllocationFlag = true> class Tensor {
+template <typename Element, int Dim, bool AllocationFlag> class Tensor {
 
   public:
     using size_type = size_t;
@@ -238,7 +235,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class Tensor {
         return *this;
     }
 
-    template <bool copy2> auto operator=(Tensor<Element, Dim, copy2> const &x) -> Tensor &
+    template <bool copy2> auto operator=(Tensor<Element, Dim, copy2> const & x) -> Tensor &
     {
         if constexpr (AllocationFlag) {
             if (_data_size != x.data_size()) {

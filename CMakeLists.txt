@@ -14,12 +14,15 @@ message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
 message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
 
 add_library(${LIBRARY_NAME} SHARED
-        src/exceptions.hpp
+        src/tensor/exceptions.hpp
         src/tensor/ts.hpp
         src/tensor/tensor.hpp
+        src/tensor/tensor.cpp
         src/tensor/iterator.hpp
         src/tensor/dimensions.hpp
-        src/tensor/ops.hpp)
+        src/tensor/ops_naive.cpp
+        src/tensor/ops_common.hpp
+        )
 set_target_properties(${LIBRARY_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(${LIBRARY_NAME}
         INTERFACE
@@ -43,9 +46,9 @@ endif()
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_executable(tests
             tests/main_catch2.cpp
-            tests/tensor/test_flatarray.cpp
+            tests/tensor/test_tensor.cpp
             tests/tensor/test_dimensions.cpp
-            tests/tensor/test_dot.cpp)
+            tests/tensor/test_ops.cpp)
     target_link_libraries(tests ${LIBRARY_NAME} Catch2::Catch2)
 
     include(lib/Catch2/contrib/Catch.cmake)

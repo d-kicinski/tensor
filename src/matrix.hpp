@@ -1,6 +1,6 @@
 #pragma once
 
-#include "exceptions.hpp"
+#include "tensor/exceptions.hpp"
 #include <algorithm>
 #include <array>
 #include <chrono>

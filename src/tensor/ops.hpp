@@ -5,3 +5,5 @@
 #else
     #include "ops_naive.hpp"
 #endif
+
+#include "ops_common.hpp"

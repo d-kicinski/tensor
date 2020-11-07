@@ -9,7 +9,7 @@ TEST_CASE("dot: Matrix[2, 3] X Vector[3]")
     Matrix matrix = {{1, 1, 1},
                      {2, 2, 2}};
     Vector vector = {1, 1, 1};
-    Vector result = dot(matrix, vector);
+    Vector result = multiply(matrix, vector);
     Vector expected_result = {3, 6};
 
     REQUIRE(expected_result == result);
@@ -24,7 +24,7 @@ TEST_CASE("dot: Matrix[3, 3] X Vector[3]")
         {2, 6, 5}
     };
     Vector vector= { -1, -1, 1 };
-    Vector result = dot(matrix, vector);
+    Vector result = multiply(matrix, vector);
     Vector expected_result = {-1, 3, -3};
 
     REQUIRE(expected_result == result);
@@ -37,7 +37,7 @@ TEST_CASE("dot: Matrix[3, 3] X Matrix[3, 3]")
         {1, 5, 9},
         {2, 6, 5}
     };
-    Matrix result = dot(matrix, matrix);
+    Matrix result = multiply(matrix, matrix);
     Matrix expected_result = {
         {16, 26, 33},
         {26, 80, 93},
@@ -58,11 +58,24 @@ TEST_CASE("dot: Matrix[2, 3] X Matrix[3, 2]")
         {1, 5},
         {2, 6}
     };
-    Matrix result = dot(matrixA, matrixB);
+    Matrix result = multiply(matrixA, matrixB);
     Matrix expected_result = {
         {16, 26},
         {26, 80},
     };
 
     REQUIRE(expected_result == result);
+}
+
+TEST_CASE("add")
+{
+    Matrix t1 = {{1, 1, 1},
+                 {1, 1, 1}};
+    Matrix t2 = {{1, 1, 1},
+                 {1, 1, 1}};
+    Matrix expected = {{2, 2, 2},
+                       {2, 2, 2}};
+    auto result = ts::add(t1, t2);
+
+    REQUIRE(result == expected);
 }
