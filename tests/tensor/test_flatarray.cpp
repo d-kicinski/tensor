@@ -108,6 +108,19 @@ TEST_CASE("basic iterator")
    }
 }
 
+TEST_CASE("copy constructor")
+{
+    Tensor<int, 2> t1 = {{1, 2, 3}, { 4, 5, 6}};
+    Tensor<int, 2> t2(t1);
+
+    REQUIRE(t2.owner() == true);
+    REQUIRE(t1 == t2);
+
+    t2(0, 0) = 1337;
+    REQUIRE(t1(0, 0) == 1);
+    REQUIRE(t2(0, 0) == 1337);
+}
+
 TEST_CASE("sub-array iterator 2D")
 {
 //    int array[6] = {0, 0, 1, 1, 2, 2};

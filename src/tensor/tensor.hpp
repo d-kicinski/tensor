@@ -124,6 +124,15 @@ template <typename Element, int Dim, bool AllocationFlag = true> class Tensor {
         _owner = false;
     }
 
+    Tensor(Tensor const & x)
+    {
+        _data_size = x.data_size();
+        _data = new Element[x.data_size()];
+        _dimensions = new size_type[Dim];
+        std::copy(x.data(), x.data() + data_size(), _data);
+        std::copy(x.dimensions(), x.dimensions() + Dim, _dimensions);
+    }
+
     // getting a reference to a subarray
     template <bool AllocationFlag2>
     Tensor(Tensor<Element, Dim + 1, AllocationFlag2> array, size_type index)
@@ -211,7 +220,7 @@ template <typename Element, int Dim, bool AllocationFlag = true> class Tensor {
                 if (!_owner) {
                     std::ostringstream ss;
                     ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
-                       << " size2: " << x.m_dataSize;
+                       << " size2: " << x.data_size();
                     throw TensorException(ss.str());
                 }
                 delete[] _data;
@@ -232,20 +241,20 @@ template <typename Element, int Dim, bool AllocationFlag = true> class Tensor {
     template <bool copy2> auto operator=(Tensor<Element, Dim, copy2> const &x) -> Tensor &
     {
         if constexpr (AllocationFlag) {
-            if (_data_size != x.m_dataSize) {
+            if (_data_size != x.data_size()) {
                 if (!_owner) {
                     std::ostringstream ss;
                     ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
-                       << " size2: " << x.m_dataSize;
+                       << " size2: " << x.data_size();
                     throw TensorException(ss.str());
                 }
                 delete[] _data;
-                _data_size = x.m_dataSize;
+                _data_size = x.data_size();
                 _data = new Element[_data_size];
             }
 
-            std::copy(x.m_data, x.m_data + _data_size, _data);
-            std::copy(x.m_dimensions, x.m_dimensions + Dim, _dimensions);
+            std::copy(x.data(), x.data() + _data_size, _data);
+            std::copy(x.dimensions(), x.dimensions() + Dim, _dimensions);
         } else {
             _dimensions = x.dimensions();
             _data_size = x.data_size();
