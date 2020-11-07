@@ -8,7 +8,10 @@ add_subdirectory(lib/Catch2)
 add_subdirectory(lib/fmt)
 
 option(TENSOR_USE_BLAS "" OFF)
-option(TENSOR_ENABLE_COVERAGE OFF)
+option(TENSOR_ENABLE_COVERAGE "" OFF)
+
+message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
+message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
 
 add_library(${LIBRARY_NAME} SHARED
         src/exceptions.hpp
