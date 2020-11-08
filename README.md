@@ -1,5 +1,5 @@
 # tensor
-[![Build Status](https://travis-ci.org/dawidkski/tensor.svg?branch=master)](https://travis-ci.org/dawidkski/tensor)
+[![Build Status](https://travis-ci.org/d-kicinski/tensor.svg?branch=master)](https://travis-ci.org/d-kicinski/tensor)
 [![codecov](https://codecov.io/gh/dawidkski/tensor/branch/master/graph/badge.svg?token=VN370FECA9)](https://codecov.io/gh/dawidkski/tensor)
 
 This library provides a class for interfacing with BLAS/LAPACK libraries with optional fallback to
