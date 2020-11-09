@@ -96,6 +96,33 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
         }
     }
 
+    Tensor(std::vector<Tensor<Element, Dim - 1>> list)
+    {
+        _dimensions = new size_type[Dim];
+        if (list.size() == 0) {
+            _data_size = 0;
+            _data = nullptr;
+            return;
+        }
+
+        size_type first_dim = list.size();
+        size_type counter = 0;
+        for (Tensor<Element, Dim - 1> const &e : list) {
+            if (counter == 0) {
+                _dimensions[0] = first_dim;
+                std::copy(e.dimensions(), e.dimensions() + Dim - 1, _dimensions + 1);
+            }
+            counter += e.data_size();
+        }
+        _data_size = counter;
+        _data = new Element[_data_size];
+
+        Element *data_end = _data;
+        for (Tensor<Element, Dim - 1> const &e : list) {
+            data_end = std::copy(e._data, e._data + e._data_size, data_end);
+        }
+    }
+
     template <typename... Sizes> Tensor(size_type first, Sizes... rest)
     {
         // allocate memory before set_sizes
@@ -152,7 +179,7 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
     auto begin() const -> const_iterator { return iterator::begin(data(), data_size()); }
     auto end() const -> const_iterator { return iterator::end(data(), data_size()); }
 
-    auto shape() -> std::vector<int>
+    auto shape() const -> std::vector<int>
     {
         std::vector<int> shape(_dimensions, _dimensions + Dim);
         shape.resize(Dim);
@@ -161,6 +188,20 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
 
     template <typename... Indices>
     auto operator()(size_type first, Indices... rest) -> decltype(auto)
+    {
+        if constexpr (sizeof...(Indices) == Dim - 1) {
+            return _data[get_index(0, 0, first, rest...)];
+        } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
+            return Tensor<Element, Dim - 1, false>(*this, first);
+        } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
+            return Tensor<Element, Dim - 1, false>(*this, first)(rest...);
+        } else {
+            throw TensorException("operator()");
+        }
+    }
+
+    template <typename... Indices>
+    auto operator()(size_type first, Indices... rest) const -> decltype(auto)
     {
         if constexpr (sizeof...(Indices) == Dim - 1) {
             return _data[get_index(0, 0, first, rest...)];
@@ -306,7 +347,7 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
     }
 
     template <typename... Indices>
-    auto get_index(dimension_index pos, size_type prev_index, size_type first, Indices... rest)
+    auto get_index(dimension_index pos, size_type prev_index, size_type first, Indices... rest) const
         -> size_type
     {
         size_type index = (prev_index * _dimensions[pos]) + first;

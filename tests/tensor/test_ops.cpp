@@ -79,3 +79,28 @@ TEST_CASE("add")
 
     REQUIRE(result == expected);
 }
+
+TEST_CASE("multiply: Tensor[2, 2, 2] x Matrix[2, 3]")
+{
+    Tensor<float, 3> tensorA = {
+        {{1, 1},
+         {2, 2}},
+
+        {{3, 3},
+         {4, 4}}
+    };
+    Matrix matrixB = {
+        {3, 1, 3},
+        {1, 5, 9},
+    };
+    Tensor<float, 3> expected = {
+        {{4, 6, 12},
+         {8, 12, 24}},
+
+        {{12, 18, 36},
+         {16, 24, 48}}
+    };
+    Tensor<float, 3> result = ts::multiply(tensorA, matrixB);
+
+    REQUIRE(result == expected);
+}
