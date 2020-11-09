@@ -77,10 +77,9 @@ TEST_CASE("shape: scalar")
 
 TEST_CASE("bracket operator")
 {
-    Tensor<int, 2> matrix{Dimensions{2, 3}, initialized_array(6, 1)};
-
-    Tensor<int, 1, false> array = matrix[0];
-    std::vector<int> expected_shape{3};
+    Tensor<int, 2> matrix{Dimensions{3, 2}, initialized_array(6, 1)};
+    Tensor<int, 1> array = matrix[0];
+    std::vector<int> expected_shape{2};
     REQUIRE(expected_shape == array.shape());
     REQUIRE(1 == array[0]);
 }

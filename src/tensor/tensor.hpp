@@ -18,11 +18,9 @@ namespace ts {
  *
  * @tparam Element is the type of array element
  * @tparam Dim is the number of dimensions
- * @tparam AllocationFlag is the flag informing whether the dimensions and the elements
- *  are allocated or referenced
  */
 
-template <typename Element, int Dim, bool AllocationFlag> class Tensor {
+template <typename Element, int Dim> class Tensor {
 
   public:
     using size_type = size_t;
@@ -38,26 +36,25 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
         _dimensions = new size_type[Dim];
         _data_size = 0;
         _data = nullptr;
+        _owner = true;
     }
 
     ~Tensor()
     {
-        // TODO: this causes SEGFAULT :/
-        //        if constexpr (AllocationFlag) {
-        //            delete[] _dimensions;
-        //            if (_owner) {
-        //                delete _data;
-        //            }
-        //        }
+        delete[] _dimensions;
+        if (_owner) {
+            delete _data;
+        }
     }
 
     Tensor(std::initializer_list<Element> list)
     {
         _dimensions = new size_type[Dim];
-        _data_size = 0;
-        _data = nullptr;
+        _owner = true;
 
         if (list.size() == 0) {
+            _data_size = 0;
+            _data = nullptr;
             return;
         }
         _data_size = list.size();
@@ -72,6 +69,8 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
     Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list)
     {
         _dimensions = new size_type[Dim];
+        _owner = true;
+
         if (list.size() == 0) {
             _data_size = 0;
             _data = nullptr;
@@ -79,26 +78,27 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
         }
 
         size_type first_dim = list.size();
-        size_type counter = 0;
+        size_type data_size = 0;
         for (Tensor<Element, Dim - 1> const &e : list) {
-            if (counter == 0) {
+            if (data_size == 0) {
                 _dimensions[0] = first_dim;
                 std::copy(e.dimensions(), e.dimensions() + Dim - 1, _dimensions + 1);
             }
-            counter += e.data_size();
+            data_size += e.data_size();
         }
-        _data_size = counter;
+        _data_size = data_size;
         _data = new Element[_data_size];
 
         Element *data_end = _data;
         for (Tensor<Element, Dim - 1> const &e : list) {
-            data_end = std::copy(e._data, e._data + e._data_size, data_end);
+            data_end = std::copy(e.data(), e.data() + e.data_size(), data_end);
         }
     }
 
     Tensor(std::vector<Tensor<Element, Dim - 1>> list)
     {
         _dimensions = new size_type[Dim];
+        _owner = true;
         if (list.size() == 0) {
             _data_size = 0;
             _data = nullptr;
@@ -119,55 +119,48 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
 
         Element *data_end = _data;
         for (Tensor<Element, Dim - 1> const &e : list) {
-            data_end = std::copy(e._data, e._data + e._data_size, data_end);
+            data_end = std::copy(e.data(), e.data() + e.data_size(), data_end);
         }
     }
 
     template <typename... Sizes> Tensor(size_type first, Sizes... rest)
     {
-        // allocate memory before set_sizes
+        _owner = true;
         _dimensions = new size_type[Dim];
         set_sizes(0, first, rest...);
-        // the data is allocated here, outside of set_sizes
         _data = new Element[_data_size];
-
-        // use default init for all elements
-        // btw, calling default constructor is default behaviour of cpp
         for (size_type i = 0; i < _data_size; i++) {
             _data[i] = Element();
         }
-        _owner = true;
     }
 
     Tensor(Dimensions const &sizes, Element *data)
     {
+        _owner = false;
         _data = data;
         _dimensions = new size_type[Dim];
         std::copy(sizes.dimensions, sizes.dimensions + Dim, _dimensions);
         _data_size = sizes.data_size;
-        _owner = false;
     }
 
-    Tensor(Tensor const & x)
+    Tensor(Tensor const &tensor)
     {
-        _data_size = x.data_size();
-        _data = new Element[x.data_size()];
+        _owner = true;
+        _data_size = tensor.data_size();
+        _data = new Element[_data_size];
         _dimensions = new size_type[Dim];
-        std::copy(x.data(), x.data() + data_size(), _data);
-        std::copy(x.dimensions(), x.dimensions() + Dim, _dimensions);
+        std::copy(tensor.data(), tensor.data() + tensor.data_size(), _data);
+        std::copy(tensor.dimensions(), tensor.dimensions() + Dim, _dimensions);
     }
 
     // getting a reference to a subarray
-    template <bool AllocationFlag2>
-    Tensor(Tensor<Element, Dim + 1, AllocationFlag2> array, size_type index)
+    Tensor(Tensor<Element, Dim + 1> const & tensor, size_type index)
     {
-        _data_size = array.data_size() / array.dimensions()[0];
-        _dimensions = array.dimensions() + 1;
-        size_type m = 1;
-        for (dimension_index i = 0; i < Dim; ++i) {
-            m *= _dimensions[i];
-        }
-        _data = array.data() + index * m;
+        _dimensions = new size_type[Dim];
+        std::copy(tensor.dimensions() + 1, tensor.dimensions() + Dim + 1, _dimensions);
+
+        _data_size = tensor.data_size() / tensor.dimensions()[0];
+        _data = tensor.data() + index * _data_size;
         _owner = false;
     }
 
@@ -192,9 +185,9 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
         if constexpr (sizeof...(Indices) == Dim - 1) {
             return _data[get_index(0, 0, first, rest...)];
         } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
-            return Tensor<Element, Dim - 1, false>(*this, first);
+            return Tensor<Element, Dim - 1>(*this, first);
         } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
-            return Tensor<Element, Dim - 1, false>(*this, first)(rest...);
+            return Tensor<Element, Dim - 1>(*this, first)(rest...);
         } else {
             throw TensorException("operator()");
         }
@@ -206,9 +199,9 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
         if constexpr (sizeof...(Indices) == Dim - 1) {
             return _data[get_index(0, 0, first, rest...)];
         } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
-            return Tensor<Element, Dim - 1, false>(*this, first);
+            return Tensor<Element, Dim - 1>(*this, first);
         } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
-            return Tensor<Element, Dim - 1, false>(*this, first)(rest...);
+            return Tensor<Element, Dim - 1>(*this, first)(rest...);
         } else {
             throw TensorException("operator()");
         }
@@ -219,20 +212,11 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
         if constexpr (Dim == 1) {
             return _data[i];
         } else {
-            return Tensor<Element, Dim - 1, false>(*this, i);
+            return Tensor<Element, Dim - 1>(*this, i);
         }
     }
 
-    auto operator[](size_type i) const -> decltype(auto)
-    {
-        if constexpr (Dim == 1) {
-            return _data[i];
-        } else {
-            return Tensor<Element, Dim - 1, false>(*this, i);
-        }
-    }
-
-    auto operator==(Tensor<Element, Dim, AllocationFlag> other) const -> bool
+    auto operator==(Tensor<Element, Dim> other) const -> bool
     {
         if (_data_size != other.data_size()) {
             return false;
@@ -246,73 +230,44 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
         return true;
     }
 
-    auto operator!=(Tensor<Element, Dim, AllocationFlag> const &other) -> bool
+    auto operator!=(Tensor<Element, Dim> const &other) -> bool
     {
         return !(*this == other);
     }
 
-    auto operator=(Tensor const &x) -> Tensor &
+    auto operator=(Tensor const &tensor) -> Tensor &
     {
-        if constexpr (AllocationFlag) {
-            if (_data_size != x.data_size()) {
-                if (!_owner) {
-                    std::ostringstream ss;
-                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
-                       << " size2: " << x.data_size();
-                    throw TensorException(ss.str());
-                }
-                delete[] _data;
-                _data_size = x.data_size();
-                _data = new Element[data_size()];
+        if(this == &tensor)
+            return *this;
+
+        if (_owner) {
+            if (_data_size != tensor.data_size()) {
+                std::ostringstream ss;
+                ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
+                   << " size2: " << tensor.data_size();
+                throw TensorException(ss.str());
             }
 
-            std::copy(x.data(), x.data() + _data_size, _data);
-            std::copy(x.dimensions(), x.dimensions() + Dim, _dimensions);
+            std::copy(tensor.data(), tensor.data() + _data_size, _data);
+            std::copy(tensor.dimensions(), tensor.dimensions() + Dim, _dimensions);
         } else {
-            _dimensions = x.dimensions();
-            _data_size = x.data_size();
-            _data = x.data();
+            _dimensions = tensor.dimensions();
+            _data_size = tensor.data_size();
+            _data = tensor.data();
         }
         return *this;
     }
 
-    template <bool copy2> auto operator=(Tensor<Element, Dim, copy2> const & x) -> Tensor &
-    {
-        if constexpr (AllocationFlag) {
-            if (_data_size != x.data_size()) {
-                if (!_owner) {
-                    std::ostringstream ss;
-                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
-                       << " size2: " << x.data_size();
-                    throw TensorException(ss.str());
-                }
-                delete[] _data;
-                _data_size = x.data_size();
-                _data = new Element[_data_size];
-            }
-
-            std::copy(x.data(), x.data() + _data_size, _data);
-            std::copy(x.dimensions(), x.dimensions() + Dim, _dimensions);
-        } else {
-            _dimensions = x.dimensions();
-            _data_size = x.data_size();
-            _data = x.data();
-        }
-        return *this;
-    }
-
+    // TODO: is this code dead?
     template <typename... Sizes> auto resize(Sizes... sizes) -> void
     {
-        if constexpr (AllocationFlag) {
-            if (_owner) {
-                set_sizes(0, sizes...);
-                delete[] _data;
-                _data = new Element();
-                for (int i = 0; i < _data_size; ++i) {
-                    _data[i] = Element();
-                }
-            } else
-                throw TensorException();
+        if (_owner) {
+            set_sizes(0, sizes...);
+            delete[] _data;
+            _data = new Element();
+            for (int i = 0; i < _data_size; ++i) {
+                _data[i] = Element();
+            }
         } else
             throw TensorException();
     }
@@ -326,11 +281,6 @@ template <typename Element, int Dim, bool AllocationFlag> class Tensor {
     Element *_data;
 
     bool _owner = true;
-
-    friend class Tensor<Element, Dim - 1, true>;
-    friend class Tensor<Element, Dim - 1, false>;
-    friend class Tensor<Element, Dim + 1, true>;
-    friend class Tensor<Element, Dim + 1, false>;
 
     template <typename... Sizes>
     auto set_sizes(dimension_index pos, size_type first, Sizes... rest) -> void

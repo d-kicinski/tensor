@@ -5,12 +5,17 @@
 namespace ts {
 
 class Dimensions {
+
   public:
     using size_type = size_t;
     using dimension_index = int;
 
     size_type *dimensions;
     size_type data_size;
+
+    ~Dimensions() {
+        delete[] dimensions;
+    }
 
     template <typename... Sizes> Dimensions(size_type first, Sizes... rest)
     {
