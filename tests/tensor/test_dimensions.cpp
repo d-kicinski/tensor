@@ -1,5 +1,5 @@
-#include "tensor/dimensions.hpp"
 #include <catch2/catch.hpp>
+#include <tensor/dimensions.hpp>
 
 using namespace ts;
 
