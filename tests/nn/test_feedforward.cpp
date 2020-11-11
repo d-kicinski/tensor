@@ -5,6 +5,5 @@ using namespace ts::nn;
 
 TEST_CASE("Create FeedForward layer")
 {
-    FeedForward ff;
     REQUIRE(true);
 }

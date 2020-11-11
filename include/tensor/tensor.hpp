@@ -1,2 +1,2 @@
 #pragma once
-#include "../../src/tensor/ops.hpp"
+#include "../../src/tensor/tensor.hpp"

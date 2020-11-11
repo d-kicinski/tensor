@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(TensorOps LANGUAGES CXX)
-set(LIBRARY_NAME tensor)
+project(tensor LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
@@ -12,7 +11,7 @@ option(TENSOR_ENABLE_COVERAGE "" OFF)
 message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
 message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
 
-add_library(${LIBRARY_NAME} SHARED
+add_library(tensor SHARED
         src/tensor/exceptions.hpp
         src/tensor/ts.hpp
         src/tensor/tensor.hpp
@@ -23,7 +22,8 @@ add_library(${LIBRARY_NAME} SHARED
         src/tensor/ops_common.hpp
         src/tensor/ops_common.cpp
         include/tensor/tensor.hpp
-        include/tensor/ops.hpp)
+        include/tensor/ops.hpp
+        )
 set_target_properties(tensor PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(tensor
         PUBLIC
@@ -58,7 +58,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             tests/tensor/test_tensor.cpp
             tests/tensor/test_dimensions.cpp
             tests/tensor/test_ops_common.cpp
-            tests/tensor/test_ops_dot.cpp)
+            tests/tensor/test_ops_dot.cpp
+            )
 
     target_link_libraries(tests tensor Catch2::Catch2)
 
