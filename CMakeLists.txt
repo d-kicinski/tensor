@@ -21,47 +21,46 @@ add_library(tensor SHARED
         src/tensor/ops_dot.cpp
         src/tensor/ops_common.hpp
         src/tensor/ops_common.cpp
-        include/tensor/tensor.hpp
-        include/tensor/ops.hpp
         )
 set_target_properties(tensor PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(tensor
         PUBLIC
         $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         )
 
-if(TENSOR_USE_BLAS)
+if (TENSOR_USE_BLAS)
     message("Using BLAS for matrix operations.")
     find_package(BLAS REQUIRED)
     target_compile_definitions(tensor PUBLIC USE_BLAS)
     target_link_libraries(tensor ${BLAS_LIBRARIES})
-endif()
+endif ()
 
 
 add_library(nn SHARED
-        src/nn/feedforward.cpp
-        src/nn/feedforward.hpp)
+        src/tensor/nn/feedforward.cpp
+        )
 target_link_libraries(nn tensor)
 
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(nn
         PUBLIC
         $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         )
 
 # Enable tests only if project is not imported via add_subdirectory()
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_executable(tests
             tests/main_catch2.cpp
             tests/tensor/test_tensor.cpp
             tests/tensor/test_dimensions.cpp
             tests/tensor/test_ops_common.cpp
             tests/tensor/test_ops_dot.cpp
+            tests/nn/test_feedforward.cpp
             )
 
-    target_link_libraries(tests tensor Catch2::Catch2)
+    target_link_libraries(tests tensor nn Catch2::Catch2)
 
     include(lib/Catch2/contrib/Catch.cmake)
     enable_testing()
@@ -74,5 +73,5 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
         coverage_evaluate()
     endif ()
-endif()
+endif ()
 
