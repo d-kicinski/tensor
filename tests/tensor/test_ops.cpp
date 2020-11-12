@@ -67,6 +67,48 @@ TEST_CASE("dot: Matrix[2, 3] X Matrix[3, 2]")
     REQUIRE(expected_result == result);
 }
 
+TEST_CASE("multiply: Matrix[3, 2].T X Matrix[3, 2]")
+{
+    Matrix matrixA = {
+        {3, 1},
+        {1, 5},
+        {3, 9}
+    };
+    Matrix matrixB = {
+        {3, 1},
+        {1, 5},
+        {2, 6}
+    };
+    Matrix result = multiply(matrixA, matrixB, true);
+    Matrix expected_result = {
+        {16, 26},
+        {26, 80},
+    };
+
+    REQUIRE(expected_result == result);
+}
+
+TEST_CASE("multiply: Matrix[2, 3] X Matrix[2, 3].T")
+{
+    Matrix matrixA = {
+        {3, 1, 3},
+        {1, 5, 9},
+    };
+
+    Matrix matrixB = {
+        {3, 1, 2},
+        {1, 5, 6}
+    };
+
+    Matrix result = multiply(matrixA, matrixB, false, true);
+    Matrix expected_result = {
+        {16, 26},
+        {26, 80},
+    };
+
+    REQUIRE(expected_result == result);
+}
+
 TEST_CASE("add")
 {
     Matrix t1 = {{1, 1, 1},
