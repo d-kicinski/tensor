@@ -146,3 +146,16 @@ TEST_CASE("multiply: Tensor[2, 2, 2] x Matrix[2, 3]")
 
     REQUIRE(result == expected);
 }
+
+TEST_CASE("transpose")
+{
+    Matrix matrix = {{1, 1, 1},
+                     {1, 1, 1}};
+
+    Matrix expected = {{1, 1},
+                       {1, 1},
+                       {1, 1}};
+    auto result = ts::transpose(matrix);
+
+    REQUIRE(result == expected);
+}

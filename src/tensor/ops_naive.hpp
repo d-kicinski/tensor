@@ -9,4 +9,6 @@ auto multiply(Matrix const & A, Matrix const & B, bool A_T=false, bool B_T=false
 
 auto multiply(Tensor<float, 3> const & A, Matrix const & B) -> Tensor<float, 3>;
 
+auto transpose(Matrix const &) -> Matrix ;
+
 }

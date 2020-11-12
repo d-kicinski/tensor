@@ -57,4 +57,16 @@ auto multiply(Tensor<float, 3> const &A, Matrix const &B) -> Tensor<float, 3>
     return Tensor<float, 3>(partial);
 }
 
+auto transpose(const Matrix & matrix) -> Matrix {
+    int m = matrix.shape()[1];
+    int n = matrix.shape()[0];
+    Matrix transposed(m, n);
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < n; ++j) {
+           transposed(i, j) = matrix(j, i);
+        }
+    }
+    return transposed;
+}
+
 } // namespace ts
