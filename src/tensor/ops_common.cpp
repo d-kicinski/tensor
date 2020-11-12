@@ -75,4 +75,16 @@ auto multiply(Tensor<Element, Dim> tensor, Element value) -> Tensor<Element, Dim
    return result;
 }
 
+auto transpose(const Matrix & matrix) -> Matrix {
+    int m = matrix.shape()[1];
+    int n = matrix.shape()[0];
+    Matrix transposed(m, n);
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < n; ++j) {
+            transposed(i, j) = matrix(j, i);
+        }
+    }
+    return transposed;
+}
+
 }

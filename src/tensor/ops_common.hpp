@@ -18,4 +18,6 @@ auto assign_if(Tensor<Element, Dim>, Tensor<bool, Dim>, Element) -> Tensor<Eleme
 template <typename Element, int Dim>
 auto multiply(Tensor<Element, Dim>, Element) -> Tensor<Element, Dim>;
 
+auto transpose(Matrix const &) -> Matrix ;
+
 }

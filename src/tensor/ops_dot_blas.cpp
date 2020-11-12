@@ -1,7 +1,7 @@
 #pragma once
 #define OPENBLAS_CONST
+#include "ops_dot_blas.hpp"
 #include "tensor.hpp"
-#include "ops_blas.hpp"
 #include <cblas.h>
 
 namespace ts {
