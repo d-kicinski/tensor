@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iostream>
 #include <sstream>
+#include <numeric>
 
 #include "dimensions.hpp"
 #include "iterator.hpp"
@@ -120,6 +121,18 @@ template <typename Element, int Dim> class Tensor {
         Element *data_end = _data;
         for (Tensor<Element, Dim - 1> const &e : list) {
             data_end = std::copy(e.data(), e.data() + e.data_size(), data_end);
+        }
+    }
+
+    explicit Tensor(std::vector<int> const & shape)
+    {
+        _owner = true;
+        _dimensions = new size_type[Dim];
+        std::copy(shape.begin(), shape.end(), _dimensions);
+        _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies<>());
+        _data = new Element[_data_size];
+        for (size_type i = 0; i < _data_size; i++) {
+            _data[i] = Element();
         }
     }
 

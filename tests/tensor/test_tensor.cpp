@@ -120,6 +120,18 @@ TEST_CASE("copy constructor")
     REQUIRE(t2(0, 0) == 1337);
 }
 
+TEST_CASE("construct from shape")
+{
+    Tensor<int, 2> t1 = {{1, 2, 3},
+                         { 4, 5, 6}};
+
+    Tensor<int, 2> t2(t1.shape());
+
+    REQUIRE(t2.owner() == true);
+    REQUIRE(t2.shape() == t1.shape());
+    REQUIRE(t2.data_size() == t2.data_size());
+}
+
 TEST_CASE("sub-array iterator 2D")
 {
 //    int array[6] = {0, 0, 1, 1, 2, 2};
