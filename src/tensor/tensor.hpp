@@ -6,6 +6,7 @@
 #include <numeric>
 #include <sstream>
 #include <vector>
+#include <random>
 
 #include "dimensions.hpp"
 #include "exceptions.hpp"
@@ -304,6 +305,18 @@ template <typename Element, int Dim> class Tensor {
     {
        std::transform(_data, _data + _data_size, tensor.data(), _data, std::plus()) ;
        return *this;
+    }
+
+    auto static randn(std::vector<int> const & shape) -> Tensor
+    {
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::normal_distribution<Element> dist{0.0};
+
+        Tensor<Element, Dim> tensor(shape);
+        std::generate(tensor.data(), tensor.data() + tensor.data_size(),
+                      [&]() { return dist(mt); });
+        return tensor;
     }
 
     // TODO: is this code dead?

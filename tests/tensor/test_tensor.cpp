@@ -149,6 +149,13 @@ TEST_CASE("Assign to existing matrix")
     matrix = Matrix(2, 2);
 }
 
+TEST_CASE("random tensor")
+{
+    auto matrix = Tensor<float, 2>::randn({2, 2});
+    std::vector<int> expected_shape = {2, 2};
+    REQUIRE(matrix.shape() == expected_shape);
+}
+
 TEST_CASE("sub-array iterator 2D")
 {
 //    int array[6] = {0, 0, 1, 1, 2, 2};

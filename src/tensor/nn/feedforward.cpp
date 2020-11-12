@@ -6,9 +6,8 @@ namespace ts {
 FeedForward::FeedForward(int dim_in, int dim_out, float alpha, bool activation)
     : _alpha(alpha), _activation(activation)
 {
-    // TODO initialize _weight with random values, like np.random.rand in numpy
-   _weights = ts::Matrix(dim_in, dim_out);
-   _bias = ts::Vector(dim_out);
+   _weights = ts::Matrix::randn({dim_in, dim_out});
+   _bias = ts::Vector::randn({dim_out});
 }
 
 auto FeedForward::operator()(Matrix const &inputs) -> Matrix { return forward(inputs); }
