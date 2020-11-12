@@ -6,7 +6,7 @@
 
 namespace ts {
 
-auto multiply(Matrix A, Vector X) -> Vector
+auto dot(Matrix A, Vector X) -> Vector
 {
     Vector Y(A.shape()[0]);
     cblas_sgemv(CBLAS_ORDER::CblasRowMajor, CBLAS_TRANSPOSE::CblasNoTrans, A.shape()[0],
@@ -15,7 +15,7 @@ auto multiply(Matrix A, Vector X) -> Vector
     return Y;
 }
 
-auto multiply(Matrix A, Matrix B) -> Matrix
+auto dot(Matrix A, Matrix B) -> Matrix
 {
     Matrix C(A.shape()[0], B.shape()[1]);
     cblas_sgemm(CBLAS_ORDER::CblasRowMajor, CBLAS_TRANSPOSE::CblasNoTrans,

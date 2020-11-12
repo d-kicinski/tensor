@@ -17,19 +17,19 @@ TEST_CASE("multiply: Matrix[2, 3] X scalar")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("multiply: Matrix[2, 3] X Vector[3]")
+TEST_CASE("dot: Matrix[2, 3] X Vector[3]")
 {
     Matrix matrix = {{1, 1, 1},
                      {2, 2, 2}};
     Vector vector = {1, 1, 1};
-    Vector result = multiply(matrix, vector);
+    Vector result = dot(matrix, vector);
     Vector expected_result = {3, 6};
 
     REQUIRE(expected_result == result);
 }
 
 
-TEST_CASE("multiply: Matrix[3, 3] X Vector[3]")
+TEST_CASE("dot: Matrix[3, 3] X Vector[3]")
 {
     Matrix matrix = {
         {3, 1, 3},
@@ -37,20 +37,20 @@ TEST_CASE("multiply: Matrix[3, 3] X Vector[3]")
         {2, 6, 5}
     };
     Vector vector= { -1, -1, 1 };
-    Vector result = multiply(matrix, vector);
+    Vector result = dot(matrix, vector);
     Vector expected_result = {-1, 3, -3};
 
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("multiply: Matrix[3, 3] X Matrix[3, 3]")
+TEST_CASE("dot: Matrix[3, 3] X Matrix[3, 3]")
 {
     Matrix matrix = {
         {3, 1, 3},
         {1, 5, 9},
         {2, 6, 5}
     };
-    Matrix result = multiply(matrix, matrix);
+    Matrix result = dot(matrix, matrix);
     Matrix expected_result = {
         {16, 26, 33},
         {26, 80, 93},
@@ -60,7 +60,7 @@ TEST_CASE("multiply: Matrix[3, 3] X Matrix[3, 3]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("multiply: Matrix[2, 3] X Matrix[3, 2]")
+TEST_CASE("dot: Matrix[2, 3] X Matrix[3, 2]")
 {
     Matrix matrixA = {
         {3, 1, 3},
@@ -71,7 +71,7 @@ TEST_CASE("multiply: Matrix[2, 3] X Matrix[3, 2]")
         {1, 5},
         {2, 6}
     };
-    Matrix result = multiply(matrixA, matrixB);
+    Matrix result = dot(matrixA, matrixB);
     Matrix expected_result = {
         {16, 26},
         {26, 80},
@@ -80,7 +80,7 @@ TEST_CASE("multiply: Matrix[2, 3] X Matrix[3, 2]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("multiply: Matrix[3, 2].T X Matrix[3, 2]")
+TEST_CASE("dot: Matrix[3, 2].T X Matrix[3, 2]")
 {
     Matrix matrixA = {
         {3, 1},
@@ -92,7 +92,7 @@ TEST_CASE("multiply: Matrix[3, 2].T X Matrix[3, 2]")
         {1, 5},
         {2, 6}
     };
-    Matrix result = multiply(matrixA, matrixB, true);
+    Matrix result = dot(matrixA, matrixB, true);
     Matrix expected_result = {
         {16, 26},
         {26, 80},
@@ -101,7 +101,7 @@ TEST_CASE("multiply: Matrix[3, 2].T X Matrix[3, 2]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("multiply: Matrix[2, 3] X Matrix[2, 3].T")
+TEST_CASE("dot: Matrix[2, 3] X Matrix[2, 3].T")
 {
     Matrix matrixA = {
         {3, 1, 3},
@@ -113,7 +113,7 @@ TEST_CASE("multiply: Matrix[2, 3] X Matrix[2, 3].T")
         {1, 5, 6}
     };
 
-    Matrix result = multiply(matrixA, matrixB, false, true);
+    Matrix result = dot(matrixA, matrixB, false, true);
     Matrix expected_result = {
         {16, 26},
         {26, 80},
@@ -135,7 +135,7 @@ TEST_CASE("add")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("multiply: Tensor[2, 2, 2] x Matrix[2, 3]")
+TEST_CASE("dot: Tensor[2, 2, 2] x Matrix[2, 3]")
 {
     Tensor<float, 3> tensorA = {
         {{1, 1},
@@ -155,7 +155,7 @@ TEST_CASE("multiply: Tensor[2, 2, 2] x Matrix[2, 3]")
         {{12, 18, 36},
          {16, 24, 48}}
     };
-    Tensor<float, 3> result = ts::multiply(tensorA, matrixB);
+    Tensor<float, 3> result = ts::dot(tensorA, matrixB);
 
     REQUIRE(result == expected);
 }

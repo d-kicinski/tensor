@@ -3,7 +3,7 @@
 
 namespace ts {
 
-auto multiply(Matrix const &A, Vector const &x) -> Vector
+auto dot(Matrix const &A, Vector const &x) -> Vector
 {
     // C(m) = A(m, k) * x(k)
     Vector y(A.shape()[0]);
@@ -19,7 +19,7 @@ auto multiply(Matrix const &A, Vector const &x) -> Vector
     return y;
 }
 
-auto multiply(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
+auto dot(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
 {
     // C(m, n) = A(m, k) * B(k, n)
     int m = A_T ? A.shape()[1] : A.shape()[0];
@@ -44,14 +44,14 @@ auto multiply(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
     return C;
 }
 
-auto multiply(Tensor<float, 3> const &A, Matrix const &B) -> Tensor<float, 3>
+auto dot(Tensor<float, 3> const &A, Matrix const &B) -> Tensor<float, 3>
 {
     int const batch_size = A.dimensions()[0];
     std::vector<Matrix> partial;
     partial.resize(batch_size);
     for (int i = 0; i < batch_size; ++i) {
         Tensor<float, 2> matrix = A(i);
-        Tensor<float, 2> sub_result = multiply(matrix, B);
+        Tensor<float, 2> sub_result = dot(matrix, B);
         partial.push_back(sub_result);
     }
     return Tensor<float, 3>(partial);

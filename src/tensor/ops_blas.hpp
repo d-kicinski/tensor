@@ -3,8 +3,8 @@
 
 namespace ts {
 
-auto multiply(Matrix, Vector) -> Vector;
+auto dot(Matrix, Vector) -> Vector;
 
-auto multiply(Matrix, Matrix) -> Matrix ;
+auto dot(Matrix, Matrix) -> Matrix ;
 
 }
