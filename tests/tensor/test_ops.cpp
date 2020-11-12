@@ -4,6 +4,19 @@
 
 using namespace ts;
 
+TEST_CASE("multiply: Matrix[2, 3] X scalar")
+{
+    Tensor<float, 2> matrix = {{1, 1, 1},
+                               {1, 1, 1}};
+    float scalar = 1337;
+
+    Tensor<float, 2> expected = {{1337, 1337, 1337},
+                                 {1337, 1337, 1337}};
+    auto result = multiply(matrix, scalar);
+
+    REQUIRE(result == expected);
+}
+
 TEST_CASE("multiply: Matrix[2, 3] X Vector[3]")
 {
     Matrix matrix = {{1, 1, 1},

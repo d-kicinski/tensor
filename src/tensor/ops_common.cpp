@@ -20,6 +20,10 @@ template auto assign_if(Tensor<float, 1>, Tensor<bool, 1>, float) -> Tensor<floa
 template auto assign_if(Tensor<float, 2>, Tensor<bool, 2>, float) -> Tensor<float, 2>;
 template auto assign_if(Tensor<float, 3>, Tensor<bool, 3>, float) -> Tensor<float, 3>;
 
+template auto multiply(Tensor<float, 1> tensor, float value) -> Tensor<float, 1>;
+template auto multiply(Tensor<float, 2> tensor, float value) -> Tensor<float, 2>;
+template auto multiply(Tensor<float, 3> tensor, float value) -> Tensor<float, 3>;
+
 
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> t1, Tensor<Element, Dim> t2) -> Tensor<Element, Dim>
@@ -58,6 +62,17 @@ auto assign_if(Tensor<Element, Dim> tensor, Tensor<bool, Dim> predicate, Element
                       return pred ? value : e;
                    });
     return result;
+}
+
+template <typename Element, int Dim>
+auto multiply(Tensor<Element, Dim> tensor, Element value) -> Tensor<Element, Dim>
+{
+   auto result(tensor);
+   std::transform(tensor.data(), tensor.data() + tensor.data_size(), result.data(),
+                  [&](Element & e) {
+                    return e * value;
+                  });
+   return result;
 }
 
 }
