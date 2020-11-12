@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
-
-#include "tensor/ops.hpp"
+#include <tensor/ops.hpp>
+#include <tensor/tensor.hpp>
 
 using namespace ts;
 
@@ -156,6 +156,41 @@ TEST_CASE("transpose")
                        {1, 1},
                        {1, 1}};
     auto result = ts::transpose(matrix);
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("maximum(scalar, Matrix)")
+{
+    Matrix matrix = {{1, -1, 1},
+                     {1, -1, 1}};
+    Matrix expected = {{1, 0, 1},
+                       {1, 0, 1}};
+    auto result = ts::maximum(0.0f, matrix);
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("mask from tensor")
+{
+    Matrix matrix = {{1, -1, 1},
+                     {1, -1, 1}};
+    Tensor<bool, 2> expected = {{true, false, true},
+                                {true, false, true}};
+
+    auto mask = ts::mask<float>(matrix, [](float e) { return e >= 0; });
+
+    REQUIRE(mask == expected);
+}
+
+TEST_CASE("assign_if")
+{
+    Matrix matrix = {{1, -1, 1},
+                     {1, -1, 1}};
+    Matrix expected = {{1, 1337, 1},
+                       {1, 1337, 1}};
+
+    auto result = assign_if(matrix, matrix < 0, 1337.0f);
 
     REQUIRE(result == expected);
 }

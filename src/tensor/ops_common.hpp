@@ -1,15 +1,18 @@
 #pragma once
-#include "tensor.hpp"
-#include <algorithm>
+#include "tensor_forward.hpp"
 
 namespace ts {
 
 template <typename Element, int Dim>
-auto add(Tensor<Element, Dim> t1, Tensor<Element, Dim> t2) -> Tensor<Element, Dim>
-{
-    Tensor<Element, Dim> result(t1);
-    std::transform(std::begin(t2), std::end(t2), std::begin(t2), std::begin(result), std::plus<>());
-    return result;
-}
+auto add(Tensor<Element, Dim>, Tensor<Element, Dim>) -> Tensor<Element, Dim>;
+
+template <typename Element, int Dim>
+auto maximum(Element, Tensor<Element, Dim>) -> Tensor<Element, Dim>;
+
+template <typename Element, int Dim>
+auto mask(Tensor<Element, Dim>, std::function<bool(Element)>) -> Tensor<bool, Dim>;
+
+template <typename Element, int Dim>
+auto assign_if(Tensor<Element, Dim>, Tensor<bool, Dim>, Element) -> Tensor<Element, Dim>;
 
 }
