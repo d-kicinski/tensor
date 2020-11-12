@@ -49,7 +49,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             tests/main_catch2.cpp
             tests/tensor/test_tensor.cpp
             tests/tensor/test_dimensions.cpp
-            tests/tensor/test_ops_common.cpp)
+            tests/tensor/test_ops_common.cpp
+            tests/tensor/test_ops_dot.cpp)
     target_link_libraries(tests ${LIBRARY_NAME} Catch2::Catch2)
 
     include(lib/Catch2/contrib/Catch.cmake)
