@@ -1,7 +1,7 @@
 #include "feedforward.hpp"
 
 
-namespace ts::nn {
+namespace ts {
 
 FeedForward::FeedForward(int dim_in, int dim_out, float alpha, bool activation)
     : _alpha(alpha), _activation(activation)

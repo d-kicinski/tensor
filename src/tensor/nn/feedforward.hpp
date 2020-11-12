@@ -2,7 +2,7 @@
 
 #include <tensor/tensor.hpp>
 
-namespace ts::nn {
+namespace ts {
 
 class FeedForward {
   public:

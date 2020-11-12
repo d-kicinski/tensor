@@ -2,7 +2,7 @@
 
 #include <tensor/nn/feedforward.hpp>
 
-using namespace ts::nn;
+using namespace ts;
 
 TEST_CASE("Create FeedForward layer")
 {
@@ -10,11 +10,10 @@ TEST_CASE("Create FeedForward layer")
     REQUIRE(true);
 }
 
-
 TEST_CASE("ff: forward, backward")
 {
     FeedForward layer(2, 3);
-    ts::Matrix input(32, 2);
+    Matrix input(32, 2);
     auto y = layer(input);
     {
         std::vector<int> expected_shape = {32, 3};
