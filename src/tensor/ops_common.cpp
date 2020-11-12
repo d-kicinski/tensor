@@ -1,6 +1,7 @@
-#include <algorithm>
-#include "tensor.hpp"
 #include "ops_common.hpp"
+#include "tensor.hpp"
+#include <algorithm>
+#include <cassert>
 
 namespace ts {
 
@@ -85,6 +86,31 @@ auto transpose(const Matrix & matrix) -> Matrix {
         }
     }
     return transposed;
+}
+
+auto sum(Matrix const & matrix, int axis) -> Vector
+{
+    // ts::sum(d_y, axis=0, keepdims=True);
+    assert(axis == 0);
+    Vector result(matrix.shape()[1]);
+    for (int j = 0; j < matrix.shape()[1]; ++j) {
+        for (int i = 0; i < matrix.shape()[0]; ++i) {
+            auto val = matrix(i, j);
+            result(j) += matrix(i, j);
+        }
+    }
+    return result;
+}
+
+auto add(Matrix const & matrix, Vector const & vector) -> Matrix
+{
+    Matrix result(matrix.shape());
+    for (int i = 0; i < matrix.shape()[0]; ++i) {
+        auto column = matrix(i);
+        std::transform(column.data(), column.data() + column.data_size(), vector.data(),
+                       result.data() + (i * column.data_size()), std::plus());
+    }
+    return result;
 }
 
 }

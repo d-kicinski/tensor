@@ -17,7 +17,7 @@ TEST_CASE("multiply: Matrix[2, 3] X scalar")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("add")
+TEST_CASE("add: Matrix[2, 3] x Matrix[2, 3]")
 {
     Matrix t1 = {{1, 1, 1},
                  {1, 1, 1}};
@@ -26,6 +26,18 @@ TEST_CASE("add")
     Matrix expected = {{2, 2, 2},
                        {2, 2, 2}};
     auto result = ts::add(t1, t2);
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("add: Matrix[2, 3] x Vector[3]")
+{
+    Matrix matrix = {{1, 1, 1},
+                     {0, 0, 0}};
+    Vector vector = {3, 3, 3};
+    Matrix expected = {{4, 4, 4},
+                       {3, 3, 3}};
+    auto result = ts::add(matrix, vector);
 
     REQUIRE(result == expected);
 }
@@ -74,6 +86,17 @@ TEST_CASE("assign_if")
                        {1, 1337, 1}};
 
     auto result = assign_if(matrix, matrix < 0, 1337.0f);
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("sum")
+{
+    Matrix matrix = {{1, 1, 1},
+                     {1, 1, 1}};
+    Vector expected = {2, 2, 2};
+
+    auto result = sum(matrix, 0);
 
     REQUIRE(result == expected);
 }
