@@ -1,19 +1,20 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
 #include <iostream>
-#include <sstream>
 #include <numeric>
+#include <sstream>
+#include <vector>
 
 #include "dimensions.hpp"
+#include "exceptions.hpp"
 #include "iterator.hpp"
 #include "ops.hpp"
-#include "exceptions.hpp"
-
 #include "tensor_forward.hpp"
 
-namespace ts {
 
+namespace ts {
 
 /**
  *
@@ -269,6 +270,31 @@ template <typename Element, int Dim> class Tensor {
             _data = tensor.data();
         }
         return *this;
+    }
+
+    auto operator<(Element const &value) -> Tensor<bool, Dim>
+    {
+        return ts::mask<Element, Dim>(*this, [&](Element e) { return e < value; });
+    }
+
+    auto operator<=(Element const &value) -> Tensor<bool, Dim>
+    {
+        return ts::mask<Element, Dim>(*this, [&](Element e) { return e <= value; });
+    }
+
+    auto operator>(Element const &value) -> Tensor<bool, Dim>
+    {
+        return ts::mask<Element, Dim>(*this, [&](Element e) { return e > value; });
+    }
+
+    auto operator>=(Element const &value) -> Tensor<bool, Dim>
+    {
+        return ts::mask<Element, Dim>(*this, [&](Element e) { return e >= value; });
+    }
+
+    auto operator==(Element const &value) -> Tensor<bool, Dim>
+    {
+        return ts::mask<Element, Dim>(*this, [&](Element e) { return e == value; });
     }
 
     // TODO: is this code dead?

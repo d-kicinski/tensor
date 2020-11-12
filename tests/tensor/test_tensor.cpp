@@ -1,6 +1,7 @@
-#include "tensor/tensor.hpp"
-#include <catch2/catch.hpp>
 #include <iostream>
+#include <catch2/catch.hpp>
+#include <tensor/dimensions.hpp>
+#include <tensor/tensor.hpp>
 
 using namespace ts;
 
@@ -123,13 +124,23 @@ TEST_CASE("copy constructor")
 TEST_CASE("construct from shape")
 {
     Tensor<int, 2> t1 = {{1, 2, 3},
-                         { 4, 5, 6}};
-
+                         {4, 5, 6}};
     Tensor<int, 2> t2(t1.shape());
 
     REQUIRE(t2.owner() == true);
     REQUIRE(t2.shape() == t1.shape());
     REQUIRE(t2.data_size() == t2.data_size());
+}
+
+TEST_CASE("operator<(Tensor, scalar)")
+{
+
+    Matrix matrix = {{1, -1, 1},
+                     {1, -1, 1}};
+    auto result = matrix > 0;
+    Tensor<bool, 2> expected = {{true, false, true},
+                                {true, false, true}};
+    REQUIRE(result == expected);
 }
 
 TEST_CASE("sub-array iterator 2D")
