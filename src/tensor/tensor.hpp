@@ -255,16 +255,19 @@ template <typename Element, int Dim> class Tensor {
             return *this;
 
         if (_owner) {
-            if (_data_size != tensor.data_size()) {
-                std::ostringstream ss;
-                ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
-                   << " size2: " << tensor.data_size();
-                throw TensorException(ss.str());
+            if (_data == nullptr) {
+                _data = new Element[tensor.data_size()];
+                _data_size = tensor.data_size();
+            } else if (_data_size != tensor.data_size()) {
+                    std::ostringstream ss;
+                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
+                       << " size2: " << tensor.data_size();
+                    throw TensorException(ss.str());
             }
-
             std::copy(tensor.data(), tensor.data() + _data_size, _data);
             std::copy(tensor.dimensions(), tensor.dimensions() + Dim, _dimensions);
         } else {
+            // I'm no owner so I don't give a damn
             _dimensions = tensor.dimensions();
             _data_size = tensor.data_size();
             _data = tensor.data();
@@ -295,6 +298,12 @@ template <typename Element, int Dim> class Tensor {
     auto operator==(Element const &value) -> Tensor<bool, Dim>
     {
         return ts::mask<Element, Dim>(*this, [&](Element e) { return e == value; });
+    }
+
+    auto operator+=(Tensor const & tensor) -> Tensor &
+    {
+       std::transform(_data, _data + _data_size, tensor.data(), _data, std::plus()) ;
+       return *this;
     }
 
     // TODO: is this code dead?

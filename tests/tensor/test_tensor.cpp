@@ -143,6 +143,12 @@ TEST_CASE("operator<(Tensor, scalar)")
     REQUIRE(result == expected);
 }
 
+TEST_CASE("Assign to existing matrix")
+{
+    Matrix matrix;
+    matrix = Matrix(2, 2);
+}
+
 TEST_CASE("sub-array iterator 2D")
 {
 //    int array[6] = {0, 0, 1, 1, 2, 2};
