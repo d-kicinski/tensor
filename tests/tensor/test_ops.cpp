@@ -4,7 +4,7 @@
 
 using namespace ts;
 
-TEST_CASE("dot: Matrix[2, 3] X Vector[3]")
+TEST_CASE("multiply: Matrix[2, 3] X Vector[3]")
 {
     Matrix matrix = {{1, 1, 1},
                      {2, 2, 2}};
@@ -16,7 +16,7 @@ TEST_CASE("dot: Matrix[2, 3] X Vector[3]")
 }
 
 
-TEST_CASE("dot: Matrix[3, 3] X Vector[3]")
+TEST_CASE("multiply: Matrix[3, 3] X Vector[3]")
 {
     Matrix matrix = {
         {3, 1, 3},
@@ -30,7 +30,7 @@ TEST_CASE("dot: Matrix[3, 3] X Vector[3]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("dot: Matrix[3, 3] X Matrix[3, 3]")
+TEST_CASE("multiply: Matrix[3, 3] X Matrix[3, 3]")
 {
     Matrix matrix = {
         {3, 1, 3},
@@ -47,7 +47,7 @@ TEST_CASE("dot: Matrix[3, 3] X Matrix[3, 3]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("dot: Matrix[2, 3] X Matrix[3, 2]")
+TEST_CASE("multiply: Matrix[2, 3] X Matrix[3, 2]")
 {
     Matrix matrixA = {
         {3, 1, 3},

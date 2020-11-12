@@ -36,9 +36,8 @@ Matrix B = {
     {1, 5},
     {2, 6}
 };
-// Multiply with separate function or with operator@
-Matrix C1 = ts::dot(A, B);
-Matrix C2 = A @ B;
+// Multiply via free function
+Matrix C = ts::multiply(A, B);
 // C = 
 //    / 16 26 \
 //    \ 26 80 /
