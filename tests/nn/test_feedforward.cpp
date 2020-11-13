@@ -16,12 +16,12 @@ TEST_CASE("ff: forward, backward")
     Matrix input(32, 2);
     auto y = layer(input);
     {
-        std::vector<int> expected_shape = {32, 3};
+        std::array<int, 2> expected_shape = {32, 3};
         REQUIRE(y.shape() == expected_shape);
     }
     auto d_y =layer.backward(y);
     {
-        std::vector<int> expected_shape = {32, 2};
+        std::array<int, 2> expected_shape = {32, 2};
         REQUIRE(d_y.shape() == expected_shape);
     }
     layer.update(0.001);

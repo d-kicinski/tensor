@@ -3,17 +3,15 @@
 #include <cstddef>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <numeric>
+#include <random>
 #include <sstream>
 #include <vector>
-#include <random>
 
-#include "dimensions.hpp"
 #include "exceptions.hpp"
-#include "iterator.hpp"
 #include "ops.hpp"
 #include "tensor_forward.hpp"
-
 
 namespace ts {
 
@@ -26,348 +24,330 @@ namespace ts {
 template <typename Element, int Dim> class Tensor {
 
   public:
-    using size_type = size_t;
-    using dimension_index = int;
+    using size_type = int;
+    using vector_t = std::vector<Element>;
+    using data_t = std::shared_ptr<vector_t>;
+    using iterator = typename vector_t::iterator;
 
+    auto data() const -> data_t { return _data; };
+    auto shape() const -> std::array<size_type, Dim> { return _dimensions; };
     auto data_size() const -> size_type { return _data_size; }
-    auto data() const -> Element * { return _data; };
-    auto owner() const -> bool { return _owner; };
-    auto dimensions() const -> size_type * { return _dimensions; };
 
-    Tensor()
-    {
-        _dimensions = new size_type[Dim];
-        _data_size = 0;
-        _data = nullptr;
-        _owner = true;
-    }
+    auto begin() -> iterator { return _begin; }
+    auto end() -> iterator { return _end; }
+    auto begin() const -> iterator { return _begin; }
+    auto end() const -> iterator { return _end; }
 
-    ~Tensor()
-    {
-        delete[] _dimensions;
-        if (_owner) {
-            delete _data;
-        }
-    }
+    Tensor();
 
-    Tensor(std::initializer_list<Element> list)
-    {
-        _dimensions = new size_type[Dim];
-        _owner = true;
-
-        if (list.size() == 0) {
-            _data_size = 0;
-            _data = nullptr;
-            return;
-        }
-        _data_size = list.size();
-        _dimensions[0] = _data_size;
-        _data = new Element[_data_size];
-        size_type i = 0;
-        for (Element const &element : list) {
-            _data[i++] = element;
-        }
-    }
+    Tensor(std::initializer_list<Element> list);
 
     Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list)
-    {
-        _dimensions = new size_type[Dim];
-        _owner = true;
+        : Tensor(list.begin(), list.end(), true){};
 
-        if (list.size() == 0) {
-            _data_size = 0;
-            _data = nullptr;
-            return;
-        }
+    Tensor(std::vector<Tensor<Element, Dim - 1>> list) : Tensor(list.begin(), list.end(), true) {}
 
-        size_type first_dim = list.size();
-        size_type data_size = 0;
-        for (Tensor<Element, Dim - 1> const &e : list) {
-            if (data_size == 0) {
-                _dimensions[0] = first_dim;
-                std::copy(e.dimensions(), e.dimensions() + Dim - 1, _dimensions + 1);
-            }
-            data_size += e.data_size();
-        }
-        _data_size = data_size;
-        _data = new Element[_data_size];
+    Tensor(std::vector<size_type> const &shape);
 
-        Element *data_end = _data;
-        for (Tensor<Element, Dim - 1> const &e : list) {
-            data_end = std::copy(e.data(), e.data() + e.data_size(), data_end);
-        }
-    }
+    Tensor(std::array<size_type, Dim> const &shape);
 
-    Tensor(std::vector<Tensor<Element, Dim - 1>> list)
-    {
-        _dimensions = new size_type[Dim];
-        _owner = true;
-        if (list.size() == 0) {
-            _data_size = 0;
-            _data = nullptr;
-            return;
-        }
+    template <typename... Sizes> Tensor(size_type first, Sizes... rest);
 
-        size_type first_dim = list.size();
-        size_type counter = 0;
-        for (Tensor<Element, Dim - 1> const &e : list) {
-            if (counter == 0) {
-                _dimensions[0] = first_dim;
-                std::copy(e.dimensions(), e.dimensions() + Dim - 1, _dimensions + 1);
-            }
-            counter += e.data_size();
-        }
-        _data_size = counter;
-        _data = new Element[_data_size];
+    Tensor(Tensor const &tensor);
 
-        Element *data_end = _data;
-        for (Tensor<Element, Dim - 1> const &e : list) {
-            data_end = std::copy(e.data(), e.data() + e.data_size(), data_end);
-        }
-    }
-
-    explicit Tensor(std::vector<int> const & shape)
-    {
-        _owner = true;
-        _dimensions = new size_type[Dim];
-        std::copy(shape.begin(), shape.end(), _dimensions);
-        _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies<>());
-        _data = new Element[_data_size];
-        for (size_type i = 0; i < _data_size; i++) {
-            _data[i] = Element();
-        }
-    }
-
-    template <typename... Sizes> Tensor(size_type first, Sizes... rest)
-    {
-        _owner = true;
-        _dimensions = new size_type[Dim];
-        set_sizes(0, first, rest...);
-        _data = new Element[_data_size];
-        for (size_type i = 0; i < _data_size; i++) {
-            _data[i] = Element();
-        }
-    }
-
-    Tensor(Dimensions const &sizes, Element *data)
-    {
-        _owner = false;
-        _data = data;
-        _dimensions = new size_type[Dim];
-        std::copy(sizes.dimensions, sizes.dimensions + Dim, _dimensions);
-        _data_size = sizes.data_size;
-    }
-
-    Tensor(Tensor const &tensor)
-    {
-        _owner = true;
-        _data_size = tensor.data_size();
-        _data = new Element[_data_size];
-        _dimensions = new size_type[Dim];
-        std::copy(tensor.data(), tensor.data() + tensor.data_size(), _data);
-        std::copy(tensor.dimensions(), tensor.dimensions() + Dim, _dimensions);
-    }
-
-    // getting a reference to a subarray
-    Tensor(Tensor<Element, Dim + 1> const & tensor, size_type index)
-    {
-        _dimensions = new size_type[Dim];
-        std::copy(tensor.dimensions() + 1, tensor.dimensions() + Dim + 1, _dimensions);
-
-        _data_size = tensor.data_size() / tensor.dimensions()[0];
-        _data = tensor.data() + index * _data_size;
-        _owner = false;
-    }
-
-    using iterator = IteratorClass<Element>;
-    auto begin() -> iterator { return iterator::begin(data(), data_size()); }
-    auto end() -> iterator { return iterator::end(data(), data_size()); }
-
-    using const_iterator = IteratorClass<Element>;
-    auto begin() const -> const_iterator { return iterator::begin(data(), data_size()); }
-    auto end() const -> const_iterator { return iterator::end(data(), data_size()); }
-
-    auto shape() const -> std::vector<int>
-    {
-        std::vector<int> shape(_dimensions, _dimensions + Dim);
-        shape.resize(Dim);
-        return shape;
-    }
+    Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
     template <typename... Indices>
-    auto operator()(size_type first, Indices... rest) -> decltype(auto)
-    {
-        if constexpr (sizeof...(Indices) == Dim - 1) {
-            return _data[get_index(0, 0, first, rest...)];
-        } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
-            return Tensor<Element, Dim - 1>(*this, first);
-        } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
-            return Tensor<Element, Dim - 1>(*this, first)(rest...);
-        } else {
-            throw TensorException("operator()");
-        }
-    }
+    auto operator()(size_type first, Indices... rest) -> decltype(auto);
 
     template <typename... Indices>
-    auto operator()(size_type first, Indices... rest) const -> decltype(auto)
-    {
-        if constexpr (sizeof...(Indices) == Dim - 1) {
-            return _data[get_index(0, 0, first, rest...)];
-        } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
-            return Tensor<Element, Dim - 1>(*this, first);
-        } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
-            return Tensor<Element, Dim - 1>(*this, first)(rest...);
-        } else {
-            throw TensorException("operator()");
-        }
-    }
+    auto operator()(size_type first, Indices... rest) const -> decltype(auto);
 
-    auto operator[](size_type i) -> decltype(auto)
-    {
-        if constexpr (Dim == 1) {
-            return _data[i];
-        } else {
-            return Tensor<Element, Dim - 1>(*this, i);
-        }
-    }
+    auto operator[](size_type i) -> decltype(auto);
 
-    auto operator==(Tensor<Element, Dim> other) const -> bool
-    {
-        if (_data_size != other.data_size()) {
-            return false;
-        }
+    auto operator==(Tensor<Element, Dim> const &other) const -> bool;
 
-        for (int i = 0; i < _data_size; ++i) {
-            if (other.data()[i] != _data[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
+    auto operator!=(Tensor<Element, Dim> const &other) -> bool;
 
-    auto operator!=(Tensor<Element, Dim> const &other) -> bool
-    {
-        return !(*this == other);
-    }
+    auto operator=(Tensor const &tensor) -> Tensor &;
 
-    auto operator=(Tensor const &tensor) -> Tensor &
-    {
-        if(this == &tensor)
-            return *this;
+    auto operator<(Element const &value) -> Tensor<bool, Dim>;
 
-        if (_owner) {
-            if (_data == nullptr) {
-                _data = new Element[tensor.data_size()];
-                _data_size = tensor.data_size();
-            } else if (_data_size != tensor.data_size()) {
-                    std::ostringstream ss;
-                    ss << "operator= NON-OWNER CANNOT BE RESIZED. size1: " << _data_size
-                       << " size2: " << tensor.data_size();
-                    throw TensorException(ss.str());
-            }
-            std::copy(tensor.data(), tensor.data() + _data_size, _data);
-            std::copy(tensor.dimensions(), tensor.dimensions() + Dim, _dimensions);
-        } else {
-            // I'm no owner so I don't give a damn
-            _dimensions = tensor.dimensions();
-            _data_size = tensor.data_size();
-            _data = tensor.data();
-        }
-        return *this;
-    }
+    auto operator<=(Element const &value) -> Tensor<bool, Dim>;
 
-    auto operator<(Element const &value) -> Tensor<bool, Dim>
-    {
-        return ts::mask<Element, Dim>(*this, [&](Element e) { return e < value; });
-    }
+    auto operator>(Element const &value) -> Tensor<bool, Dim>;
 
-    auto operator<=(Element const &value) -> Tensor<bool, Dim>
-    {
-        return ts::mask<Element, Dim>(*this, [&](Element e) { return e <= value; });
-    }
+    auto operator>=(Element const &value) -> Tensor<bool, Dim>;
 
-    auto operator>(Element const &value) -> Tensor<bool, Dim>
-    {
-        return ts::mask<Element, Dim>(*this, [&](Element e) { return e > value; });
-    }
+    auto operator==(Element const &value) -> Tensor<bool, Dim>;
 
-    auto operator>=(Element const &value) -> Tensor<bool, Dim>
-    {
-        return ts::mask<Element, Dim>(*this, [&](Element e) { return e >= value; });
-    }
+    auto operator+=(Tensor const &tensor) -> Tensor &;
 
-    auto operator==(Element const &value) -> Tensor<bool, Dim>
-    {
-        return ts::mask<Element, Dim>(*this, [&](Element e) { return e == value; });
-    }
-
-    auto operator+=(Tensor const & tensor) -> Tensor &
-    {
-       std::transform(_data, _data + _data_size, tensor.data(), _data, std::plus()) ;
-       return *this;
-    }
-
-    auto static randn(std::vector<int> const & shape) -> Tensor
-    {
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::normal_distribution<Element> dist{0.0};
-
-        Tensor<Element, Dim> tensor(shape);
-        std::generate(tensor.data(), tensor.data() + tensor.data_size(),
-                      [&]() { return dist(mt); });
-        return tensor;
-    }
-
-    // TODO: is this code dead?
-    template <typename... Sizes> auto resize(Sizes... sizes) -> void
-    {
-        if (_owner) {
-            set_sizes(0, sizes...);
-            delete[] _data;
-            _data = new Element();
-            for (int i = 0; i < _data_size; ++i) {
-                _data[i] = Element();
-            }
-        } else
-            throw TensorException();
-    }
+    auto static randn(std::vector<int> const &shape) -> Tensor;
 
   private:
-    // sizes of dimensions
-    size_type *_dimensions;
-    // total number of elements
     size_type _data_size;
-    // all the elements; their number is _data_size
-    Element *_data;
+    std::array<size_type, Dim> _dimensions;
+    std::shared_ptr<std::vector<Element>> _data;
+    iterator _begin;
+    iterator _end;
 
-    bool _owner = true;
+    template <typename Iterator> Tensor(Iterator first, Iterator last, bool);
 
-    template <typename... Sizes>
-    auto set_sizes(dimension_index pos, size_type first, Sizes... rest) -> void
-    {
-        if (pos == 0) {
-            _data_size = 1;
-        }
-        _dimensions[pos] = first;
-        _data_size *= first;
-
-        if constexpr (sizeof...(rest) > 0) {
-            set_sizes(pos + 1, rest...);
-        }
-    }
+    template <typename... Sizes> auto set_sizes(int pos, size_type first, Sizes... rest) -> void;
 
     template <typename... Indices>
-    auto get_index(dimension_index pos, size_type prev_index, size_type first, Indices... rest) const
-        -> size_type
-    {
-        size_type index = (prev_index * _dimensions[pos]) + first;
-        if constexpr (sizeof...(rest) > 0) {
-            return get_index(pos + 1, index, rest...);
-        } else {
-            return index;
-        }
-    }
+    auto get_index(int pos, size_type prev_index, size_type first, Indices... rest) const
+        -> size_type;
 };
 
-}  // namespace ts
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor()
+{
+    _data = nullptr;
+    _data_size = 0;
+}
+
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(const std::vector<int> &shape)
+{
+    std::copy(shape.begin(), shape.end(), _dimensions.begin());
+    _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies<>());
+    _data = std::make_shared<vector_t>(_data_size);
+    _begin = _data->begin();
+    _end = _data->end();
+}
+
+template <typename Element, int Dim>
+template <typename Iterator>
+Tensor<Element, Dim>::Tensor(Iterator first, Iterator last, bool)
+{
+    size_type size = last - first;
+    if (size == 0) {
+        _data_size = 0;
+        _data = nullptr;
+        return;
+    }
+
+    size_type first_dim = size;
+    size_type data_size = 0;
+    for (auto it = first; it != last; ++it) {
+        if (data_size == 0) {
+            _dimensions[0] = first_dim;
+            std::copy(it->shape().begin(), it->shape().end() - 1, _dimensions.begin() + 1);
+        }
+        data_size += it->data_size();
+    }
+
+    _data_size = data_size;
+    _data = std::make_shared<vector_t>(_data_size);
+    auto data_end = _data->begin();
+    for (auto it = first; it != last; ++it) {
+        data_end = std::copy(it->begin(), it->end(), data_end);
+    }
+    _begin = _data->begin();
+    _end = data_end;
+}
+
+template <typename Element, int Dim>
+template <typename... Sizes>
+Tensor<Element, Dim>::Tensor(Tensor::size_type first, Sizes... rest)
+{
+    set_sizes(0, first, rest...);
+    _data = std::make_shared<vector_t>(_data_size);
+    _begin = _data->begin();
+    _end = _data->end();
+}
+
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(Tensor const &tensor)
+{
+    _data_size = tensor.data_size();
+    _dimensions = tensor.shape();
+    _data = std::make_shared<vector_t>(*tensor.data());
+    _begin = _data->begin();
+    _end = _data->end();
+}
+
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(Tensor<Element, Dim + 1> const &tensor, Tensor::size_type index)
+{
+    std::copy(tensor.shape().begin() + 1, tensor.shape().end(), _dimensions.begin());
+    _data_size = tensor.data_size() / tensor.shape()[0];
+    _data = tensor.data();
+    _begin = _data->begin() + index * _data_size;
+    _end = _begin + _data_size;  // TODO: I added +1 and nothing tests didn't break :/
+}
+
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(const std::array<size_type, Dim> &shape)
+{
+    std::copy(shape.begin(), shape.end(), _dimensions.begin());
+    _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies<>());
+    _data = std::make_shared<vector_t>(_data_size);
+    _begin = _data->begin();
+    _end = _data->end();
+}
+
+template <typename Element, int Dim>
+template <typename... Indices>
+auto Tensor<Element, Dim>::operator()(Tensor::size_type first, Indices... rest) -> decltype(auto)
+{
+    if constexpr (sizeof...(Indices) == Dim - 1) {
+        return _begin[get_index(0, 0, first, rest...)];
+    } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
+        return Tensor<Element, Dim - 1>(*this, first);
+    } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
+        return Tensor<Element, Dim - 1>(*this, first)(rest...);
+    } else {
+        throw TensorException("operator()");
+    }
+}
+
+template <typename Element, int Dim>
+template <typename... Indices>
+auto Tensor<Element, Dim>::operator()(Tensor::size_type first, Indices... rest) const
+    -> decltype(auto)
+{
+    if constexpr (sizeof...(Indices) == Dim - 1) {
+        return _begin[get_index(0, 0, first, rest...)];
+    } else if constexpr (Dim >= 2 && sizeof...(Indices) == 0) {
+        return Tensor<Element, Dim - 1>(*this, first);
+    } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
+        return Tensor<Element, Dim - 1>(*this, first)(rest...);
+    } else {
+        throw TensorException("operator()");
+    }
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator==(const Tensor<Element, Dim> &other) const -> bool
+{
+    if (_data_size != other.data_size()) {
+        return false;
+    }
+    return std::equal(other.begin(), other.end(), _begin);
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator[](Tensor::size_type i) -> decltype(auto)
+{
+    if constexpr (Dim == 1) {
+        return _begin[i];
+    } else {
+        return Tensor<Element, Dim - 1>(*this, i);
+    }
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator!=(const Tensor<Element, Dim> &other) -> bool
+{
+    return !(*this == other);
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator=(const Tensor &tensor) -> Tensor &
+{
+    if (this == &tensor)
+        return *this;
+
+    _data = tensor.data();
+    _data_size = tensor.data_size();
+    _dimensions = tensor.shape();
+    _begin = tensor.begin();
+    _end = tensor.end();
+
+    return *this;
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::randn(const std::vector<int> &shape) -> Tensor
+{
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::normal_distribution<Element> dist{0.0};
+
+    Tensor<Element, Dim> tensor(shape);
+    std::generate(tensor.begin(), tensor.end(), [&]() { return dist(mt); });
+    return tensor;
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator<(const Element &value) -> Tensor<bool, Dim>
+{
+    return ts::mask<Element, Dim>(*this, [&](Element e) { return e < value; });
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator<=(const Element &value) -> Tensor<bool, Dim>
+{
+    return ts::mask<Element, Dim>(*this, [&](Element e) { return e <= value; });
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator>(const Element &value) -> Tensor<bool, Dim>
+{
+    return ts::mask<Element, Dim>(*this, [&](Element e) { return e > value; });
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator>=(const Element &value) -> Tensor<bool, Dim>
+{
+    return ts::mask<Element, Dim>(*this, [&](Element e) { return e >= value; });
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator==(const Element &value) -> Tensor<bool, Dim>
+{
+    return ts::mask<Element, Dim>(*this, [&](Element e) { return e == value; });
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator+=(const Tensor &tensor) -> Tensor &
+{
+    std::transform(_begin, _end, tensor.begin(), _begin, std::plus());
+    return *this;
+}
+
+template <typename Element, int Dim>
+template <typename... Sizes>
+auto Tensor<Element, Dim>::set_sizes(int pos, Tensor::size_type first, Sizes... rest) -> void
+{
+    if (pos == 0) {
+        _data_size = 1;
+    }
+    _dimensions[pos] = first;
+    _data_size *= first;
+
+    if constexpr (sizeof...(rest) > 0) {
+        set_sizes(pos + 1, rest...);
+    }
+}
+
+template <typename Element, int Dim>
+template <typename... Indices>
+auto Tensor<Element, Dim>::get_index(int pos, Tensor::size_type prev_index, Tensor::size_type first,
+                                     Indices... rest) const -> Tensor::size_type
+{
+    size_type index = (prev_index * _dimensions[pos]) + first;
+    if constexpr (sizeof...(rest) > 0) {
+        return get_index(pos + 1, index, rest...);
+    } else {
+        return index;
+    }
+}
+
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
+{
+    if (list.size() == 0) {
+        _data_size = 0;
+        _data = nullptr;
+        return;
+    }
+    _data_size = list.size();
+    _dimensions[0] = _data_size;
+    _data = std::make_shared<vector_t>(_data_size);
+    _begin = _data->begin();
+    _end = _data->end();
+    std::copy(list.begin(), list.end(), _begin);
+}
+
+} // namespace ts

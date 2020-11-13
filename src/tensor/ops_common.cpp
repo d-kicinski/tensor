@@ -5,6 +5,7 @@
 
 namespace ts {
 
+// To preserve my sanity:
 template auto mask<float, 1>(Tensor<float, 1>, std::function<bool (float)>) -> Tensor<bool, 1> ;
 template auto mask<float, 2>(Tensor<float, 2>, std::function<bool (float)>) -> Tensor<bool, 2> ;
 template auto mask<float, 3>(Tensor<float, 3>, std::function<bool (float)>) -> Tensor<bool, 3> ;
@@ -38,7 +39,7 @@ template <typename Element, int Dim>
 auto maximum(Element value, Tensor<Element, Dim> tensor) -> Tensor<Element, Dim>
 {
     Tensor<Element, Dim> result(tensor.shape());
-    std::transform(tensor.data(), tensor.data() + tensor.data_size(), result.data(),
+    std::transform(tensor.begin(), tensor.end(), result.begin(),
                    [&](Element & e) {
                      return e < value ? value : e;
                    });
@@ -49,7 +50,7 @@ template <typename Element, int Dim>
 auto mask(Tensor<Element, Dim> tensor, std::function<bool(Element)> fn) -> Tensor<bool, Dim>
 {
     Tensor<bool, Dim> mask(tensor.shape());
-    std::transform(tensor.data(), tensor.data() + tensor.data_size(), mask.data(), fn );
+    std::transform(tensor.begin(), tensor.end(), mask.begin(), fn );
     return mask;
 }
 
@@ -58,7 +59,7 @@ auto assign_if(Tensor<Element, Dim> tensor, Tensor<bool, Dim> predicate, Element
     -> Tensor<Element, Dim>
 {
     Tensor<Element, Dim> result(tensor.shape());
-    std::transform(tensor.data(), tensor.data() + tensor.data_size(), predicate.data(), result.data(),
+    std::transform(tensor.begin(), tensor.end(), predicate.begin(), result.begin(),
                    [&](Element & e, bool pred) {
                       return pred ? value : e;
                    });
@@ -69,7 +70,7 @@ template <typename Element, int Dim>
 auto multiply(Tensor<Element, Dim> tensor, Element value) -> Tensor<Element, Dim>
 {
    auto result(tensor);
-   std::transform(tensor.data(), tensor.data() + tensor.data_size(), result.data(),
+   std::transform(tensor.begin(), tensor.end(), result.begin(),
                   [&](Element & e) {
                     return e * value;
                   });
@@ -107,8 +108,8 @@ auto add(Matrix const & matrix, Vector const & vector) -> Matrix
     Matrix result(matrix.shape());
     for (int i = 0; i < matrix.shape()[0]; ++i) {
         auto column = matrix(i);
-        std::transform(column.data(), column.data() + column.data_size(), vector.data(),
-                       result.data() + (i * column.data_size()), std::plus());
+        std::transform(column.begin(), column.end(), vector.begin(),
+                       result.begin() + (i * column.data_size()), std::plus());
     }
     return result;
 }

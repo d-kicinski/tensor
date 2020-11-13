@@ -16,8 +16,6 @@ add_library(tensor SHARED
         src/tensor/ts.hpp
         src/tensor/tensor.hpp
         src/tensor/tensor.cpp
-        src/tensor/iterator.hpp
-        src/tensor/dimensions.hpp
         src/tensor/ops_dot.cpp
         src/tensor/ops_common.hpp
         src/tensor/ops_common.cpp
@@ -55,7 +53,6 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_executable(tests
             tests/main_catch2.cpp
             tests/tensor/test_tensor.cpp
-            tests/tensor/test_dimensions.cpp
             tests/tensor/test_ops_common.cpp
             tests/tensor/test_ops_dot.cpp
             tests/nn/test_feedforward.cpp

@@ -46,9 +46,8 @@ auto dot(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
 
 auto dot(Tensor<float, 3> const &A, Matrix const &B) -> Tensor<float, 3>
 {
-    int const batch_size = A.dimensions()[0];
+    int const batch_size = A.shape()[0];
     std::vector<Matrix> partial;
-    partial.resize(batch_size);
     for (int i = 0; i < batch_size; ++i) {
         Tensor<float, 2> matrix = A(i);
         Tensor<float, 2> sub_result = dot(matrix, B);
