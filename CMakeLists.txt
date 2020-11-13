@@ -39,7 +39,8 @@ endif ()
 
 add_library(nn SHARED
         src/tensor/nn/feedforward.cpp
-        )
+        src/tensor/nn/loss.cpp
+       )
 target_link_libraries(nn tensor)
 
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
