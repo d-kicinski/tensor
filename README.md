@@ -1,6 +1,7 @@
 # tensor
 [![Build Status](https://travis-ci.org/d-kicinski/tensor.svg?branch=master)](https://travis-ci.org/d-kicinski/tensor)
-[![codecov](https://codecov.io/gh/dawidkski/tensor/branch/master/graph/badge.svg?token=VN370FECA9)](https://codecov.io/gh/dawidkski/tensor)
+[![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg)](https://codecov.io/gh/d-kicinski/tensor)
+
 
 This library provides a class for interfacing with BLAS/LAPACK libraries with optional fallback to
 own naive implementations. The design goal is to create a numpy alike interface for interacting
