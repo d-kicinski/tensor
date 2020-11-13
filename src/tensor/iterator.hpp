@@ -9,8 +9,6 @@ template <typename Element> class IteratorClass {
   public:
     typedef std::forward_iterator_tag iterator_category;
 
-//    IteratorClass(Element *element, std::size_t index) : _element(element), _index(index) {}
-
     IteratorClass(Element *element, std::size_t index) : _element(element), _index(index) {}
 
     auto operator++() -> IteratorClass &
@@ -41,20 +39,12 @@ template <typename Element> class IteratorClass {
         return &(lhs._element[lhs._index]) != &(rhs._element[rhs._index]);
     }
 
-//    static auto begin(Element * element, std::size_t length) -> IteratorClass {
-//        return IteratorClass(element, 0);
-//    }
-
-    static auto begin(typename std::vector<Element>::iterator it) -> IteratorClass {
-        return IteratorClass(it);
+    static auto begin(Element * element, std::size_t length) -> IteratorClass {
+        return IteratorClass(element, 0);
     }
 
-//    static auto end(Element * element, std::size_t length) -> IteratorClass {
-//        return IteratorClass(element, length);
-//    }
-
-    static auto end(typename std::vector<Element>::iterator it) -> IteratorClass {
-        return IteratorClass(it);
+    static auto end(Element * element, std::size_t length) -> IteratorClass {
+        return IteratorClass(element, length);
     }
 };
 
