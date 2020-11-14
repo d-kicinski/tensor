@@ -106,6 +106,14 @@ TEST_CASE("sum(Matrix, Vector)")
     REQUIRE(result == expected);
 }
 
+TEST_CASE("sum(Tensor)")
+{
+    Matrix matrix = {{1, 1, 1},
+                     {1, 1, 1}};
+    auto result = ts::sum(matrix);
+    REQUIRE(result == 6);
+}
+
 TEST_CASE("to_one_hot")
 {
     Tensor<int, 1> vector = {2, 0, 1};

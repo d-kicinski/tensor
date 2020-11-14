@@ -29,6 +29,9 @@ auto multiply(Tensor<Element, Dim> const &, Element) -> Tensor<Element, Dim>;
 
 auto transpose(Matrix const &) -> Matrix;
 
+template<typename Element, int Dim>
+auto sum(Tensor<Element, Dim> const &) -> Element;
+
 auto sum(Matrix const &, int) -> Vector;
 
 auto to_one_hot(Tensor<int, 1> const &) -> Tensor<bool, 2>;
