@@ -30,8 +30,8 @@ template <typename Element, int Dim> class Tensor {
     using iterator = typename vector_t::iterator;
 
     auto data() const -> data_t { return _data; };
-    auto shape() const -> std::array<size_type, Dim> { return _dimensions; };
-    auto data_size() const -> size_type { return _data_size; }
+    auto shape() const -> std::array<size_type, Dim> { return _dimensions; }
+    [[nodiscard]] auto data_size() const -> size_type { return _data_size; }
 
     auto begin() -> iterator { return _begin; }
     auto end() -> iterator { return _end; }
@@ -42,10 +42,9 @@ template <typename Element, int Dim> class Tensor {
 
     Tensor(std::initializer_list<Element> list);
 
-    Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list)
-        : Tensor(list.begin(), list.end(), true){};
+    Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list);
 
-    Tensor(std::vector<Tensor<Element, Dim - 1>> list) : Tensor(list.begin(), list.end(), true) {}
+    Tensor(std::vector<Tensor<Element, Dim - 1>> list);
 
     Tensor(std::vector<size_type> const &shape);
 
@@ -92,8 +91,6 @@ template <typename Element, int Dim> class Tensor {
     iterator _begin;
     iterator _end;
 
-    template <typename Iterator> Tensor(Iterator first, Iterator last, bool);
-
     template <typename... Sizes> auto set_sizes(int pos, size_type first, Sizes... rest) -> void;
 
     template <typename... Indices>
@@ -114,37 +111,6 @@ template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(const std::vec
     _data = std::make_shared<vector_t>(_data_size);
     _begin = _data->begin();
     _end = _data->end();
-}
-
-template <typename Element, int Dim>
-template <typename Iterator>
-Tensor<Element, Dim>::Tensor(Iterator first, Iterator last, bool)
-{
-    size_type size = last - first;
-    if (size == 0) {
-        _data_size = 0;
-        _data = nullptr;
-        return;
-    }
-
-    size_type first_dim = size;
-    size_type data_size = 0;
-    for (auto it = first; it != last; ++it) {
-        if (data_size == 0) {
-            _dimensions[0] = first_dim;
-            std::copy(it->shape().begin(), it->shape().end() - 1, _dimensions.begin() + 1);
-        }
-        data_size += it->data_size();
-    }
-
-    _data_size = data_size;
-    _data = std::make_shared<vector_t>(_data_size);
-    auto data_end = _data->begin();
-    for (auto it = first; it != last; ++it) {
-        data_end = std::copy(it->begin(), it->end(), data_end);
-    }
-    _begin = _data->begin();
-    _end = data_end;
 }
 
 template <typename Element, int Dim>
@@ -173,7 +139,7 @@ Tensor<Element, Dim>::Tensor(Tensor<Element, Dim + 1> const &tensor, Tensor::siz
     _data_size = tensor.data_size() / tensor.shape()[0];
     _data = tensor.data();
     _begin = _data->begin() + index * _data_size;
-    _end = _begin + _data_size;  // TODO: I added +1 and nothing tests didn't break :/
+    _end = _begin + _data_size; // TODO: I added +1 and nothing tests didn't break :/
 }
 
 template <typename Element, int Dim>
@@ -243,7 +209,7 @@ auto Tensor<Element, Dim>::operator!=(const Tensor<Element, Dim> &other) -> bool
 }
 
 template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator=(const Tensor &tensor) -> Tensor &
+auto Tensor<Element, Dim>::operator=(Tensor const &tensor) -> Tensor &
 {
     if (this == &tensor)
         return *this;
@@ -300,7 +266,7 @@ auto Tensor<Element, Dim>::operator==(const Element &value) -> Tensor<bool, Dim>
 }
 
 template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator+=(const Tensor &tensor) -> Tensor &
+auto Tensor<Element, Dim>::operator+=(Tensor const &tensor) -> Tensor &
 {
     std::transform(_begin, _end, tensor.begin(), _begin, std::plus());
     return *this;
@@ -335,6 +301,62 @@ auto Tensor<Element, Dim>::get_index(int pos, Tensor::size_type prev_index, Tens
 }
 
 template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list)
+{
+    if (list.size() == 0) {
+        _data_size = 0;
+        _data = nullptr;
+        return;
+    }
+    _data_size = 0;
+    _dimensions[0] = list.size();
+    for (auto const &tensor : list) {
+        if (_data_size == 0) {
+            for (int i = 0; i < tensor.shape().size(); ++i) {
+                _dimensions[i + 1] = tensor.shape()[i];
+            }
+        }
+        _data_size += tensor.data_size();
+    }
+
+    _data = std::make_shared<vector_t>(_data_size);
+    auto data_end = _data->begin();
+    for (auto const &tensor : list) {
+        data_end = std::copy(tensor.begin(), tensor.end(), data_end);
+    }
+    _begin = _data->begin();
+    _end = data_end;
+}
+
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(std::vector<Tensor<Element, Dim - 1>> list)
+{
+    if (list.size() == 0) {
+        _data_size = 0;
+        _data = nullptr;
+        return;
+    }
+    _data_size = 0;
+    _dimensions[0] = list.size();
+    for (auto const &tensor : list) {
+        if (_data_size == 0) {
+            for (int i = 0; i < tensor.shape().size(); ++i) {
+                _dimensions[i + 1] = tensor.shape()[i];
+            }
+        }
+        _data_size += tensor.data_size();
+    }
+
+    _data = std::make_shared<vector_t>(_data_size);
+    auto data_end = _data->begin();
+    for (auto const &tensor : list) {
+        data_end = std::copy(tensor.begin(), tensor.end(), data_end);
+    }
+    _begin = _data->begin();
+    _end = data_end;
+}
+
+template <typename Element, int Dim>
 Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
 {
     if (list.size() == 0) {
@@ -344,10 +366,9 @@ Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
     }
     _data_size = list.size();
     _dimensions[0] = _data_size;
-    _data = std::make_shared<vector_t>(_data_size);
+    _data = std::make_shared<vector_t>(list.begin(), list.end());
     _begin = _data->begin();
     _end = _data->end();
-    std::copy(list.begin(), list.end(), _begin);
 }
 
 } // namespace ts

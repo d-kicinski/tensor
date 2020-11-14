@@ -1,5 +1,6 @@
 #pragma once
 #include "tensor_forward.hpp"
+#include <vector>
 
 namespace ts {
 

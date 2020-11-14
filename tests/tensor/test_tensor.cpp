@@ -4,32 +4,11 @@
 
 using namespace ts;
 
-template <typename ValueType> auto initialized_array(size_t size, ValueType value) -> ValueType *
-{
-    auto *array = new ValueType[size];
-    for (int i = 0; i < size; i++) {
-        array[i] = value;
-    }
-    return array;
-}
-
-auto get_2_by_3_float_tensor() -> Tensor<float, 2>
-{
-    return {{1, 2, 3},
-            {4, 5, 6}};
-}
-
 TEST_CASE("simple initialization")
 {
-    Tensor<float, 3> flat_array(2, 2, 1);
-    REQUIRE(flat_array.shape() == std::array{2, 2, 1});
-}
-
-TEST_CASE("not the owner of the data")
-{
-//    std::vector<std::string> vector{"Foo", "Bar", "0", "Spam", "Spam", "1"};
-//    Tensor<std::string, 2> array{Dimensions{2, 3}, vector.data()};
-//    REQUIRE(array.shape() == std::vector{2, 3});
+    Tensor<float, 3> tensor(2, 2, 1);
+    REQUIRE(tensor.shape() == std::array{2, 2, 1});
+    REQUIRE(tensor.data_size() == 4);
 }
 
 TEST_CASE("simple initializer_list")
@@ -37,7 +16,7 @@ TEST_CASE("simple initializer_list")
     Tensor<int, 1> array = {0, 1, 2, 3};
     REQUIRE(array.shape() == std::array{4});
     REQUIRE(array.data_size() == 4);
-    REQUIRE(array[3] == 3);
+    REQUIRE(*array.data() == std::vector{0, 1, 2, 3});
 }
 
 TEST_CASE("nested initializer_list")
@@ -46,10 +25,7 @@ TEST_CASE("nested initializer_list")
                             {2, 3}};
     REQUIRE(array.shape() == std::array{2, 2});
     REQUIRE(array.data_size() == 4);
-    REQUIRE(array.data()->at(0) == 0);
-    REQUIRE(array.data()->at(1) == 1);
-    REQUIRE(array.data()->at(2) == 2);
-    REQUIRE(array.data()->at(3) == 3);
+    REQUIRE(*array.data() == std::vector{0, 1, 2, 3});
 }
 
 TEST_CASE("indexing multidimensional array")
@@ -78,12 +54,29 @@ TEST_CASE("shape: scalar")
 
 TEST_CASE("bracket operator")
 {
-    Tensor<float, 2> matrix = get_2_by_3_float_tensor();
-    Tensor<float, 1> array = matrix[0];
-
+    Tensor<float, 2> matrix ={{1, 2, 3},
+                              {4, 5, 6}};
     REQUIRE(matrix.shape() == std::array{2, 3});
-    REQUIRE(array.shape() == std::array{3});
-    REQUIRE(1 == array[0]);
+    REQUIRE(*matrix.data() == std::vector<float>{1, 2, 3, 4, 5, 6});
+
+    {
+        Tensor<float, 1> array = matrix[0];
+        REQUIRE(array.shape() == std::array{3});
+        std::vector<float> expected = {1, 2, 3};
+        REQUIRE(std::equal(array.begin(), array.end(), expected.begin()));
+        REQUIRE(array[0] == 1);
+        REQUIRE(array[1] == 2);
+        REQUIRE(array[2] == 3);
+    }
+    {
+        Tensor<float, 1> array = matrix[1];
+        REQUIRE(array.shape() == std::array{3});
+        std::vector<float> expected = {4, 5, 6};
+        REQUIRE(std::equal(array.begin(), array.end(), expected.begin()));
+        REQUIRE(array[0] == 4);
+        REQUIRE(array[1] == 5);
+        REQUIRE(array[2] == 6);
+    }
 }
 
 TEST_CASE("operator==")
@@ -108,17 +101,51 @@ TEST_CASE("basic iterator")
    }
 }
 
-TEST_CASE("copy constructor")
+TEST_CASE("iterator of sub-array")
 {
-    Tensor<int, 2> t1 = {{1, 2, 3}, { 4, 5, 6}};
-    Tensor<int, 2> t2(t1);
-
-    REQUIRE(t1 == t2);
-
-    t2(0, 0) = 1337;
-    REQUIRE(t1(0, 0) == 1);
-    REQUIRE(t2(0, 0) == 1337);
+    Tensor<float, 2> matrix ={{1, 2, 3},
+                              {4, 5, 6}};
+    Tensor<float, 1> array = matrix(1);
+    int first_expected = 4;
+    for (auto element: array) {
+        REQUIRE(first_expected == element);
+        ++first_expected;
+    }
 }
+
+
+TEST_CASE("copy constructor: should create an deep copy")
+{
+    Tensor<float, 2> matrix = {{1, 2, 3},
+                               {4, 5, 6}};
+    Tensor<float, 2> matrix_copy(matrix);
+    REQUIRE(matrix == matrix_copy);
+    REQUIRE(matrix.shape() == matrix_copy.shape());
+    REQUIRE(matrix.data_size() == matrix_copy.data_size());
+    REQUIRE(*matrix.data() == *matrix_copy.data());
+
+    matrix_copy(0, 0) = 1337.0f;
+    REQUIRE(matrix(0, 0) == 1.0f);
+    REQUIRE(matrix_copy(0, 0) == 1337.0f);
+}
+
+
+TEST_CASE("assigment operator: should create an alias")
+{
+    Tensor<float, 2> matrix = {{1, 2, 3},
+                               {4, 5, 6}};
+    Tensor<float, 2> matrix_alias;
+    matrix_alias = matrix;
+
+    REQUIRE(matrix.shape() == matrix_alias.shape());
+    REQUIRE(matrix.data_size() == matrix_alias.data_size());
+    REQUIRE(*matrix.data() == *matrix_alias.data());
+
+    matrix(0, 0) = 1337.0f;
+    REQUIRE(matrix(0, 0) == 1337.0f);
+    REQUIRE(matrix_alias(0, 0) == 1337.0f);
+}
+
 
 TEST_CASE("construct from shape")
 {
@@ -128,11 +155,11 @@ TEST_CASE("construct from shape")
 
     REQUIRE(t2.shape() == t1.shape());
     REQUIRE(t2.data_size() == t2.data_size());
+    REQUIRE(!std::equal(t1.begin(), t1.end(), t2.begin()));
 }
 
 TEST_CASE("operator<(Tensor, scalar)")
 {
-
     Matrix matrix = {{1, -1, 1},
                      {1, -1, 1}};
     auto result = matrix > 0;
@@ -141,16 +168,11 @@ TEST_CASE("operator<(Tensor, scalar)")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("Assign to existing matrix")
-{
-    Matrix matrix;
-    matrix = Matrix(2, 2);
-}
-
-TEST_CASE("random tensor")
+TEST_CASE("rand(shape)")
 {
     auto matrix = Tensor<float, 2>::randn({2, 2});
     REQUIRE(matrix.shape() == std::array{2, 2});
+    REQUIRE(matrix.data_size() == 4);
 }
 
 TEST_CASE("sub-array indexing")
@@ -187,16 +209,4 @@ TEST_CASE("access element of a sub-array")
     REQUIRE(matrix == expected);
     REQUIRE(matrix(0, 0) == expected(0, 0));
     REQUIRE(matrix(1, 1) == expected(1, 1));
-}
-
-TEST_CASE("sub-array iterator 2D")
-{
-//    int array[6] = {0, 0, 1, 1, 2, 2};
-//    Tensor<int, 2> flat_array(Dimensions{3, 2}, array);
-//    int value = 0;
-//    for(auto element: flat_array) {
-//        int* expected_subarray = initialized_array(2, value);
-//        REQUIRE(Tensor<int, 1>(Dimensions{1}, expected_subarray) == element);
-//        ++value;
-//    }
 }
