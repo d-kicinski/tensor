@@ -25,6 +25,7 @@ class FeedForward {
     Vector _d_bias;
     float _alpha;
     bool _activation;
+
 };
 
 }
