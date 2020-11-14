@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 
-#include <tensor/nn/feedforward.hpp>
+#include <tensor/nn/cross_entropy_loss.hpp>
+#include <tensor/nn/feed_forward.hpp>
 
 using namespace ts;
 
@@ -10,7 +11,7 @@ TEST_CASE("Create FeedForward layer")
     REQUIRE(true);
 }
 
-TEST_CASE("ff: forward, backward")
+TEST_CASE("FeedForward: forward, backward")
 {
     FeedForward layer(2, 3);
     Matrix input(32, 2);
