@@ -83,6 +83,8 @@ template <typename Element, int Dim> class Tensor {
 
     auto operator+=(Tensor const &tensor) -> Tensor &;
 
+    auto operator-() -> Tensor &;
+
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
   private:
@@ -332,6 +334,13 @@ auto Tensor<Element, Dim>::get_index(int pos, Tensor::size_type prev_index, Tens
     } else {
         return index;
     }
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator-() -> Tensor &
+{
+    std::transform(_begin, _end, _begin, [](Element const &e) { return -e;});
+    return *this;
 }
 
 template <typename Element, int Dim>

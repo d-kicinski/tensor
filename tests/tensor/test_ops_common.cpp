@@ -1,8 +1,13 @@
+#include <functional>
+#include <cmath>
+
 #include <catch2/catch.hpp>
 #include <tensor/ops.hpp>
 #include <tensor/tensor.hpp>
 
+
 using namespace ts;
+using namespace std::placeholders;
 
 TEST_CASE("multiply: Matrix[2, 3] X scalar")
 {
@@ -90,7 +95,7 @@ TEST_CASE("assign_if")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("sum")
+TEST_CASE("sum(Matrix, Vector)")
 {
     Matrix matrix = {{1, 1, 1},
                      {1, 1, 1}};
@@ -99,4 +104,65 @@ TEST_CASE("sum")
     auto result = sum(matrix, 0);
 
     REQUIRE(result == expected);
+}
+
+TEST_CASE("to_one_hot")
+{
+    Tensor<int, 1> vector = {2, 0, 1};
+    Matrix matrix = {{1, 2, 3},
+                     {1, 2, 3},
+                     {1, 2, 3}};
+
+    Tensor<bool, 2> expected = {{false, false, true},
+                                {true, false, false},
+                                {false, true, false}
+    };
+    Tensor<bool, 2> one_hot = ts::to_one_hot(vector);
+
+    REQUIRE(one_hot == expected);
+}
+
+TEST_CASE("apply_if")
+{
+    Matrix matrix = {{1, -1, 1},
+                     {1, -1, 1}};
+    Matrix expected = {{1, 1, 1},
+                       {1, 1, 1}};
+
+    auto result = ts::apply_if(matrix, matrix < 0,
+                               (Fn<float>)[](float e) { return std::abs(e); });
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("get(Matrix, Vector)")
+{
+    Matrix matrix = {{1, 2, 3},
+                     {1, 2, 3}};
+    Tensor<int, 1> vector = {2, 0};
+    Vector expected = {3, 1};
+
+    auto result = ts::get(matrix, vector);
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("apply")
+{
+    Matrix matrix = {{1, 2, 3},
+                     {1, 2, 3}};
+
+    Matrix expected = {{1, 4, 9},
+                       {1, 4, 9}};
+
+    Tensor<float, 2> result = ts::apply<float, 2>(matrix, (Fn<float>)[](float e){ return std::pow(e, 2); });
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("ts::log")
+{
+    Matrix matrix = {{1, 2, 3},
+                     {1, 2, 3}};
+    Tensor<float, 2> result = ts::log(matrix);
 }

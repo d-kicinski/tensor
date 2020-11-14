@@ -189,6 +189,17 @@ TEST_CASE("access element of a sub-array")
     REQUIRE(matrix(1, 1) == expected(1, 1));
 }
 
+TEST_CASE("unary operator-")
+{
+   Matrix matrix = {{1, 1, 1},
+                    {1, 1, 1}};
+   Matrix expected = {{-1, -1, -1},
+                      {-1, -1, -1}};
+   Matrix result = -matrix;
+
+   REQUIRE(result == expected);
+}
+
 TEST_CASE("sub-array iterator 2D")
 {
 //    int array[6] = {0, 0, 1, 1, 2, 2};
