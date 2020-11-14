@@ -19,17 +19,17 @@ template auto maximum(float, Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto maximum(float, Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto maximum(float, Tensor<float, 3> const &) -> Tensor<float, 3>;
 
-template auto assign_if(Tensor<float, 1> const &, Tensor<bool, 1> const &, float) -> Tensor<float, 1>;
-template auto assign_if(Tensor<float, 2> const &, Tensor<bool, 2> const &, float) -> Tensor<float, 2>;
-template auto assign_if(Tensor<float, 3> const &, Tensor<bool, 3> const &, float) -> Tensor<float, 3>;
-
 template auto log(Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto log(Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto log(Tensor<float, 3> const &) -> Tensor<float, 3>;
 
-template auto multiply(Tensor<float, 1> const & tensor, float value) -> Tensor<float, 1>;
-template auto multiply(Tensor<float, 2> const & tensor, float value) -> Tensor<float, 2>;
-template auto multiply(Tensor<float, 3> const & tensor, float value) -> Tensor<float, 3>;
+template auto sum(Tensor<float, 1> const &) -> float;
+template auto sum(Tensor<float, 2> const &) -> float;
+template auto sum(Tensor<float, 3> const &) -> float;
+
+template auto assign_if(Tensor<float, 1> const &, Tensor<bool, 1> const &, float) -> Tensor<float, 1>;
+template auto assign_if(Tensor<float, 2> const &, Tensor<bool, 2> const &, float) -> Tensor<float, 2>;
+template auto assign_if(Tensor<float, 3> const &, Tensor<bool, 3> const &, float) -> Tensor<float, 3>;
 
 template auto apply_if(Tensor<float, 1>, Tensor<bool, 1>, Fn<float>) -> Tensor<float, 1>;
 template auto apply_if(Tensor<float, 2>, Tensor<bool, 2>, Fn<float>) -> Tensor<float, 2>;
@@ -39,6 +39,9 @@ template auto apply(Tensor<float, 1> const &, Fn<float>) -> Tensor<float, 1>;
 template auto apply(Tensor<float, 2> const &, Fn<float>) -> Tensor<float, 2>;
 template auto apply(Tensor<float, 3> const &, Fn<float>) -> Tensor<float, 3>;
 
+template auto multiply(Tensor<float, 1> const & tensor, float value) -> Tensor<float, 1>;
+template auto multiply(Tensor<float, 2> const & tensor, float value) -> Tensor<float, 2>;
+template auto multiply(Tensor<float, 3> const & tensor, float value) -> Tensor<float, 3>;
 
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tensor<Element, Dim>
@@ -135,6 +138,12 @@ auto sum(Matrix const &matrix, int axis) -> Vector
         }
     }
     return result;
+}
+
+template<typename Element, int Dim>
+auto sum(Tensor<Element, Dim> const & tensor) -> Element
+{
+    return std::accumulate(tensor.begin(), tensor.end(), Element());
 }
 
 auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<bool, 2>
