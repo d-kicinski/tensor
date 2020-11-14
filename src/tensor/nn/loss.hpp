@@ -1,23 +1,26 @@
 #pragma once
 
 #include <tensor/tensor.hpp>
+#include <utility>
 
 namespace ts {
 
 class Loss {
   public:
-    Loss(std::vector<Matrix> weights, int batch_size, float alpha=1e-3);
+    Loss(std::vector<Matrix> weights, int batch_size, float alpha=1e-3)
+        : _weights(std::move(weights)), _batch_size(batch_size), _alpha(alpha) {}
 
-    auto operator()(Matrix const & probs, Vector labels) -> float;
+    auto operator()(Matrix const & probs, Tensor<int, 1> const &labels) -> float;
 
-    auto forward(Matrix const & probs, Vector labels) -> float;
+    auto forward(Matrix const & probs, Tensor<int, 1> const &labels) -> float;
 
-    auto backward(Matrix const & scores) -> Matrix;
+    auto backward(Matrix const &scores) -> Matrix;
 
   private:
-    float _alpha;
-    int _batch_size;
     std::vector<Matrix> _weights;
+    int _batch_size;
+    float _alpha;
+    Tensor<int, 1> _labels;
 
 };
 

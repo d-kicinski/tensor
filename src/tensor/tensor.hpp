@@ -82,6 +82,8 @@ template <typename Element, int Dim> class Tensor {
 
     auto operator+=(Tensor const &tensor) -> Tensor &;
 
+    auto operator-() -> Tensor &;
+
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
   private:
@@ -369,6 +371,13 @@ Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
     _data = std::make_shared<vector_t>(list.begin(), list.end());
     _begin = _data->begin();
     _end = _data->end();
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator-() -> Tensor &
+{
+    std::transform(_begin, _end, _begin, [](Element const &e) { return -e;});
+    return *this;
 }
 
 } // namespace ts
