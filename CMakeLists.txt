@@ -36,9 +36,9 @@ endif ()
 
 
 add_library(nn SHARED
-        src/tensor/nn/feedforward.cpp
-        src/tensor/nn/loss.cpp
-       )
+        src/tensor/nn/feed_forward.cpp
+        src/tensor/nn/cross_entropy_loss.cpp
+        src/tensor/nn/softmax.hpp)
 target_link_libraries(nn tensor)
 
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
@@ -55,8 +55,9 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             tests/tensor/test_tensor.cpp
             tests/tensor/test_ops_common.cpp
             tests/tensor/test_ops_dot.cpp
-            tests/nn/test_feedforward.cpp
-            )
+            tests/nn/test_feed_forward.cpp
+            tests/nn/test_cross_entropy_loss.cpp
+            tests/nn/test_softmax.cpp)
 
     target_link_libraries(tests tensor nn Catch2::Catch2)
 
