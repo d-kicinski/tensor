@@ -35,7 +35,7 @@ TEST_CASE("add: Matrix[2, 3] x Matrix[2, 3]")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("add: Matrix[2, 3] x Vector[3]")
+TEST_CASE("add(Matrix, Vector, axis=0)")
 {
     Matrix matrix = {{1, 1, 1},
                      {0, 0, 0}};
@@ -43,6 +43,18 @@ TEST_CASE("add: Matrix[2, 3] x Vector[3]")
     Matrix expected = {{4, 4, 4},
                        {3, 3, 3}};
     auto result = ts::add(matrix, vector);
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("divide(Matrix, Vector, axis=0)")
+{
+    Matrix matrix = {{3, 6, 9},
+                     {3, 6, 9}};
+    Vector vector = {3, 3};
+    Matrix expected = {{1, 2, 3},
+                       {1, 2, 3}};
+    auto result = ts::divide(matrix, vector);
 
     REQUIRE(result == expected);
 }
@@ -95,13 +107,24 @@ TEST_CASE("assign_if")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("sum(Matrix, Vector)")
+TEST_CASE("sum(Matrix, Vector, axis=0)")
 {
     Matrix matrix = {{1, 1, 1},
                      {1, 1, 1}};
     Vector expected = {2, 2, 2};
 
-    auto result = sum(matrix, 0);
+    auto result = ts::sum(matrix, 0);
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("sum(Matrix, Vector, axis=1)")
+{
+    Matrix matrix = {{1, 1, 1},
+                     {1, 1, 1}};
+    Vector expected = {3, 3};
+
+    auto result = ts::sum(matrix, 1);
 
     REQUIRE(result == expected);
 }
@@ -173,4 +196,12 @@ TEST_CASE("ts::log")
     Matrix matrix = {{1, 2, 3},
                      {1, 2, 3}};
     Tensor<float, 2> result = ts::log(matrix);
+}
+
+TEST_CASE("randint")
+{
+    auto tensor = ts::randint<2>(0, 2, {300, 3});
+    for (auto const &e: tensor) {
+        REQUIRE((e >= 0 and e <= 2));
+    }
 }
