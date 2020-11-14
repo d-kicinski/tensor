@@ -12,6 +12,8 @@ auto add(Tensor<Element, Dim> const &, Tensor<Element, Dim> const &) -> Tensor<E
 
 auto add(Matrix const &, Vector const &) -> Matrix ;
 
+auto divide(Matrix const &, Vector const &) -> Matrix ;
+
 template <typename Element, int Dim>
 auto maximum(Element, Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
 
@@ -43,5 +45,14 @@ auto apply(Tensor<Element, Dim> const &, Fn<Element>) -> Tensor<Element, Dim>;
 
 template <typename Element, int Dim>
 auto log(Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
+
+template <typename Element, int Dim>
+auto pow(Tensor<Element, Dim> const &tensor, int) -> Tensor<Element, Dim>;
+
+template <typename Element, int Dim>
+auto exp(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>;
+
+template <int Dim>
+auto randint(int low, int high, const std::vector<int> &shape) -> Tensor<int, Dim>;
 
 }

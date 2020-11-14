@@ -23,6 +23,14 @@ template auto log(Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto log(Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto log(Tensor<float, 3> const &) -> Tensor<float, 3>;
 
+template auto exp(Tensor<float, 1> const &) -> Tensor<float, 1>;
+template auto exp(Tensor<float, 2> const &) -> Tensor<float, 2>;
+template auto exp(Tensor<float, 3> const &) -> Tensor<float, 3>;
+
+template auto pow(Tensor<float, 1> const &, int) -> Tensor<float, 1>;
+template auto pow(Tensor<float, 2> const &, int) -> Tensor<float, 2>;
+template auto pow(Tensor<float, 3> const &, int) -> Tensor<float, 3>;
+
 template auto sum(Tensor<float, 1> const &) -> float;
 template auto sum(Tensor<float, 2> const &) -> float;
 template auto sum(Tensor<float, 3> const &) -> float;
@@ -43,6 +51,11 @@ template auto multiply(Tensor<float, 1> const & tensor, float value) -> Tensor<f
 template auto multiply(Tensor<float, 2> const & tensor, float value) -> Tensor<float, 2>;
 template auto multiply(Tensor<float, 3> const & tensor, float value) -> Tensor<float, 3>;
 
+template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 1>;
+template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 2>;
+template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 3>;
+
+
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tensor<Element, Dim>
 {
@@ -53,11 +66,25 @@ auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tens
 
 auto add(Matrix const &matrix, Vector const &vector) -> Matrix
 {
+    // TODO: add(matrix, vector, axis=0)?
     Matrix result(matrix.shape());
     for (int i = 0; i < matrix.shape()[0]; ++i) {
-        auto column = matrix(i);
-        std::transform(column.begin(), column.end(), vector.begin(),
-                       result.begin() + (i * column.data_size()), std::plus());
+        auto row = matrix(i);
+        std::transform(row.begin(), row.end(), vector.begin(),
+                       result.begin() + (i * row.data_size()), std::plus());
+    }
+    return result;
+}
+
+auto divide(Matrix const &matrix, Vector const &vector) -> Matrix
+{
+    // TODO: divide(matrix, vector, axis=1)?
+    Matrix result(matrix.shape());
+    for (int i = 0; i < vector.shape()[0]; ++i) {
+        auto row = matrix(i);
+        std::transform(row.begin(), row.end(),
+                       result.begin() + (i * row.data_size()),
+                       [&vector, &i](float e) { return e / vector(i); });
     }
     return result;
 }
@@ -128,16 +155,25 @@ auto transpose(Matrix const &matrix) -> Matrix {
 
 auto sum(Matrix const &matrix, int axis) -> Vector
 {
-    // ts::sum(d_y, axis=0, keepdims=True);
-    assert(axis == 0);
-    Vector result(matrix.shape()[1]);
-    for (int j = 0; j < matrix.shape()[1]; ++j) {
-        for (int i = 0; i < matrix.shape()[0]; ++i) {
-            auto val = matrix(i, j);
-            result(j) += matrix(i, j);
+    if (axis == 0) {
+        // np.sum(matrix, axis=0, keepdims=True);
+
+        Vector result(matrix.shape()[1]);
+        for (int j = 0; j < matrix.shape()[1]; ++j) {
+            for (int i = 0; i < matrix.shape()[0]; ++i) {
+                result(j) += matrix(i, j);
+            }
         }
+        return result;
+    } else if (axis == 1) {
+        // np.sum(matrix, axis=1, keepdims=True)
+
+        Vector result(matrix.shape()[0]);
+        for (int i = 0; i < matrix.shape()[0]; ++i) {
+           result(i) = ts::sum(matrix(i));
+        }
+        return result;
     }
-    return result;
 }
 
 template<typename Element, int Dim>
@@ -176,8 +212,35 @@ auto apply(Tensor<Element, Dim> const &tensor, Fn<Element> fn) -> Tensor<Element
 template <typename Element, int Dim>
 auto log(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>
 {
-    std::function<Element(Element)> log = [](Element e){return std::log(e); };
+    Fn<float> log = [](Element e){return std::log(e); };
     return ts::apply(tensor, log);
+}
+
+template <typename Element, int Dim>
+
+auto exp(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>
+{
+    Fn<float> exp = [](Element e){return std::exp(e); };
+    return ts::apply(tensor, exp);
+}
+
+template <typename Element, int Dim>
+auto pow(Tensor<Element, Dim> const &tensor, int value) -> Tensor<Element, Dim>
+{
+    Fn<float> pow = [&value](Element e){return std::pow(e, value); };
+    return ts::apply(tensor, pow);
+}
+
+template <int Dim>
+auto randint(int low, int high, const std::vector<int> &shape) -> Tensor<int, Dim>
+{
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(low, high);
+
+    Tensor<int, Dim> tensor(shape);
+    std::generate(tensor.begin(), tensor.end(), [&]() { return dist(mt); });
+    return tensor;
 }
 
 }
