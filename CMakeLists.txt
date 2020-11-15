@@ -38,7 +38,10 @@ endif ()
 add_library(nn SHARED
         src/tensor/nn/feed_forward.cpp
         src/tensor/nn/cross_entropy_loss.cpp
-        src/tensor/nn/softmax.hpp)
+        src/tensor/nn/softmax.hpp
+        src/tensor/nn/planar_dataset.cpp
+        src/tensor/nn/dataset_iterator.cpp
+        )
 target_link_libraries(nn tensor)
 
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
@@ -57,7 +60,8 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             tests/tensor/test_ops_dot.cpp
             tests/nn/test_feed_forward.cpp
             tests/nn/test_cross_entropy_loss.cpp
-            tests/nn/test_softmax.cpp)
+            tests/nn/test_softmax.cpp
+            tests/nn/test_planar_dataset.cpp)
 
     target_link_libraries(tests tensor nn Catch2::Catch2)
 
@@ -73,4 +77,6 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         coverage_evaluate()
     endif ()
 endif ()
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/resources DESTINATION ${CMAKE_BINARY_DIR})
 
