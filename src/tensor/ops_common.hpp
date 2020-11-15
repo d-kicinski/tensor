@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include "tensor_forward.hpp"
+#include "exceptions.hpp"
 
 namespace ts {
 
@@ -57,5 +58,34 @@ auto randint(int low, int high, const std::vector<int> &shape) -> Tensor<int, Di
 
 template <typename Element>
 auto from_vector(std::vector<Element>) -> Tensor<Element, 1>;
+
+template <typename Element, int axis>
+auto concatenate(std::vector<Tensor<Element, 1>>) -> decltype(auto);
+
+// for some unknown reasons this couldn't be in .cpp file :(
+template <typename Element, int axis>
+auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
+{
+    if constexpr (axis == 1) {
+        int vector_size = list[0].shape()[0];
+        Tensor<Element, 2> tensor(vector_size, list.size());
+        for (int i = 0; i < vector_size; ++i) {
+            for (int j = 0; j < list.size(); ++j) {
+                tensor(i, j) = list[j][i];
+            }
+        }
+    return tensor;
+    } else if constexpr (axis == 0) {
+        int vector_size = list[0].shape()[0];
+        Tensor<Element, 1> tensor(list.size() * vector_size);
+        int i = 0;
+        for (auto const & v : list) {
+            std::copy(v.begin(), v.end(), tensor.begin() + (i++ * vector_size));
+        }
+        return tensor;
+    } else {
+        throw TensorException("concatenate()");
+    }
+}
 
 }

@@ -1,7 +1,6 @@
 #include "ops_common.hpp"
 #include "tensor.hpp"
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 
 namespace ts {
@@ -57,6 +56,12 @@ template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 3>;
 
 template auto from_vector(std::vector<int>) -> Tensor<int, 1>;
 template auto from_vector(std::vector<float>) -> Tensor<float, 1>;
+
+template auto concatenate<int, 1>(std::vector<Tensor<int, 1>> list) -> decltype(auto);
+template auto concatenate<float, 1>(std::vector<Tensor<float, 1>> list) -> decltype(auto);
+
+template auto concatenate<int, 2>(std::vector<Tensor<int, 1>> list) -> decltype(auto);
+template auto concatenate<float, 2>(std::vector<Tensor<float, 1>> list) -> decltype(auto);
 
 
 template <typename Element, int Dim>
