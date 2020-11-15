@@ -234,13 +234,16 @@ auto pow(Tensor<Element, Dim> const &tensor, int value) -> Tensor<Element, Dim>
 }
 
 template <int Dim>
-auto randint(int low, int high, const std::vector<int> &shape) -> Tensor<int, Dim>
+auto randint(int low, int high, std::vector<int> const &shape) -> Tensor<int, Dim>
 {
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_int_distribution<int> dist(low, high);
 
-    Tensor<int, Dim> tensor(shape);
+    // TODO: this is weird :P
+    std::array<int, Dim> _shape;
+    std::copy(shape.begin(), shape.end(), _shape.begin());
+    Tensor<int, Dim> tensor(_shape);
     std::generate(tensor.begin(), tensor.end(), [&]() { return dist(mt); });
     return tensor;
 }
