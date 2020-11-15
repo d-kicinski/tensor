@@ -63,6 +63,10 @@ template auto concatenate<float, 1>(std::vector<Tensor<float, 1>> list) -> declt
 template auto concatenate<int, 2>(std::vector<Tensor<int, 1>> list) -> decltype(auto);
 template auto concatenate<float, 2>(std::vector<Tensor<float, 1>> list) -> decltype(auto);
 
+template auto slice(Tensor<float, 1> tensor, int from, int to) -> Tensor<float, 1>;
+template auto slice(Tensor<float, 2> tensor, int from, int to) -> Tensor<float, 2>;
+template auto slice(Tensor<int, 1> tensor, int from, int to) -> Tensor<int, 1>;
+template auto slice(Tensor<int, 2> tensor, int from, int to) -> Tensor<int, 2>;
 
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tensor<Element, Dim>

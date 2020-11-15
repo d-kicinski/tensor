@@ -88,4 +88,34 @@ auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
     }
 }
 
+template <typename Element>
+auto slice(Tensor<Element, 2> tensor, int from, int to) -> Tensor<Element, 2>
+{
+    std::array<int, 2> shape(tensor.shape());
+    shape[0] = to - from;
+    int row_size = tensor.shape()[1];
+
+    Tensor<Element, 2> slice(shape);
+    int begin_offset = from * row_size;
+    int end_offset = to * row_size;
+    std::copy(tensor.begin() + begin_offset, tensor.begin() + end_offset , slice.begin());
+
+    return slice;
+}
+
+template <typename Element>
+auto slice(Tensor<Element, 1> tensor, int from, int to) -> Tensor<Element, 1>
+{
+    std::array<int, 1> shape(tensor.shape());
+    shape[0] = to - from;
+    int row_size = 1;
+
+    Tensor<Element, 1> slice(shape);
+    int begin_offset = from * row_size;
+    int end_offset = to * row_size;
+    std::copy(tensor.begin() + begin_offset, tensor.begin() + end_offset , slice.begin());
+
+    return slice;
+}
+
 }

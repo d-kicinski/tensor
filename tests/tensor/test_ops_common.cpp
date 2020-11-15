@@ -240,3 +240,24 @@ TEST_CASE("concatenate vectors with axis = 0")
 
     REQUIRE(result == expected);
 }
+
+TEST_CASE("slice")
+{
+    Matrix matrix = {{0, 0, 0},
+                     {1, 1, 1},
+                     {2, 2, 2}};
+
+    {
+        Matrix slice = ts::slice(matrix, 0, 2);
+        Matrix expected = {{0, 0, 0},
+                           {1, 1, 1}};
+        REQUIRE(slice == expected);
+    }
+
+    {
+        Matrix slice = ts::slice(matrix, 1, 3);
+        Matrix expected = {{1, 1, 1},
+                           {2, 2, 2}};
+        REQUIRE(slice == expected);
+    }
+}
