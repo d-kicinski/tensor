@@ -55,6 +55,9 @@ template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 1>;
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 2>;
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 3>;
 
+template auto from_vector(std::vector<int>) -> Tensor<int, 1>;
+template auto from_vector(std::vector<float>) -> Tensor<float, 1>;
+
 
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tensor<Element, Dim>
@@ -246,6 +249,14 @@ auto randint(int low, int high, std::vector<int> const &shape) -> Tensor<int, Di
     Tensor<int, Dim> tensor(_shape);
     std::generate(tensor.begin(), tensor.end(), [&]() { return dist(mt); });
     return tensor;
+}
+
+template <typename Element>
+auto from_vector(std::vector<Element> vector) -> Tensor<Element, 1>
+{
+    Tensor<Element, 1> array(vector.size());
+    std::copy(vector.begin(), vector.end(), array.begin());
+    return array;
 }
 
 }

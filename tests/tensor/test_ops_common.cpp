@@ -205,3 +205,12 @@ TEST_CASE("randint")
         REQUIRE((e >= 0 and e <= 2));
     }
 }
+
+TEST_CASE("from_vector")
+{
+   std::vector<float> std_v = {1,2,3,4,5};
+   Vector vector = ts::from_vector(std_v);
+
+   REQUIRE(std::equal(std_v.begin(), std_v.end(), vector.begin()));
+   REQUIRE(vector.shape() == std::array{5});
+}

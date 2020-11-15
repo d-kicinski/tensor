@@ -55,4 +55,7 @@ auto exp(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>;
 template <int Dim>
 auto randint(int low, int high, const std::vector<int> &shape) -> Tensor<int, Dim>;
 
+template <typename Element>
+auto from_vector(std::vector<Element>) -> Tensor<Element, 1>;
+
 }
