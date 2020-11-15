@@ -7,9 +7,11 @@ add_subdirectory(lib/Catch2)
 
 option(TENSOR_USE_BLAS "" OFF)
 option(TENSOR_ENABLE_COVERAGE "" OFF)
+option(TENSOR_BUILD_EXAMPLES "" ON)
 
 message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
 message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
+message(STATUS "BUILD_EXAMPLES: ${TENSOR_BUILD_EXAMPLES}")
 
 add_library(tensor SHARED
         src/tensor/exceptions.hpp
@@ -80,3 +82,7 @@ endif ()
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/resources DESTINATION ${CMAKE_BINARY_DIR})
 
+
+if (TENSOR_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif ()
