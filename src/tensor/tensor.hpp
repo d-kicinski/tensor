@@ -46,8 +46,6 @@ template <typename Element, int Dim> class Tensor {
 
     Tensor(std::vector<Tensor<Element, Dim - 1>> list);
 
-    Tensor(std::vector<size_type> const &shape);
-
     Tensor(std::array<size_type, Dim> const &shape);
 
     template <typename... Sizes> Tensor(size_type first, Sizes... rest);
@@ -104,15 +102,6 @@ template <typename Element, int Dim> Tensor<Element, Dim>::Tensor()
 {
     _data = nullptr;
     _data_size = 0;
-}
-
-template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(const std::vector<int> &shape)
-{
-    std::copy(shape.begin(), shape.end(), _dimensions.begin());
-    _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies<>());
-    _data = std::make_shared<vector_t>(_data_size);
-    _begin = _data->begin();
-    _end = _data->end();
 }
 
 template <typename Element, int Dim>
@@ -232,7 +221,10 @@ auto Tensor<Element, Dim>::randn(const std::vector<int> &shape) -> Tensor
     std::mt19937 mt(rd());
     std::normal_distribution<Element> dist{0.0};
 
-    Tensor<Element, Dim> tensor(shape);
+    std::array<int, Dim> array_shape;
+    // TODO: this is weird solution :P
+    std::copy(shape.begin(), shape.end(), array_shape.begin());
+    Tensor<Element, Dim> tensor(array_shape);
     std::generate(tensor.begin(), tensor.end(), [&]() { return dist(mt); });
     return tensor;
 }
