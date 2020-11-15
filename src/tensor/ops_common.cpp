@@ -174,6 +174,8 @@ auto sum(Matrix const &matrix, int axis) -> Vector
         }
         return result;
     }
+    std::stringstream ss; ss << "sum(Matrix, axis) where axis=" << axis;
+    throw TensorException(ss.str());
 }
 
 template<typename Element, int Dim>
