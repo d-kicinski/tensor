@@ -9,7 +9,7 @@ auto ts::CrossEntropyLoss::forward(const ts::Matrix &probs, ts::Tensor<int, 1> c
 {
     _labels = labels;
     auto log_probs = -ts::log(ts::get(probs, labels));
-    float data_loss = ts::sum(log_probs) / static_cast<float>(_batch_size);
+    float data_loss = ts::sum(log_probs) / probs.shape()[0];
     float reg_loss = _calculate_regularization_loss();
     return data_loss + reg_loss;
 }
@@ -19,7 +19,7 @@ auto ts::CrossEntropyLoss::backward(ts::Matrix const &scores) -> ts::Matrix
     auto d_scores = ts::apply_if(scores, ts::to_one_hot(_labels),
                         (Fn<float>) [](float e) { return e - 1; });
     d_scores = ts::apply(d_scores,
-        (Fn<float>) [&](float e) { return  e / static_cast<float>(_batch_size); });
+        (Fn<float>) [&](float e) { return  e / scores.shape()[0]; });
     return d_scores;
 }
 
