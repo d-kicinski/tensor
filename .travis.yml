@@ -38,7 +38,7 @@ before_script:
 script:
   - cd Build-Debug
   - make -j 2
-  - CTEST_OUTPUT_ON_FAILURE=1 ctest -j 2
+  - cd bin && ./tests && cd ..
   # Coverage collection does not work for OS X atm
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${COVERAGE}" == "ON" ]]; then
@@ -48,4 +48,4 @@ script:
   # Go to release build
   - cd ../Build-Release
   - make -j 2
-  - CTEST_OUTPUT_ON_FAILURE=1 ctest -j 2
+  - cd bin && ./tests && cd ..
