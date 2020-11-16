@@ -21,6 +21,8 @@ class PlanarDataset {
 
     auto labels() -> ts::Tensor<int, 1>;
 
+    auto size() -> int;
+
     auto begin() -> DatasetIterator;
 
     auto end() -> DatasetIterator;
