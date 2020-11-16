@@ -261,3 +261,14 @@ TEST_CASE("slice")
         REQUIRE(slice == expected);
     }
 }
+
+TEST_CASE("argmax(Matrix)")
+{
+    Tensor<float, 2> matrix = {{0, 1, 0},
+                               {3, 2, 1},
+                               {0, 0, 1}};
+    Tensor<int, 1> expected = {1, 0, 2};
+    Tensor<int, 1> indexes = ts::argmax(matrix);
+
+    REQUIRE(indexes == expected);
+}

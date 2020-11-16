@@ -68,6 +68,10 @@ template auto slice(Tensor<float, 2> tensor, int from, int to) -> Tensor<float, 
 template auto slice(Tensor<int, 1> tensor, int from, int to) -> Tensor<int, 1>;
 template auto slice(Tensor<int, 2> tensor, int from, int to) -> Tensor<int, 2>;
 
+template auto argmax(Tensor<float, 2> const &) -> Tensor<int, 1>;
+template auto argmax(Tensor<int, 2> const &) -> Tensor<int, 1>;
+
+
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tensor<Element, Dim>
 {
@@ -266,6 +270,19 @@ auto from_vector(std::vector<Element> vector) -> Tensor<Element, 1>
     Tensor<Element, 1> array(vector.size());
     std::copy(vector.begin(), vector.end(), array.begin());
     return array;
+}
+
+template <typename Element>
+auto argmax(Tensor<Element, 2> const &tensor) -> Tensor<int, 1>
+{
+    int rows = tensor.shape()[0];
+    Tensor<int, 1> indexes(rows);
+    for (int i = 0; i < rows; ++i) {
+        Tensor<Element, 1> row = tensor(i);
+        int index = std::max_element(row.begin(), row.end()) - row.begin();
+        indexes[i] = index;
+    }
+    return indexes;
 }
 
 }
