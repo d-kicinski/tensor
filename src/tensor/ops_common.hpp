@@ -59,6 +59,9 @@ auto randint(int low, int high, const std::vector<int> &shape) -> Tensor<int, Di
 template <typename Element>
 auto from_vector(std::vector<Element>) -> Tensor<Element, 1>;
 
+template <typename Element>
+auto argmax(Tensor<Element, 2> const &tensor) -> Tensor<int, 1>;
+
 template <typename Element, int axis>
 auto concatenate(std::vector<Tensor<Element, 1>>) -> decltype(auto);
 
