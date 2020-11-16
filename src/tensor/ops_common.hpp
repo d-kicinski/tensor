@@ -79,11 +79,16 @@ auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
         }
     return tensor;
     } else if constexpr (axis == 0) {
-        int vector_size = list[0].shape()[0];
-        Tensor<Element, 1> tensor(list.size() * vector_size);
-        int i = 0;
+        int vector_size = 0;
         for (auto const & v : list) {
-            std::copy(v.begin(), v.end(), tensor.begin() + (i++ * vector_size));
+            vector_size += v.shape()[0];
+        }
+
+        Tensor<Element, 1> tensor(vector_size);
+        int offset = 0;
+        for (auto const & v : list) {
+            std::copy(v.begin(), v.end(), tensor.begin() + offset);
+            offset += v.shape()[0];
         }
         return tensor;
     } else {

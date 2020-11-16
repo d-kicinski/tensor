@@ -241,6 +241,18 @@ TEST_CASE("concatenate vectors with axis = 0")
     REQUIRE(result == expected);
 }
 
+TEST_CASE("concatenate vectors with axis = 0 and different sizes")
+{
+    Vector v0 = {0, 0, 0};
+    Vector v1 = {1, 1};
+    Vector v2 = {2};
+    Vector expected = {0, 0, 0, 1, 1, 2};
+
+    Tensor<float, 1> result = ts::concatenate<float, 0>({v0, v1, v2});
+
+    REQUIRE(result == expected);
+}
+
 TEST_CASE("slice")
 {
     Matrix matrix = {{0, 0, 0},
