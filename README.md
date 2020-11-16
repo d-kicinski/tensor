@@ -3,15 +3,19 @@
 [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg)](https://codecov.io/gh/d-kicinski/tensor)
 
 
-This library provides a class for interfacing with BLAS/LAPACK libraries with optional fallback to
-own naive implementations. The design goal is to create a numpy alike interface for interacting
-with multidimensional arrays packaged in a simple, relatively lightweight, library that
-could be used on many different platforms like android phones and microcontrollers.
+This library providesa two main features:
+- A class for interacting with multidimensional arrays (For backend library uses BLAS/LAPACK libraries with fallback to
+own naive implementations).
+- Deep neural networks.
 
-#### How to use
-If you're using cmake see [tensor-example](https://github.com/dawidkski/tensor-example) for example usage.
+The design goal is to create a numpy/pytorch alike interface for interacting
+with multidimensional arrays packaged in a simple, relatively lightweight, library with limited external dependencies that
+could be used on platforms like android phones and microcontrollers.
 
-#### Usage
+#### Usage of `tensor/nn` module
+For example usage jump to [nn-planar-data example](https://github.com/d-kicinski/tensor/tree/master/examples/nn-planar-data)
+
+#### Usage of `tensor` module
 Create multidimensional tensor:
 ```c++
 // Create an array for storing bitmaps with variadic constructor
@@ -20,7 +24,7 @@ int constexpr height = 720;
 int constexpr channels = 3;
 
 ts::Tensor<int, 3> image(width, height, channels);
-image.shape();      // std::vector{1024, 720, 3});
+image.shape();      // std::array{1024, 720, 3});
 image.data_size();  // 1024 * 720 * 3 = 2211840
 ```
 
@@ -43,3 +47,6 @@ Matrix C = ts::dot(A, B);
 //    / 16 26 \
 //    \ 26 80 /
 ```
+
+#### How to use in your project
+If you're using cmake see [tensor-example](https://github.com/dawidkski/tensor-example) for example usage.
