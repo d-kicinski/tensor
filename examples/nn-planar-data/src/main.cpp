@@ -75,8 +75,8 @@ auto label(Model &model, ts::PlanarDataset &dataset) -> Model::VectorI
 int main()
 {
 
-    ts::PlanarDataset dataset_train("resources/train.tsv", true, 300);
-    ts::PlanarDataset dataset_test("resources/test.tsv", true, 1);
+    ts::PlanarDataset dataset_train("resources/train_planar_data.tsv", true, 300);
+    ts::PlanarDataset dataset_test("resources/test_planar_data.tsv", true, 1);
     Model model;
 
     std::cout << "Training... " << std::endl;
@@ -87,8 +87,8 @@ int main()
     auto labels = label(model, dataset_test);
     std::cout << "done!" << std::endl;
 
-    std::cout << "Dumping labels to 'resources/labels.tsv'... ";
-    if (std::ofstream output = std::ofstream("resources/labels.tsv")) {
+    std::cout << "Dumping labels to 'resources/labels_planar_data.tsv'... ";
+    if (std::ofstream output = std::ofstream("resources/labels_planar_data.tsv")) {
         for (auto label : labels) {
             output << label << std::endl;
         }
