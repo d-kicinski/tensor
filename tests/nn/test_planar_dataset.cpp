@@ -5,6 +5,7 @@ TEST_CASE("load dataset")
 {
     auto dataset = ts::PlanarDataset("resources/test_planar_data.tsv", true);
 
+    REQUIRE(dataset.size() == 6);
     REQUIRE(dataset.inputs().shape() == std::array{6, 2});
     REQUIRE(dataset.labels().shape() == std::array{6});
 }
