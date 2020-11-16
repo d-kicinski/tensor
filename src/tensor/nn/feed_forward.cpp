@@ -2,7 +2,7 @@
 
 namespace ts {
 
-FeedForward::FeedForward(int dim_in, int dim_out, float alpha, bool activation)
+FeedForward::FeedForward(int dim_in, int dim_out, bool activation, float alpha)
     : _alpha(alpha), _activation(activation)
 {
    _weights = ts::Matrix::randn({dim_in, dim_out});
@@ -38,5 +38,7 @@ auto FeedForward::update(float step_size) -> void
     _weights +=  ts::multiply(_d_weights, -step_size);
     _bias += ts::multiply(_d_bias, -step_size);
 }
+
+auto FeedForward::weights() -> Matrix { return _weights; }
 
 }

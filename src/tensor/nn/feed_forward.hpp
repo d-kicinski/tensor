@@ -6,7 +6,7 @@ namespace ts {
 
 class FeedForward {
   public:
-    FeedForward(int dim_in, int dim_out, float alpha=1e-3, bool activation=false);
+    FeedForward(int dim_in, int dim_out, bool activation=false, float alpha=1e-3);
 
     auto operator()(Matrix const &) -> Matrix;
 
@@ -15,6 +15,8 @@ class FeedForward {
     auto backward(Matrix) -> Matrix;
 
     auto update(float step_size) -> void;
+
+    auto weights() -> Matrix;
 
   private:
     Matrix _x;
