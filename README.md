@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg)](https://codecov.io/gh/d-kicinski/tensor)
 
 
-This library providesa two main features:
+This library provides a two main features:
 - A class for interacting with multidimensional arrays (For backend library uses BLAS/LAPACK libraries with fallback to
 own naive implementations).
 - Deep neural networks.
