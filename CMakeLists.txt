@@ -27,7 +27,6 @@ message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
 message(STATUS "BUILD_EXAMPLES: ${TENSOR_BUILD_EXAMPLES}")
 
 add_library(tensor SHARED
-        src/tensor/exceptions.hpp
         src/tensor/ts.hpp
         src/tensor/tensor.hpp
         src/tensor/tensor.cpp

@@ -1,7 +1,7 @@
 #pragma once
-#include <functional>
 #include "tensor_forward.hpp"
-#include "exceptions.hpp"
+#include <cassert>
+#include <functional>
 
 namespace ts {
 
@@ -92,7 +92,7 @@ auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
         }
         return tensor;
     } else {
-        throw TensorException("concatenate()");
+        assert(false);
     }
 }
 

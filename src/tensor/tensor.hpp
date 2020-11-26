@@ -9,7 +9,6 @@
 #include <sstream>
 #include <vector>
 
-#include "exceptions.hpp"
 #include "ops.hpp"
 #include "tensor_forward.hpp"
 
@@ -154,7 +153,7 @@ auto Tensor<Element, Dim>::operator()(Tensor::size_type first, Indices... rest) 
     } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
         return Tensor<Element, Dim - 1>(*this, first)(rest...);
     } else {
-        throw TensorException("operator()");
+        assert(false);
     }
 }
 
@@ -170,7 +169,7 @@ auto Tensor<Element, Dim>::operator()(Tensor::size_type first, Indices... rest) 
     } else if constexpr (Dim >= 2 && sizeof...(Indices) < Dim - 1) {
         return Tensor<Element, Dim - 1>(*this, first)(rest...);
     } else {
-        throw TensorException("operator()");
+        assert(false);
     }
 }
 
