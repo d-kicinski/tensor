@@ -12,10 +12,16 @@ The design goal is to create a numpy/pytorch alike interface for interacting
 with multidimensional arrays packaged in a simple, relatively lightweight, library with limited external dependencies that
 could be used on platforms like android phones and microcontrollers.
 
+#### How to use in your project
+If you're using cmake see [tensor-example](https://github.com/dawidkski/tensor-example) for example usage.
+
 #### Usage of `tensor/nn` module
 For example usage jump to [nn-planar-data example](https://github.com/d-kicinski/tensor/tree/master/examples/nn-planar-data)
 
-#### Usage of `tensor` module
+#### Usage of `tensor` module in embedded application
+See this [repository](https://github.com/d-kicinski/tensor-example-embedded)
+
+#### Example usages of `tensor` module
 Create multidimensional tensor:
 ```c++
 // Create an array for storing bitmaps with variadic constructor
@@ -47,6 +53,3 @@ Matrix C = ts::dot(A, B);
 //    / 16 26 \
 //    \ 26 80 /
 ```
-
-#### How to use in your project
-If you're using cmake see [tensor-example](https://github.com/dawidkski/tensor-example) for example usage.
