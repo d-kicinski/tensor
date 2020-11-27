@@ -85,10 +85,10 @@ if (TENSOR_BUILD_TESTS AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             tests/tensor/test_tensor.cpp
             tests/tensor/test_ops_common.cpp
             tests/tensor/test_ops_dot.cpp
-            tests/nn/test_feed_forward.cpp
-            tests/nn/test_cross_entropy_loss.cpp
-            tests/nn/test_softmax.cpp
-            tests/nn/test_planar_dataset.cpp)
+            tests/tensor/nn/test_feed_forward.cpp
+            tests/tensor/nn/test_cross_entropy_loss.cpp
+            tests/tensor/nn/test_softmax.cpp
+            tests/tensor/nn/test_planar_dataset.cpp)
 
     target_link_libraries(tests tensor nn Catch2::Catch2)
 
