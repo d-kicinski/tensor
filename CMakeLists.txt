@@ -16,17 +16,29 @@ if (NOT CMAKE_BUILD_TYPE)
             FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 
-add_subdirectory(lib/Catch2)
-
 option(TENSOR_USE_BLAS "" OFF)
 option(TENSOR_ENABLE_COVERAGE "" OFF)
 option(TENSOR_BUILD_EXAMPLES "" ON)
+option(TENSOR_BUILD_TESTS "" ON)
+option(TENSOR_BUILD_SHARED_LIBS "" ON)
 
 message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
 message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
 message(STATUS "BUILD_EXAMPLES: ${TENSOR_BUILD_EXAMPLES}")
+message(STATUS "BUILD_TESTS: ${TENSOR_BUILD_TESTS}")
+message(STATUS "BUILD_SHARED_LIBS: ${TENSOR_BUILD_SHARED_LIBS}")
 
-add_library(tensor SHARED
+if (TENSOR_BUILD_TESTS)
+    add_subdirectory(lib/Catch2)
+endif ()
+
+if (TENSOR_BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS ON)
+endif()
+
+set(COMPILE_OPTIONS -fno-exceptions -fno-rtti)
+
+add_library(tensor
         src/tensor/ts.hpp
         src/tensor/tensor.hpp
         src/tensor/tensor.cpp
@@ -35,6 +47,7 @@ add_library(tensor SHARED
         src/tensor/ops_common.cpp
         )
 set_target_properties(tensor PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_options(tensor PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(tensor
         PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -49,7 +62,7 @@ if (TENSOR_USE_BLAS)
 endif ()
 
 
-add_library(nn SHARED
+add_library(nn
         src/tensor/nn/feed_forward.cpp
         src/tensor/nn/cross_entropy_loss.cpp
         src/tensor/nn/softmax.hpp
@@ -57,8 +70,8 @@ add_library(nn SHARED
         src/tensor/nn/dataset_iterator.cpp
         )
 target_link_libraries(nn tensor)
-
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_options(nn PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(nn
         PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -66,7 +79,7 @@ target_include_directories(nn
         )
 
 # Enable tests only if project is not imported via add_subdirectory()
-if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+if (TENSOR_BUILD_TESTS AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_executable(tests
             tests/main_catch2.cpp
             tests/tensor/test_tensor.cpp
@@ -90,9 +103,9 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
         coverage_evaluate()
     endif ()
-endif ()
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif ()
 
 
 if (TENSOR_BUILD_EXAMPLES)
