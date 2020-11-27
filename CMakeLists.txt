@@ -46,6 +46,7 @@ add_library(tensor
         src/tensor/ops_common.hpp
         src/tensor/ops_common.cpp
         )
+add_library(tensor::tensor ALIAS tensor)
 set_target_properties(tensor PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_options(tensor PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(tensor
@@ -69,6 +70,7 @@ add_library(nn
         src/tensor/nn/planar_dataset.cpp
         src/tensor/nn/dataset_iterator.cpp
         )
+add_library(tensor::nn ALIAS nn)
 target_link_libraries(nn tensor)
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_options(nn PRIVATE ${COMPILE_OPTIONS})
