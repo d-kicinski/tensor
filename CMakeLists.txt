@@ -18,9 +18,9 @@ endif (NOT CMAKE_BUILD_TYPE)
 
 option(TENSOR_USE_BLAS "" OFF)
 option(TENSOR_ENABLE_COVERAGE "" OFF)
-option(TENSOR_BUILD_EXAMPLES "" ON)
-option(TENSOR_BUILD_TESTS "" ON)
-option(TENSOR_BUILD_SHARED_LIBS "" ON)
+option(TENSOR_BUILD_EXAMPLES "" OFF)
+option(TENSOR_BUILD_TESTS "" OFF)
+option(TENSOR_BUILD_SHARED_LIBS "" OFF)
 
 message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
 message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
@@ -36,15 +36,16 @@ if (TENSOR_BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-set(COMPILE_OPTIONS -fno-exceptions -fno-rtti)
+#set(COMPILE_OPTIONS -fno-exceptions -fno-rtti)
+
 
 add_library(tensor
-        src/tensor/ts.hpp
+#        src/tensor/ts.hpp
         src/tensor/tensor.hpp
         src/tensor/tensor.cpp
-        src/tensor/ops_dot.cpp
-        src/tensor/ops_common.hpp
-        src/tensor/ops_common.cpp
+#        src/tensor/ops_dot.cpp
+#        src/tensor/ops_common.hpp
+#        src/tensor/ops_common.cpp
         )
 add_library(tensor::tensor ALIAS tensor)
 set_target_properties(tensor PROPERTIES LINKER_LANGUAGE CXX)
@@ -63,22 +64,22 @@ if (TENSOR_USE_BLAS)
 endif ()
 
 
-add_library(nn
-        src/tensor/nn/feed_forward.cpp
-        src/tensor/nn/cross_entropy_loss.cpp
-        src/tensor/nn/softmax.hpp
-        src/tensor/nn/planar_dataset.cpp
-        src/tensor/nn/dataset_iterator.cpp
-        )
-add_library(tensor::nn ALIAS nn)
-target_link_libraries(nn tensor)
-set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
-target_compile_options(nn PRIVATE ${COMPILE_OPTIONS})
-target_include_directories(nn
-        PUBLIC
-        $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        )
+#add_library(nn
+#        src/tensor/nn/feed_forward.cpp
+#        src/tensor/nn/cross_entropy_loss.cpp
+#        src/tensor/nn/softmax.hpp
+#        src/tensor/nn/planar_dataset.cpp
+#        src/tensor/nn/dataset_iterator.cpp
+#        )
+#add_library(tensor::nn ALIAS nn)
+#target_link_libraries(nn tensor)
+#set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
+#target_compile_options(nn PRIVATE ${COMPILE_OPTIONS})
+#target_include_directories(nn
+#        PUBLIC
+#        $<INSTALL_INTERFACE:include>
+#        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+#        )
 
 # Enable tests only if project is not imported via add_subdirectory()
 if (TENSOR_BUILD_TESTS AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
@@ -113,3 +114,5 @@ endif ()
 if (TENSOR_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
+
+include(CMake/python.cmake)

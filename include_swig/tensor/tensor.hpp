@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma once
+
 #include <cstddef>
 #include <functional>
 #include <iostream>
@@ -9,7 +11,6 @@
 #include <sstream>
 #include <vector>
 
-#include "tensor_forward.hpp"
 
 namespace ts {
 
@@ -38,19 +39,11 @@ template <typename Element, int Dim> class Tensor {
 
     Tensor();
 
-    Tensor(std::initializer_list<Element> list);
-
-//    Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list);
-
-//    Tensor(std::vector<Tensor<Element, Dim - 1>> list);
-
-    Tensor(std::array<size_type, Dim> const &shape);
+    Tensor(std::array<size_type, Dim> shape);
 
     template <typename... Sizes> Tensor(size_type first, Sizes... rest);
 
     Tensor(Tensor const &tensor);
-
-//    Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
 //    template <typename... Indices>
 //    auto operator()(size_type first, Indices... rest) -> decltype(auto);
@@ -80,7 +73,7 @@ template <typename Element, int Dim> class Tensor {
 
     Tensor& operator-();
 
-    Tensor randn(std::vector<int> const &shape);
+    Tensor randn(std::vector<int> shape);
 
   private:
     size_type _data_size;
@@ -93,7 +86,7 @@ template <typename Element, int Dim> class Tensor {
 
     template <typename... Indices>
     auto get_index(int pos, size_type prev_index, size_type first, Indices... rest) const
-        -> size_type;
+    -> size_type;
 };
 
 template <typename Element, int Dim> Tensor<Element, Dim>::Tensor()
@@ -132,7 +125,7 @@ template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(Tensor const &
 //}
 
 template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(const std::array<size_type, Dim> &shape)
+Tensor<Element, Dim>::Tensor(std::array<size_type, Dim> shape)
 {
     std::copy(shape.begin(), shape.end(), _dimensions.begin());
     _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies<>());
@@ -213,7 +206,7 @@ Tensor<Element, Dim>& Tensor<Element, Dim>::operator=(Tensor const &tensor)
 }
 
 template <typename Element, int Dim>
-auto Tensor<Element, Dim>::randn(const std::vector<int> &shape) -> Tensor
+auto Tensor<Element, Dim>::randn(std::vector<int> shape) -> Tensor
 {
     std::random_device rd;
     std::mt19937 mt(rd());
@@ -348,20 +341,20 @@ auto Tensor<Element, Dim>::get_index(int pos, Tensor::size_type prev_index, Tens
 //    _end = data_end;
 //}
 
-template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
-{
-    if (list.size() == 0) {
-        _data_size = 0;
-        _data = nullptr;
-        return;
-    }
-    _data_size = list.size();
-    _dimensions[0] = _data_size;
-    _data = std::make_shared<vector_t>(list.begin(), list.end());
-    _begin = _data->begin();
-    _end = _data->end();
-}
+//template <typename Element, int Dim>
+//Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
+//{
+//    if (list.size() == 0) {
+//        _data_size = 0;
+//        _data = nullptr;
+//        return;
+//    }
+//    _data_size = list.size();
+//    _dimensions[0] = _data_size;
+//    _data = std::make_shared<vector_t>(list.begin(), list.end());
+//    _begin = _data->begin();
+//    _end = _data->end();
+//}
 
 template <typename Element, int Dim>
 Tensor<Element, Dim>& Tensor<Element, Dim>::operator-()
