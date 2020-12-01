@@ -30,6 +30,7 @@ template <typename Element, int Dim> class Tensor {
 
     auto data() const -> data_t { return _data; };
     auto shape() const -> std::array<size_type, Dim> { return _dimensions; }
+    [[nodiscard]] auto shape(size_type index) const -> size_type { return _dimensions[index]; }
     [[nodiscard]] auto data_size() const -> size_type { return _data_size; }
 
     auto begin() -> iterator { return _begin; }
