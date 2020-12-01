@@ -7,3 +7,5 @@ if [ -f ${BUILD_DIR}/bin/tests ]; then
   cd bin && ./tests && cd ..
 fi
 cd ..
+
+cp -r ${BUILD_DIR}/bin/pytensor* python/lib/
