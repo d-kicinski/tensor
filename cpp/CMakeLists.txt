@@ -55,7 +55,7 @@ if (TENSOR_BUILD_TESTS)
 
     target_link_libraries(tests tensor nn Catch2::Catch2)
 
-    include(${CMAKE_SOURCE_DIR}/lib/Catch2/contrib/Catch.cmake)
+    include(${CMAKE_SOURCE_DIR}/third-party/Catch2/contrib/Catch.cmake)
     enable_testing()
     catch_discover_tests(tests)
 

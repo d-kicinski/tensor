@@ -31,7 +31,7 @@ message(STATUS "BUILD_SHARED_LIBS: ${TENSOR_BUILD_SHARED_LIBS}")
 message(STATUS "BUILD_PYTHON_WRAPPER: ${TENSOR_BUILD_PYTHON_WRAPPER}")
 
 if (TENSOR_BUILD_TESTS)
-    add_subdirectory(lib/Catch2)
+    add_subdirectory(third-party/Catch2)
 endif ()
 
 if (TENSOR_BUILD_SHARED_LIBS)
@@ -45,6 +45,6 @@ if (TENSOR_BUILD_EXAMPLES)
 endif ()
 
 if (TENSOR_BUILD_PYTHON_WRAPPER)
-    add_subdirectory(lib/pybind11)
+    add_subdirectory(third-party/pybind11)
     add_subdirectory(python)
 endif()
