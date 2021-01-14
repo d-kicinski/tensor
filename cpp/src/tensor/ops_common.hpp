@@ -70,7 +70,7 @@ template <typename Element, int axis>
 auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
 {
     if constexpr (axis == 1) {
-        int vector_size = list[0].shape()[0];
+        int vector_size = list[0].shape(0);
         Tensor<Element, 2> tensor(vector_size, list.size());
         for (int i = 0; i < vector_size; ++i) {
             for (int j = 0; j < list.size(); ++j) {
@@ -81,14 +81,14 @@ auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
     } else if constexpr (axis == 0) {
         int vector_size = 0;
         for (auto const & v : list) {
-            vector_size += v.shape()[0];
+            vector_size += v.shape(0);
         }
 
         Tensor<Element, 1> tensor(vector_size);
         int offset = 0;
         for (auto const & v : list) {
             std::copy(v.begin(), v.end(), tensor.begin() + offset);
-            offset += v.shape()[0];
+            offset += v.shape(0);
         }
         return tensor;
     } else {
@@ -101,7 +101,7 @@ auto slice(Tensor<Element, 2> tensor, int from, int to) -> Tensor<Element, 2>
 {
     std::array<int, 2> shape(tensor.shape());
     shape[0] = to - from;
-    int row_size = tensor.shape()[1];
+    int row_size = tensor.shape(1);
 
     Tensor<Element, 2> slice(shape);
     int begin_offset = from * row_size;

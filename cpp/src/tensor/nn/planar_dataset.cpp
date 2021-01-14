@@ -37,7 +37,7 @@ auto ts::PlanarDataset::inputs() -> ts::Tensor<float, 2> { return _inputs; }
 
 auto ts::PlanarDataset::labels() -> ts::Tensor<int, 1> { return _labels; }
 
-auto ts::PlanarDataset::size() -> int { return _inputs.shape()[0]; }
+auto ts::PlanarDataset::size() -> int { return _inputs.shape(0); }
 
 auto ts::PlanarDataset::begin() -> ts::DatasetIterator
 {
@@ -46,5 +46,5 @@ auto ts::PlanarDataset::begin() -> ts::DatasetIterator
 
 auto ts::PlanarDataset::end() -> ts::DatasetIterator
 {
-    return DatasetIterator(_inputs, _labels, _batch_size, _inputs.shape()[0]);
+    return DatasetIterator(_inputs, _labels, _batch_size, _inputs.shape(0));
 }

@@ -43,7 +43,7 @@ auto ts::DatasetIterator::make_pair() const -> ts::DatasetIterator::return_type
 
 auto ts::operator==(const ts::DatasetIterator &lhs, const ts::DatasetIterator &rhs) -> bool
 {
-    return lhs._index >= rhs._inputs.shape()[0];
+    return lhs._index >= rhs._inputs.shape(0);
 }
 
 auto ts::operator!=(const ts::DatasetIterator &lhs, const ts::DatasetIterator &rhs) -> bool

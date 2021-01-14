@@ -84,7 +84,7 @@ auto add(Matrix const &matrix, Vector const &vector) -> Matrix
 {
     // TODO: add(matrix, vector, axis=0)?
     Matrix result(matrix.shape());
-    for (int i = 0; i < matrix.shape()[0]; ++i) {
+    for (int i = 0; i < matrix.shape(0); ++i) {
         auto row = matrix(i);
         std::transform(row.begin(), row.end(), vector.begin(),
                        result.begin() + (i * row.data_size()), std::plus());
@@ -96,7 +96,7 @@ auto divide(Matrix const &matrix, Vector const &vector) -> Matrix
 {
     // TODO: divide(matrix, vector, axis=1)?
     Matrix result(matrix.shape());
-    for (int i = 0; i < vector.shape()[0]; ++i) {
+    for (int i = 0; i < vector.shape(0); ++i) {
         auto row = matrix(i);
         std::transform(row.begin(), row.end(),
                        result.begin() + (i * row.data_size()),
@@ -158,8 +158,8 @@ auto multiply(Tensor<Element, Dim> const &tensor, Element value) -> Tensor<Eleme
 }
 
 auto transpose(Matrix const &matrix) -> Matrix {
-    int m = matrix.shape()[1];
-    int n = matrix.shape()[0];
+    int m = matrix.shape(1);
+    int n = matrix.shape(0);
     Matrix transposed(m, n);
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < n; ++j) {
@@ -174,9 +174,9 @@ auto sum(Matrix const &matrix, int axis) -> Vector
     if (axis == 0) {
         // np.sum(matrix, axis=0, keepdims=True);
 
-        Vector result(matrix.shape()[1]);
-        for (int j = 0; j < matrix.shape()[1]; ++j) {
-            for (int i = 0; i < matrix.shape()[0]; ++i) {
+        Vector result(matrix.shape(1));
+        for (int j = 0; j < matrix.shape(1); ++j) {
+            for (int i = 0; i < matrix.shape(0); ++i) {
                 result(j) += matrix(i, j);
             }
         }
@@ -184,8 +184,8 @@ auto sum(Matrix const &matrix, int axis) -> Vector
     } else if (axis == 1) {
         // np.sum(matrix, axis=1, keepdims=True)
 
-        Vector result(matrix.shape()[0]);
-        for (int i = 0; i < matrix.shape()[0]; ++i) {
+        Vector result(matrix.shape(0));
+        for (int i = 0; i < matrix.shape(0); ++i) {
            result(i) = ts::sum(matrix(i));
         }
         return result;
@@ -202,8 +202,8 @@ auto sum(Tensor<Element, Dim> const & tensor) -> Element
 auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<bool, 2>
 {
     int max_index = *std::max_element(vector.begin(), vector.end());
-    Tensor<bool, 2> one_hot(vector.shape()[0], max_index + 1);
-    for (int i = 0; i < one_hot.shape()[0]; ++i) {
+    Tensor<bool, 2> one_hot(vector.shape(0), max_index + 1);
+    for (int i = 0; i < one_hot.shape(0); ++i) {
         one_hot(i, vector(i)) = true;
     }
     return one_hot;
@@ -212,7 +212,7 @@ auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<bool, 2>
 auto get(Matrix const &matrix, Tensor<int, 1> const &indices) -> Vector
 {
     Vector result(indices.shape());
-    for (int i = 0; i < matrix.shape()[0]; ++i) {
+    for (int i = 0; i < matrix.shape(0); ++i) {
         result(i) = matrix(i, indices(i));
     }
     return result;
@@ -274,7 +274,7 @@ auto from_vector(std::vector<Element> vector) -> Tensor<Element, 1>
 template <typename Element>
 auto argmax(Tensor<Element, 2> const &tensor) -> Tensor<int, 1>
 {
-    int rows = tensor.shape()[0];
+    int rows = tensor.shape(0);
     Tensor<int, 1> indexes(rows);
     for (int i = 0; i < rows; ++i) {
         Tensor<Element, 1> row = tensor(i);

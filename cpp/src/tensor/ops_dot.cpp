@@ -6,9 +6,9 @@ namespace ts {
 auto dot(Matrix const &A, Vector const &x) -> Vector
 {
     // C(m) = A(m, k) * x(k)
-    Vector y(A.shape()[0]);
-    int m = A.shape()[0];
-    int k = A.shape()[1];
+    Vector y(A.shape(0));
+    int m = A.shape(0);
+    int k = A.shape(1);
 
     for (int i = 0; i < m; i++) {
         for (int p = 0; p < k; p++) {
@@ -22,9 +22,9 @@ auto dot(Matrix const &A, Vector const &x) -> Vector
 auto dot(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
 {
     // C(m, n) = A(m, k) * B(k, n)
-    int m = A_T ? A.shape()[1] : A.shape()[0];
-    int n = B_T ? B.shape()[0]: B.shape()[1];
-    int k = A_T ? A.shape()[0] : A.shape()[1];
+    int m = A_T ? A.shape(1): A.shape(0);
+    int n = B_T ? B.shape(0): B.shape(1);
+    int k = A_T ? A.shape(0): A.shape(1);
 
     Matrix C(m, n);
 
@@ -46,7 +46,7 @@ auto dot(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
 
 auto dot(Tensor<float, 3> const &A, Matrix const &B) -> Tensor<float, 3>
 {
-    int batch_size = A.shape()[0];
+    int batch_size = A.shape(0);
     std::vector<Tensor<float, 2>> partial;
     partial.push_back(dot(A(0), B));
     for (int i = 1; i < batch_size; ++i) {

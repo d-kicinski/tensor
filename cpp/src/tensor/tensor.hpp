@@ -127,7 +127,7 @@ template <typename Element, int Dim>
 Tensor<Element, Dim>::Tensor(Tensor<Element, Dim + 1> const &tensor, Tensor::size_type index)
 {
     std::copy(tensor.shape().begin() + 1, tensor.shape().end(), _dimensions.begin());
-    _data_size = tensor.data_size() / tensor.shape()[0];
+    _data_size = tensor.data_size() / tensor.shape(0);
     _data = tensor.data();
     _begin = _data->begin() + index * _data_size;
     _end = _begin + _data_size; // TODO: I added +1 and nothing tests didn't break :/
@@ -307,7 +307,7 @@ Tensor<Element, Dim>::Tensor(std::initializer_list<Tensor<Element, Dim - 1>> lis
     for (auto const &tensor : list) {
         if (_data_size == 0) {
             for (int i = 0; i < tensor.shape().size(); ++i) {
-                _dimensions[i + 1] = tensor.shape()[i];
+                _dimensions[i + 1] = tensor.shape(i);
             }
         }
         _data_size += tensor.data_size();
@@ -335,7 +335,7 @@ Tensor<Element, Dim>::Tensor(std::vector<Tensor<Element, Dim - 1>> list)
     for (auto const &tensor : list) {
         if (_data_size == 0) {
             for (int i = 0; i < tensor.shape().size(); ++i) {
-                _dimensions[i + 1] = tensor.shape()[i];
+                _dimensions[i + 1] = tensor.shape(i);
             }
         }
         _data_size += tensor.data_size();

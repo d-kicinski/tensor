@@ -52,6 +52,13 @@ TEST_CASE("shape: scalar")
     REQUIRE(matrix.shape() == std::array{1});
 }
 
+TEST_CASE("shape(index)")
+{
+    Tensor<int, 2> matrix(2, 3);
+    REQUIRE(matrix.shape(0) == 2);
+    REQUIRE(matrix.shape(1) == 3);
+}
+
 TEST_CASE("bracket operator")
 {
     Tensor<float, 2> matrix ={{1, 2, 3},
