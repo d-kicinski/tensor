@@ -32,6 +32,7 @@ template <typename Element, int Dim> class Tensor {
     auto shape() const -> std::array<size_type, Dim> { return _dimensions; }
     [[nodiscard]] auto shape(size_type index) const -> size_type { return _dimensions[index]; }
     [[nodiscard]] auto data_size() const -> size_type { return _data_size; }
+    auto clone() const -> Tensor;
 
     auto begin() -> iterator { return _begin; }
     auto end() -> iterator { return _end; }
@@ -50,7 +51,9 @@ template <typename Element, int Dim> class Tensor {
 
     template <typename... Sizes> Tensor(size_type first, Sizes... rest);
 
-    Tensor(Tensor const &tensor);
+    Tensor(Tensor const &tensor, bool deep_copy);
+
+    Tensor(Tensor const &tensor) : Tensor(tensor, false) {};
 
     Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
@@ -110,15 +113,6 @@ Tensor<Element, Dim>::Tensor(Tensor::size_type first, Sizes... rest)
 {
     set_sizes(0, first, rest...);
     _data = std::make_shared<vector_t>(_data_size);
-    _begin = _data->begin();
-    _end = _data->end();
-}
-
-template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(Tensor const &tensor)
-{
-    _data_size = tensor.data_size();
-    _dimensions = tensor.shape();
-    _data = std::make_shared<vector_t>(*tensor.data());
     _begin = _data->begin();
     _end = _data->end();
 }
@@ -370,6 +364,25 @@ auto Tensor<Element, Dim>::operator-() -> Tensor &
 {
     std::transform(_begin, _end, _begin, [](Element const &e) { return -e;});
     return *this;
+}
+
+template <typename Element, int Dim> auto Tensor<Element, Dim>::clone() const -> Tensor
+{
+    return Tensor(*this, true);
+}
+
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(const Tensor &tensor, bool deep_copy)
+{
+    _data_size = tensor.data_size();
+    _dimensions = tensor.shape();
+    if (deep_copy) {
+        _data = std::make_shared<vector_t>(*tensor.data());
+    } else {
+        _data = tensor.data();
+    }
+    _begin = _data->begin();
+    _end = _data->end();
 }
 
 } // namespace ts

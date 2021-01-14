@@ -121,7 +121,7 @@ TEST_CASE("iterator of sub-array")
 }
 
 
-TEST_CASE("copy constructor: should create an deep copy")
+TEST_CASE("copy constructor: should create an alias")
 {
     Tensor<float, 2> matrix = {{1, 2, 3},
                                {4, 5, 6}};
@@ -132,8 +132,8 @@ TEST_CASE("copy constructor: should create an deep copy")
     REQUIRE(*matrix.data() == *matrix_copy.data());
 
     matrix_copy(0, 0) = 1337.0f;
-    REQUIRE(matrix(0, 0) == 1.0f);
     REQUIRE(matrix_copy(0, 0) == 1337.0f);
+    REQUIRE(matrix(0, 0) == 1337.0f);
 }
 
 
@@ -153,6 +153,20 @@ TEST_CASE("assigment operator: should create an alias")
     REQUIRE(matrix_alias(0, 0) == 1337.0f);
 }
 
+TEST_CASE("clone()")
+{
+    Tensor<float, 2> matrix = {{1, 2, 3},
+                               {4, 5, 6}};
+    Tensor<float, 2> matrix_copy = matrix.clone();
+
+    REQUIRE(matrix.shape() == matrix_copy.shape());
+    REQUIRE(matrix.data_size() == matrix_copy.data_size());
+    REQUIRE(*matrix.data() == *matrix_copy.data());
+
+    matrix(0, 0) = 1337.0f;
+    REQUIRE(matrix(0, 0) == 1337.0f);
+    REQUIRE(matrix_copy(0, 0) == 1.0f);
+}
 
 TEST_CASE("construct from shape")
 {
