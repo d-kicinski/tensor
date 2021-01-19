@@ -1,12 +1,21 @@
 set(COMPILE_OPTIONS -fno-exceptions -fno-rtti)
-add_library(tensor
+
+set(SOURCES
         src/tensor/ts.hpp
         src/tensor/tensor.hpp
         src/tensor/tensor.cpp
-        src/tensor/ops_dot.cpp
+        src/tensor/ops.hpp
         src/tensor/ops_common.hpp
         src/tensor/ops_common.cpp
         )
+
+if (TENSOR_USE_BLAS)
+    set(SOURCES ${SOURCES}  src/tensor/ops_dot_blas.cpp)
+else ()
+    set(SOURCES ${SOURCES}  src/tensor/ops_dot_naive.cpp)
+endif()
+
+add_library(tensor ${SOURCES})
 add_library(tensor::tensor ALIAS tensor)
 set_target_properties(tensor PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_options(tensor PRIVATE ${COMPILE_OPTIONS})
