@@ -55,6 +55,8 @@ template <typename Element, int Dim> class Tensor {
 
     Tensor(Tensor const &tensor) : Tensor(tensor, false) {};
 
+    Tensor(Tensor && tensor);
+
     Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
     template <typename... Indices>
@@ -70,6 +72,8 @@ template <typename Element, int Dim> class Tensor {
     auto operator!=(Tensor<Element, Dim> const &other) -> bool;
 
     auto operator=(Tensor const &tensor) -> Tensor &;
+
+    auto operator=(Tensor &&tensor) -> Tensor &;
 
     auto operator<(Element const &value) -> Tensor<bool, Dim>;
 
@@ -383,6 +387,33 @@ Tensor<Element, Dim>::Tensor(const Tensor &tensor, bool deep_copy)
     }
     _begin = _data->begin();
     _end = _data->end();
+}
+
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(Tensor &&tensor)
+:   _data_size(tensor._data_size),
+    _begin(std::move(tensor._begin)),
+    _end(std::move(tensor._end)),
+    _dimensions(std::move(tensor._dimensions)),
+    _data(std::move(tensor._data))
+{
+    tensor._data_size = 0;
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator=(Tensor &&tensor) -> Tensor &
+{
+    if (&tensor == this)
+        return *this;
+
+    _data_size = tensor._data_size;
+    _begin = std::move(tensor._begin);
+    _end = std::move(tensor._end);
+    _dimensions = std::move(tensor._dimensions);
+    _data = std::move(tensor._data);
+
+    tensor._data_size = 0;
+
+    return *this;
 }
 
 } // namespace ts
