@@ -284,3 +284,18 @@ TEST_CASE("argmax(Matrix)")
 
     REQUIRE(indexes == expected);
 }
+
+TEST_CASE("swap(Matrix, Matrix")
+{
+    Matrix m1 = {{1, 1}, {2, 2}};
+    Matrix m2 = {{3, 3, 3}, {4, 4,4}};
+
+    auto a = m1.clone();
+    auto b = m2.clone();
+
+    ts::swap(a, b);
+
+    REQUIRE(a == m2);
+    REQUIRE(b == m1);
+
+}

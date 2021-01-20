@@ -126,4 +126,12 @@ auto slice(Tensor<Element, 1> tensor, int from, int to) -> Tensor<Element, 1>
     return slice;
 }
 
+template <typename T>
+auto swap(T & t1, T & t2)
+{
+    auto temp(std::move(t1));
+    t1 = std::move(t2);
+    t2 = std::move(temp);
+}
+
 }
