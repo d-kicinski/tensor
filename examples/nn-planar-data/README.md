@@ -3,11 +3,11 @@ The goal of this example is to show how you can build and train simple neural ne
 `tensor/nn` module. The task is the following. We've been given a list of 2d points divided into
 3 categories. What we need to do is to build a predictive model that would classify all pair points
 (x, y) where x and y belong to the range (-2.0, 2.0). The Figure below shows the mapping of given data
-into planar space - each category has been given a separate category.
+into planar space - each category has been given a separate color.
 
 ![test data](img/train_data.png)
 
-For this task, we use a model build from 2 feed-forward layers with ReLU activation after the first one.
+For this task, we use a model build from 2 feed-forward layers with ReLU activation sandwiched between them.
 The code is fairly simple so it's better to just show it.
 ```c++
 class Model {
