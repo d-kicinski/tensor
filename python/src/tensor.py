@@ -48,11 +48,14 @@ class Tensor:
     def numpy(self):
         return np.array(self._data)
 
-    def __add__(self, other):
-        raise NotImplementedError
+    def __add__(self, other: "Tensor") -> "Tensor":
+        return Tensor(_ts.add(self._data, other._data))
 
-    def __mul__(self, other):
-        raise NotImplementedError
+    def __mul__(self, other: float) -> "Tensor":
+        return Tensor(_ts.multiply(self._data, other))
+
+    def __rmul__(self, other: float):
+        return self * other
 
     def __matmul__(self, other: "Tensor") -> "Tensor":
         return Tensor(_ts.dot(self._data, other._data))
@@ -60,3 +63,14 @@ class Tensor:
     def __str__(self) -> str:
         return f"Tensor({self._shape[0]}, {self._shape[1]})"
 
+
+def log(tensor: Tensor) -> Tensor:
+    return Tensor(_ts.log(tensor._data))
+
+
+def pow(tensor: Tensor, p: int) -> Tensor:
+    return Tensor(_ts.pow(tensor._data, p))
+
+
+def exp(tensor: Tensor) -> Tensor:
+    return Tensor(_ts.exp(tensor._data))

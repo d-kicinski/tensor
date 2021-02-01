@@ -31,3 +31,51 @@ def test_tensor_matmul():
 
     assert t.shape == expected_array.shape
     np.testing.assert_equal(t.numpy(), expected_array)
+
+
+def test_tensor_add():
+    t1 = ts.Tensor([[1, 1], [2, 2]])
+    t2 = ts.Tensor([[2, 2], [1, 1]])
+    t = t1 + t2
+
+    expected_array = np.array([[3, 3], [3, 3]])
+
+    assert t.shape == expected_array.shape
+    np.testing.assert_equal(t.numpy(), expected_array)
+
+
+def test_tensor_mul():
+    t1 = ts.Tensor([[1, 2], [3, 4]])
+    t = 2 * t1
+
+    expected_array = np.array([[2, 4], [6, 8]])
+
+    assert t.shape == expected_array.shape
+    np.testing.assert_equal(t.numpy(), expected_array)
+
+
+def test_log():
+    t1 = ts.Tensor([[2, 2], [4, 4]])
+    t = ts.log(t1)
+
+    expected_array = np.log(t1.numpy())
+
+    np.testing.assert_almost_equal(t.numpy(), expected_array)
+
+
+def test_exp():
+    t1 = ts.Tensor([[2, 2], [4, 4]])
+    t = ts.exp(t1)
+
+    expected_array = np.exp(t1.numpy())
+
+    np.testing.assert_almost_equal(t.numpy(), expected_array, decimal=6)
+
+
+def test_pow():
+    t1 = ts.Tensor([[2, 2], [4, 4]])
+    t = ts.pow(t1, 4)
+
+    expected_array = np.power(t1.numpy(), 4)
+
+    np.testing.assert_almost_equal(t.numpy(), expected_array)

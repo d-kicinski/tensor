@@ -48,7 +48,19 @@ PYBIND11_MODULE(pytensor, m)
                 {sizeof(float) * size_t(t.shape(1)), /* Strides (in bytes) for each index */
                  sizeof(float)});
         });
+
     m.def("dot",
         py::overload_cast<ts::Matrix const &, ts::Matrix const &, bool , bool>(&ts::dot),
             py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
+
+    m.def("add", &ts::add<float, 2>);
+
+    m.def("multiply", &ts::multiply<float, 2>);
+
+    m.def("log", &ts::log<float, 2>);
+
+    m.def("pow", &ts::pow<float, 2>);
+
+    m.def("exp", &ts::exp<float, 2>);
+
 }
