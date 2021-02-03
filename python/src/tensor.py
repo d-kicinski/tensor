@@ -53,6 +53,17 @@ class Tensor:
     def numpy(self):
         return np.array(self._data)
 
+    def __getitem__(self, item: Union[Tuple[int, int], int]) -> float:
+        if isinstance(item, Tuple):
+            if len(item) == 2:
+                return self._data[item]
+            elif len(item) == 1:
+                return self._data[item[0], 0]
+        elif isinstance(item, int):
+            return self._data[item, 0]
+        else:
+            raise ValueError(f"Unsupported index: {item}")
+
     def __add__(self, other: "Tensor") -> "Tensor":
         return Tensor(_ts.add(self._data, other._data))
 

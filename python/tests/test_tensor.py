@@ -85,3 +85,16 @@ def test_pow():
     expected_array = np.power(t1.numpy(), 4)
 
     np.testing.assert_almost_equal(t.numpy(), expected_array)
+
+
+def test_tensor_get_item():
+    tensor = ts.Tensor([[1, 2], [3, 4]])
+    assert tensor[0, 0] == 1
+    assert tensor[0, 1] == 2
+    assert tensor[1, 0] == 3
+    assert tensor[1, 1] == 4
+
+
+def test_tensor_get_item_scalar():
+    tensor = ts.Tensor(7)
+    assert tensor[0] == 7
