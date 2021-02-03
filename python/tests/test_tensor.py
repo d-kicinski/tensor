@@ -15,6 +15,12 @@ def test_not_tensor_create_not_supported():
     assert str(e.value) == expected
 
 
+def test_tensor_scalar():
+    scalar = ts.Tensor(7)
+    assert scalar.shape == (1, 1)
+    assert scalar[0, 0] == 7
+
+
 def test_tensor_shape():
     expected_shape = (2, 2)
     tensor = ts.Tensor(shape=expected_shape)

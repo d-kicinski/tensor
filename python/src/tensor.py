@@ -1,15 +1,16 @@
-from typing import Optional, Union, Sequence, List
+from typing import Optional, Union, Sequence, List, Tuple
 
 import pytensor as _ts
 import numpy as np
 
 ArrayT = Union[_ts.Tensor2F, np.array, List[List[float]]]
+ScalarT = int
 
 
 class Tensor:
 
     def __init__(self,
-                 array: Optional[ArrayT] = None,
+                 array: Optional[Union[ArrayT, ScalarT]] = None,
                  shape: Optional[Sequence[int]] = None):
 
         self._data: _ts.Tensor2F
@@ -25,6 +26,10 @@ class Tensor:
             self._data = _ts.Tensor2F(array.astype(np.float32))
         elif isinstance(array, List):
             arr = np.array(array)
+            self._check_shape(arr.shape)
+            self._data = _ts.Tensor2F(arr.astype(np.float32))
+        elif isinstance(array, ScalarT):
+            arr = np.array([[array]])
             self._check_shape(arr.shape)
             self._data = _ts.Tensor2F(arr.astype(np.float32))
         elif array is not None:
