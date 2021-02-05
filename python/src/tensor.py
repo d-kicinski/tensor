@@ -50,6 +50,10 @@ class Tensor:
     def shape(self):
         return self._shape
 
+    @property
+    def T(self):
+        return Tensor(_ts.transpose(self._data))
+
     def numpy(self):
         return np.array(self._data)
 

@@ -5,7 +5,7 @@ import pytest
 
 def test_not_tensor_create_not_supported():
     with pytest.raises(ValueError) as e:
-        ts.Tensor(shape=(2, ))
+        ts.Tensor(shape=(2,))
     expected = f"Tensor with dims other that 2D are not supported yet! Note that len(shape)=1"
     assert str(e.value) == expected
 
@@ -98,3 +98,12 @@ def test_tensor_get_item():
 def test_tensor_get_item_scalar():
     tensor = ts.Tensor(7)
     assert tensor[0] == 7
+
+
+def test_tensor_transpose():
+    tensor = ts.Tensor(np.array([[1, 2, 3], [1, 2, 3]]))
+    tensor_t = tensor.T
+
+    expected_array = np.array([[1, 1], [2, 2], [3, 3]])
+
+    np.testing.assert_equal(tensor_t.numpy(), expected_array)

@@ -63,4 +63,6 @@ PYBIND11_MODULE(pytensor, m)
 
     m.def("exp", &ts::exp<float, 2>);
 
+    m.def("transpose", &ts::transpose);
+
 }
