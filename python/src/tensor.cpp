@@ -67,4 +67,7 @@ PYBIND11_MODULE(pytensor, m)
 
    m.def("sum", py::overload_cast<ts::Matrix const &, int>(&ts::sum_v2));
 
+   m.def("get", [](ts::Matrix const & m, ts::Matrix const & i) {
+       return ts::Matrix({ts::get(m, i[0].cast<int>())});
+   });
 }
