@@ -242,3 +242,13 @@ TEST_CASE("unary operator-")
 
    REQUIRE(result == expected);
 }
+
+TEST_CASE("cast")
+{
+   Tensor<float, 2> matrix_f = {{1.0f, 2.0f},
+                                {3.0f, 4.0f}};
+   Tensor<int, 2> matrix_i = {{1, 2},
+                              {3, 4}};
+
+    REQUIRE(matrix_i == matrix_f.cast<int>());
+}

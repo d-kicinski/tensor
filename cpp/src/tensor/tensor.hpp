@@ -22,6 +22,8 @@ namespace ts {
 
 template <typename Element, int Dim> class Tensor {
 
+    template<typename AnyElement, int AnyDim> friend class Tensor;
+
   public:
     using size_type = int;
     using vector_t = std::vector<Element>;
@@ -65,7 +67,7 @@ template <typename Element, int Dim> class Tensor {
     template <typename... Indices>
     auto operator()(size_type first, Indices... rest) const -> decltype(auto);
 
-    auto operator[](size_type i) -> decltype(auto);
+    auto operator[](size_type i) const -> decltype(auto);
 
     auto operator==(Tensor<Element, Dim> const &other) const -> bool;
 
@@ -88,6 +90,22 @@ template <typename Element, int Dim> class Tensor {
     auto operator+=(Tensor const &tensor) -> Tensor &;
 
     auto operator-() -> Tensor &;
+
+    template <typename T>
+    auto cast() -> Tensor<T, Dim>
+    {
+       auto t = Tensor<T, Dim>();
+       t._data = std::make_shared<std::vector<T>>(std::vector<T>(begin(), end()));
+       t._dimensions = _dimensions;
+       t._data_size = _data_size;
+       t._begin = t.data()->begin();
+       t._end = t.data()->end();
+
+       std::advance(t._begin, std::distance(_data->begin(), _begin));
+       std::advance(t._end, std::distance(_end, _data->end()));
+
+       return t;
+    }
 
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
@@ -182,7 +200,7 @@ auto Tensor<Element, Dim>::operator==(const Tensor<Element, Dim> &other) const -
 }
 
 template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator[](Tensor::size_type i) -> decltype(auto)
+auto Tensor<Element, Dim>::operator[](Tensor::size_type i) const -> decltype(auto)
 {
     if constexpr (Dim == 1) {
         return _begin[i];
