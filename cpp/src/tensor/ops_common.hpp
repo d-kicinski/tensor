@@ -30,12 +30,17 @@ auto apply_if(Tensor<Element, Dim>, Tensor<bool, Dim>, Fn<Element>) -> Tensor<El
 template <typename Element, int Dim>
 auto multiply(Tensor<Element, Dim> const &, Element) -> Tensor<Element, Dim>;
 
+template <typename Element, int Dim>
+auto multiply(Tensor<Element, Dim> const &, Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
+
 auto transpose(Matrix const &) -> Matrix;
 
 template<typename Element, int Dim>
 auto sum(Tensor<Element, Dim> const &) -> Element;
 
 auto sum(Matrix const &, int) -> Vector;
+
+auto sum_v2(Matrix const &, int) -> Matrix;
 
 auto to_one_hot(Tensor<int, 1> const &) -> Tensor<bool, 2>;
 

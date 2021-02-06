@@ -54,6 +54,7 @@ class Tensor:
     def T(self):
         return Tensor(_ts.transpose(self._data))
 
+    @property
     def numpy(self):
         return np.array(self._data)
 
@@ -71,10 +72,12 @@ class Tensor:
     def __add__(self, other: "Tensor") -> "Tensor":
         return Tensor(_ts.add(self._data, other._data))
 
-    def __mul__(self, other: float) -> "Tensor":
+    def __mul__(self, other: Union[float, "Tensor"]) -> "Tensor":
+        if isinstance(other, float):
+            other = Tensor(np.full(self.shape, other))
         return Tensor(_ts.multiply(self._data, other))
 
-    def __rmul__(self, other: float):
+    def __rmul__(self, other: Union[float, "Tensor"]) -> "Tensor":
         return self * other
 
     def __matmul__(self, other: "Tensor") -> "Tensor":
@@ -94,3 +97,7 @@ def pow(tensor: Tensor, p: int) -> Tensor:
 
 def exp(tensor: Tensor) -> Tensor:
     return Tensor(_ts.exp(tensor._data))
+
+
+def sum(tensor: Tensor, axis: int) -> Tensor:
+    return Tensor(_ts.sum(tensor._data, axis))

@@ -50,6 +50,8 @@ template auto multiply(Tensor<float, 1> const & tensor, float value) -> Tensor<f
 template auto multiply(Tensor<float, 2> const & tensor, float value) -> Tensor<float, 2>;
 template auto multiply(Tensor<float, 3> const & tensor, float value) -> Tensor<float, 3>;
 
+template auto multiply(Tensor<float, 2> const &, Tensor<float, 2> const &) -> Tensor<float, 2>;
+
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 1>;
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 2>;
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 3>;
@@ -157,6 +159,19 @@ auto multiply(Tensor<Element, Dim> const &tensor, Element value) -> Tensor<Eleme
    return result;
 }
 
+template <typename Element, int Dim>
+auto multiply(Tensor<Element, Dim> const & t1, Tensor<Element, Dim> const & t2) -> Tensor<Element, Dim>
+{
+    auto result = t1.clone();
+    std::transform(t1.begin(), t1.end(),
+                   t2.begin(),
+                   result.begin(),
+                   [&](Element & e1, Element & e2) {
+                     return e1 * e2;
+                   });
+    return result;
+}
+
 auto transpose(Matrix const &matrix) -> Matrix {
     int m = matrix.shape(1);
     int n = matrix.shape(0);
@@ -187,6 +202,30 @@ auto sum(Matrix const &matrix, int axis) -> Vector
         Vector result(matrix.shape(0));
         for (int i = 0; i < matrix.shape(0); ++i) {
            result(i) = ts::sum(matrix(i));
+        }
+        return result;
+    }
+    assert(false);
+}
+
+auto sum_v2(Matrix const &matrix, int axis) -> Matrix
+{
+    if (axis == 0) {
+        // np.sum(matrix, axis=0, keepdims=True);
+
+        Matrix result(matrix.shape());
+        for (int j = 0; j < matrix.shape(1); ++j) {
+            for (int i = 0; i < matrix.shape(0); ++i) {
+                result(j, 0) += matrix(i, j);
+            }
+        }
+        return result;
+    } else if (axis == 1) {
+        // np.sum(matrix, axis=1, keepdims=True)
+
+        Matrix result(matrix.shape());
+        for (int i = 0; i < matrix.shape(0); ++i) {
+            result(i, 0) = ts::sum(matrix(i));
         }
         return result;
     }

@@ -55,7 +55,7 @@ PYBIND11_MODULE(pytensor, m)
 
     m.def("add", &ts::add<float, 2>);
 
-    m.def("multiply", &ts::multiply<float, 2>);
+    m.def("multiply", py::overload_cast<ts::Matrix const &, ts::Matrix const&>(&ts::multiply<float, 2>));
 
     m.def("log", &ts::log<float, 2>);
 
@@ -64,5 +64,7 @@ PYBIND11_MODULE(pytensor, m)
     m.def("exp", &ts::exp<float, 2>);
 
     m.def("transpose", &ts::transpose);
+
+   m.def("sum", py::overload_cast<ts::Matrix const &, int>(&ts::sum_v2));
 
 }
