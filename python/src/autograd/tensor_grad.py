@@ -27,6 +27,9 @@ class Variable:
     def grad(self, value):
         self._grad = value
 
+    def backward(self):
+        traverse(self)
+
     def __str__(self):
         return f"Variable({self.value.shape=}, {self._grad.shape=})"
 
@@ -192,7 +195,7 @@ def main():
 
     y = w1 @ (w0 @ x + b)
 
-    traverse(y)
+    y.backward()
     print_graph(y)
 
 
