@@ -213,7 +213,7 @@ auto sum_v2(Matrix const &matrix, int axis) -> Matrix
     if (axis == 0) {
         // np.sum(matrix, axis=0, keepdims=True);
 
-        Matrix result(matrix.shape());
+        Matrix result(matrix.shape(0), 1);
         for (int j = 0; j < matrix.shape(1); ++j) {
             for (int i = 0; i < matrix.shape(0); ++i) {
                 result(j, 0) += matrix(i, j);
@@ -223,7 +223,7 @@ auto sum_v2(Matrix const &matrix, int axis) -> Matrix
     } else if (axis == 1) {
         // np.sum(matrix, axis=1, keepdims=True)
 
-        Matrix result(matrix.shape());
+        Matrix result(matrix.shape(0), 1);
         for (int i = 0; i < matrix.shape(0); ++i) {
             result(i, 0) = ts::sum(matrix(i));
         }

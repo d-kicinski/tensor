@@ -87,14 +87,29 @@ class Add(Op):
     def forward(self, *inputs: Variable) -> Variable:
         x, b = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
         self._inputs.extend([x, b])
-        ret = Variable(x.value + b.value)
-        ret.op = self
-        return ret
+
+        if x.value.shape == b.value.shape:
+            return Variable(x.value + b.value, self)
+        elif b.value.shape[1] != x.value.shape[1] and b.value.shape[1] == 1:
+            # TODO: do not use numpy to do this, do not cheat :^)
+            b_broad = ts.Tensor(np.array(np.tile(b.value.numpy, (1, x.value.shape[1]))))
+            return Variable(x.value + b_broad, self)
+        else:
+            raise ValueError(f"Add(Op): Unsupported input shapes! {x.value.shape}, {b.value.shape}")
 
     def backward(self, *grads: ts.Tensor):
         grad = self._check_grads(*grads, num=self.EXPECTED_GRADS_LENGTH)
-        self._inputs[0].grad = grad
-        self._inputs[1].grad = ts.sum(grad, 0)
+        x = self._inputs[0]
+        b = self._inputs[1]
+
+        x.grad = grad
+
+        if x.value.shape == b.value.shape:
+            b.grad = grad
+        elif b.value.shape[1] != x.value.shape[1] and b.value.shape[1] == 1:
+            b.grad = ts.sum(grad, 0)
+        else:
+            raise ValueError(f"Add(Op): Unsupported input shapes! {x.value.shape}, {b.value.shape}")
 
     def __str__(self):
         return f"Add(x, y)"
@@ -165,8 +180,8 @@ def main():
     ))
 
     b = Variable(ts.Tensor(
-        [[4, 4],
-         [5, 5]]
+        [[4],
+         [5]]
     ))
 
     w1 = Variable(ts.Tensor(
