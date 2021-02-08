@@ -78,3 +78,22 @@ if (TENSOR_BUILD_TESTS)
 
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif ()
+
+
+if (TENSOR_BUILD_PYTHON_WRAPPER)
+    set(PYTHON_LIB pytensor)
+    add_library(${PYTHON_LIB} MODULE
+            src/wrapper/tensor.cpp)
+
+    pybind11_extension(${PYTHON_LIB})
+    pybind11_strip(${PYTHON_LIB})
+
+    set_target_properties(${PYTHON_LIB} PROPERTIES
+            CXX_VISIBILITY_PRESET "hidden"
+            CUDA_VISIBILITY_PRESET "hidden")
+    target_link_libraries(${PYTHON_LIB} PRIVATE
+            pybind11::module
+            pybind11::lto
+            tensor
+            )
+endif()
