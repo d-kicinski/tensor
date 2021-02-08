@@ -56,3 +56,17 @@ def test_numpy_from_tensor():
 
     array[2, 3] = 5
     assert array[2, 3] == 5
+
+
+def test_cross_entropy_loss():
+    loss = _ts.CrossEntropyLoss()
+
+    logits = _ts.Tensor2F(np.random.randn(300, 3).astype(np.float32))
+    aa = np.random.randint(0, 2, (300,))
+
+    labels = _ts.Tensor1I(np.random.randint(0, 2, (300,)).astype(np.int32))
+
+    loss_value = loss.forward(logits, labels)
+    loss.backward()
+
+    assert loss_value != 0.0
