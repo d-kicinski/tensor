@@ -7,51 +7,54 @@ namespace py = pybind11;
 
 using size_type = ts::Tensor<float, 2>::size_type;
 
-PYBIND11_MODULE(pytensor, m)
+auto wrap_tensor2F(pybind11::module & m)
 {
     py::class_<ts::Tensor<float, 2>>(m, "Tensor2F", py::buffer_protocol())
         .def(py::init<size_type , size_type>())
-        /// Construct from a buffer
+            /// Construct from a buffer
         .def(py::init([](py::buffer const b) {
-            py::buffer_info info = b.request();
-            if (info.format != py::format_descriptor<float>::format() || info.ndim != 2)
-                throw std::runtime_error("Incompatible buffer format!");
+          py::buffer_info info = b.request();
+          if (info.format != py::format_descriptor<float>::format() || info.ndim != 2)
+              throw std::runtime_error("Incompatible buffer format!");
 
-            auto v = new ts::Tensor<float, 2>(info.shape[0], info.shape[1]);
-            memcpy(v->data()->data(),
-                   info.ptr,
-                   sizeof(float) * (size_t)(v->shape(0) * v->shape(1)));
-            return v;
+          auto v = new ts::Tensor<float, 2>(info.shape[0], info.shape[1]);
+          memcpy(v->data()->data(),
+                 info.ptr,
+                 sizeof(float) * (size_t)(v->shape(0) * v->shape(1)));
+          return v;
         }))
         .def("shape", [](ts::Tensor<float, 2> const  &t) -> std::array<int, 2> {
           return t.shape();
         })
         .def("data_size", &ts::Tensor<float, 2>::data_size)
-        /// Bare bones interface
+            /// Bare bones interface
         .def("__getitem__",
              [](ts::Tensor<float, 2> const &t, std::pair<py::ssize_t, py::ssize_t> i) {
-                 if (i.first >= t.shape(0) || i.second >= t.shape(1))
-                     throw py::index_error();
-                 return t(i.first, i.second);
+               if (i.first >= t.shape(0) || i.second >= t.shape(1))
+                   throw py::index_error();
+               return t(i.first, i.second);
              })
         .def("__setitem__",
              [](ts::Tensor<float, 2> &t, std::pair<py::ssize_t, py::ssize_t> i, float v) {
-                 if (i.first >= t.shape(0) || i.second >= t.shape(1))
-                     throw py::index_error();
-                 t(i.first, i.second) = v;
+               if (i.first >= t.shape(0) || i.second >= t.shape(1))
+                   throw py::index_error();
+               t(i.first, i.second) = v;
              })
-        /// Provide buffer access
+            /// Provide buffer access
         .def_buffer([](ts::Tensor<float, 2> &t) -> py::buffer_info {
-            return py::buffer_info(
-                t.data()->data(),                          /* Pointer to buffer */
-                {t.shape(0), t.shape(1)},              /* Buffer dimensions */
-                {sizeof(float) * size_t(t.shape(1)), /* Strides (in bytes) for each index */
-                 sizeof(float)});
+          return py::buffer_info(
+              t.data()->data(),                          /* Pointer to buffer */
+              {t.shape(0), t.shape(1)},              /* Buffer dimensions */
+              {sizeof(float) * size_t(t.shape(1)), /* Strides (in bytes) for each index */
+               sizeof(float)});
         });
+}
 
+auto wrap_ops(pybind11::module & m)
+{
     m.def("dot",
-        py::overload_cast<ts::Matrix const &, ts::Matrix const &, bool , bool>(&ts::dot),
-            py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
+          py::overload_cast<ts::Matrix const &, ts::Matrix const &, bool , bool>(&ts::dot),
+          py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
 
     m.def("add", &ts::add<float, 2>);
 
@@ -65,9 +68,15 @@ PYBIND11_MODULE(pytensor, m)
 
     m.def("transpose", &ts::transpose);
 
-   m.def("sum", py::overload_cast<ts::Matrix const &, int>(&ts::sum_v2));
+    m.def("sum", py::overload_cast<ts::Matrix const &, int>(&ts::sum_v2));
 
-   m.def("get", [](ts::Matrix const & m, ts::Matrix const & i) {
-       return ts::Matrix({ts::get(m, i[0].cast<int>())});
-   });
+    m.def("get", [](ts::Matrix const & m, ts::Matrix const & i) {
+      return ts::Matrix({ts::get(m, i[0].cast<int>())});
+    });
+}
+
+PYBIND11_MODULE(pytensor, m)
+{
+    wrap_tensor2F(m);
+    wrap_ops(m);
 }
