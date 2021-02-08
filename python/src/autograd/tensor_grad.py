@@ -136,6 +136,23 @@ class Dot(Op):
         return f"Dot(a, b)"
 
 
+class Log(Op):
+    EXPECTED_INPUTS_LENGTH: int = 1
+    EXPECTED_GRADS_LENGTH: int = 1
+
+    def forward(self, *inputs: Variable):
+        x = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
+        self._inputs.extend([x])
+        return Variable(ts.log(x.value), self)
+
+    def backward(self, *grads: ts.Tensor):
+        grad = self._check_grads(*grads, num=self.EXPECTED_GRADS_LENGTH)
+        self._inputs[0].grad = self._inputs[0].value * grad
+
+    def __str__(self):
+        return f"Log(x)"
+
+
 def dot(x: Variable, y: Variable) -> Variable:
     op = Dot()
     return op.forward(x, y)
@@ -144,6 +161,11 @@ def dot(x: Variable, y: Variable) -> Variable:
 def add(x: Variable, y: Variable) -> Variable:
     op = Add()
     return op.forward(x, y)
+
+
+def log(x: Variable) -> Variable:
+    op = Log()
+    return op.forward(x)
 
 
 def traverse(var: Variable):
