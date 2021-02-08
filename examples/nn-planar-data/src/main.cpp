@@ -2,7 +2,6 @@
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/feed_forward.hpp>
 #include <tensor/nn/planar_dataset.hpp>
-#include <tensor/nn/softmax.hpp>
 
 class Model {
 
@@ -15,11 +14,11 @@ class Model {
     auto update(MatrixF const &inputs, VectorI const &labels, float learning_rate) -> float
     {
         // forward pass
-        auto probabilities = _forward(inputs);
-        float loss = _loss(probabilities, labels);
+        auto logits = _forward(inputs);
+        float loss = _loss(logits, labels);
 
         // backward pass
-        _layer1.backward(_layer2.backward(_loss.backward(probabilities)));
+        _layer1.backward(_layer2.backward(_loss.backward()));
 
         // parameters update
         _layer1.update(learning_rate);
@@ -31,12 +30,11 @@ class Model {
   private:
     ts::FeedForward _layer1 = ts::FeedForward(2, 100, true);
     ts::FeedForward _layer2 = ts::FeedForward(100, 3);
-    ts::CrossEntropyLoss _loss = ts::CrossEntropyLoss({_layer1.weights(), _layer2.weights()});
+    ts::CrossEntropyLoss _loss = ts::CrossEntropyLoss();
 
     auto _forward(MatrixF const &inputs) -> MatrixF
     {
-        auto logits = _layer2(_layer1(inputs));
-        return ts::softmax(logits);
+        return _layer2(_layer1(inputs));
     }
 };
 

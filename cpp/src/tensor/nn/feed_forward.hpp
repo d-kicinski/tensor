@@ -6,7 +6,7 @@ namespace ts {
 
 class FeedForward {
   public:
-    FeedForward(int dim_in, int dim_out, bool activation=false, float alpha=1e-3);
+    FeedForward(int dim_in, int dim_out, bool activation=false, bool l2=false, float alpha=1e-10);
 
     auto operator()(Matrix const &) -> Matrix;
 
@@ -27,6 +27,7 @@ class FeedForward {
     Vector _d_bias;
     float _alpha;
     bool _activation;
+    bool _l2;
 
 };
 

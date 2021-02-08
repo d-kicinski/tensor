@@ -36,6 +36,7 @@ endif ()
 add_library(nn
         src/tensor/nn/feed_forward.cpp
         src/tensor/nn/cross_entropy_loss.cpp
+        src/tensor/nn/regularization.hpp
         src/tensor/nn/softmax.hpp
         src/tensor/nn/planar_dataset.cpp
         src/tensor/nn/dataset_iterator.cpp

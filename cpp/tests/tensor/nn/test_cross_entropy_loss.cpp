@@ -6,15 +6,13 @@ using namespace ts;
 
 TEST_CASE("CrossEntropyLoss:: forward, backward")
 {
-    Matrix w1(2, 100);
-    Matrix w2(100, 3);
-    CrossEntropyLoss loss({w1, w2}, 16);
+    CrossEntropyLoss loss;
 
     Matrix probabilities = ts::Matrix::randn({300, 3});
     Tensor<int, 1> labels = ts::randint<1>(0, 2, {300});
 
     float loss_value = loss.forward(probabilities, labels);
-    Matrix d_probabilities = loss.backward(probabilities);
+    Matrix d_probabilities = loss.backward();
 
     REQUIRE(loss_value != 0.0);
 }
