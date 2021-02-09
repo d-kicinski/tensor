@@ -206,6 +206,7 @@ auto sum(Matrix const &matrix, int axis) -> Vector
         return result;
     }
     assert(false);
+    return Vector {};  // silencing gcc warning
 }
 
 auto sum_v2(Matrix const &matrix, int axis) -> Matrix
@@ -230,6 +231,7 @@ auto sum_v2(Matrix const &matrix, int axis) -> Matrix
         return result;
     }
     assert(false);
+    return Matrix {};  // silencing gcc warning
 }
 
 template<typename Element, int Dim>

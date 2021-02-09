@@ -96,5 +96,6 @@ if (TENSOR_BUILD_PYTHON_WRAPPER)
             pybind11::module
             pybind11::lto
             tensor
+            nn
             )
 endif()

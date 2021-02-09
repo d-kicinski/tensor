@@ -1,8 +1,10 @@
 #include "dataset_iterator.hpp"
 
-ts::DatasetIterator::DatasetIterator(const ts::Tensor<float, 2> &inputs,
-                                     const ts::Tensor<int, 1> &labels, int batch_size, int index)
-    : _inputs(inputs), _labels(labels), _batch_size(batch_size), _index(index) { }
+#include <utility>
+
+ts::DatasetIterator::DatasetIterator(ts::Tensor<float, 2> inputs,
+                                     ts::Tensor<int, 1> labels, int batch_size, int index)
+    : _inputs(std::move(inputs)), _labels(std::move(labels)), _batch_size(batch_size), _index(index) { }
 
 auto ts::DatasetIterator::operator++() -> ts::DatasetIterator &
 {
