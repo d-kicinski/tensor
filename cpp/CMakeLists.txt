@@ -82,7 +82,7 @@ endif ()
 
 
 if (TENSOR_BUILD_PYTHON_WRAPPER)
-    set(PYTHON_LIB pytensor)
+    set(PYTHON_LIB libtensor)
     add_library(${PYTHON_LIB} MODULE
             src/wrapper/tensor.cpp)
 

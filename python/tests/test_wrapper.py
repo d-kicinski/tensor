@@ -1,4 +1,4 @@
-import pytensor as _ts
+import libtensor as _ts
 import pytest
 import numpy as np
 

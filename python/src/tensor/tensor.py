@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Union, Sequence, List, Tuple, Any
 
-import pytensor as _ts
+import libtensor as _ts
 import numpy as np
 
 DataT = Union[_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI]

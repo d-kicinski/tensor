@@ -146,7 +146,7 @@ auto wrap_nn(pybind11::module & m)
         .def("backward", &ts::CrossEntropyLoss::backward);
 }
 
-PYBIND11_MODULE(pytensor, m)
+PYBIND11_MODULE(libtensor, m)
 {
     wrap_tensor2D<int>(m, "MatrixI");
     wrap_tensor2D<float>(m, "MatrixF");

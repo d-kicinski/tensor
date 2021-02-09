@@ -1,5 +1,5 @@
 import numpy as np
-import tensor as ts
+from tensor import tensor as ts
 import pytest
 
 
