@@ -4,7 +4,7 @@ on: [push]
 
 env:
   BUILD_TYPE: Release
-  CXX: g++-9
+  CXX: g++-10
 
 jobs:
   build:
@@ -32,4 +32,4 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash
-        run: cd bin && ./tests && ..
+        run: cd bin && ./tests && cd ..
