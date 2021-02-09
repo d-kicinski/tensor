@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: gcc
+      run: |
+        gcc-9 --version
+      shell: bash
     - name: Checkout repository and submodules
       uses: actions/checkout@v2
       with:
