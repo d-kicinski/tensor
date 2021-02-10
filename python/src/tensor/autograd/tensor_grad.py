@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import abstractmethod, ABCMeta
 from typing import Optional, List, Iterable, Union, TypeVar
 
@@ -10,7 +12,7 @@ IterT = Union[T, Iterable[T]]
 
 class Variable:
 
-    def __init__(self, value: ts.Tensor, op: Optional["Op"] = None):
+    def __init__(self, value: ts.Tensor, op: Optional[Op] = None):
         self._value: ts.Tensor = value
         self._grad: ts.Tensor = ts.Tensor(np.full(value.shape, 1.0))
         self.op: Optional[Op] = op
@@ -33,15 +35,15 @@ class Variable:
     def __str__(self):
         return f"Variable({self.value.shape=}, {self._grad.shape=})"
 
-    def __neg__(self) -> "Variable":
+    def __neg__(self) -> Variable:
         var = Variable(-self._value, self.op)
         var._grad = self._grad
         return var
 
-    def __matmul__(self, other: "Variable") -> "Variable":
+    def __matmul__(self, other: Variable) -> Variable:
         return dot(self, other)
 
-    def __add__(self, other: "Variable") -> "Variable":
+    def __add__(self, other: Variable) -> Variable:
         return add(self, other)
 
 
@@ -90,15 +92,7 @@ class Add(Op):
     def forward(self, *inputs: Variable) -> Variable:
         x, b = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
         self._inputs.extend([x, b])
-
-        if x.value.shape == b.value.shape:
-            return Variable(x.value + b.value, self)
-        elif b.value.shape[1] != x.value.shape[1] and b.value.shape[1] == 1:
-            # TODO: do not use numpy to do this, do not cheat :^)
-            b_broad = ts.Tensor(np.array(np.tile(b.value.numpy, (1, x.value.shape[1]))))
-            return Variable(x.value + b_broad, self)
-        else:
-            raise ValueError(f"Add(Op): Unsupported input shapes! {x.value.shape}, {b.value.shape}")
+        return Variable(x.value + b.value, self)
 
     def backward(self, *grads: ts.Tensor):
         grad = self._check_grads(*grads, num=self.EXPECTED_GRADS_LENGTH)
@@ -109,7 +103,7 @@ class Add(Op):
 
         if x.value.shape == b.value.shape:
             b.grad = grad
-        elif b.value.shape[1] != x.value.shape[1] and b.value.shape[1] == 1:
+        elif b.value.dim == 1 and x.value.shape[1] == b.value.shape[0]:
             b.grad = ts.sum(grad, 0)
         else:
             raise ValueError(f"Add(Op): Unsupported input shapes! {x.value.shape}, {b.value.shape}")
@@ -190,36 +184,3 @@ def print_graph(var: Variable, prefix=""):
                     print_graph(i, p)
 
     loop(var, prefix)
-
-
-def main():
-    x = Variable(ts.Tensor(
-        [[1, 1],
-         [2, 2],
-         [3, 3]]
-    ))
-
-    w0 = Variable(ts.Tensor(
-        [[4, 4, 4],
-         [5, 5, 5]]
-    ))
-
-    b = Variable(ts.Tensor(
-        [[4],
-         [5]]
-    ))
-
-    w1 = Variable(ts.Tensor(
-        [[1, 1],
-         [2, 2],
-         [3, 3]]
-    ))
-
-    y = w1 @ (w0 @ x + b)
-
-    y.backward()
-    print_graph(y)
-
-
-if __name__ == '__main__':
-    main()

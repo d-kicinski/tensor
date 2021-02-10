@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import abstractmethod, ABCMeta
 from math import log
 from typing import Optional, List, Iterable, Union, TypeVar
@@ -28,21 +30,21 @@ class Variable:
     def __str__(self):
         return f"Variable({self.value=}, {self._grad=})"
 
-    def __neg__(self) -> "Variable":
+    def __neg__(self) -> Variable:
         var = Variable(-self._value, self.op)
         var._grad = self._grad
         return var
 
-    def __mul__(self, other: "Variable") -> "Variable":
+    def __mul__(self, other: Variable) -> Variable:
         return multiply(self, other)
 
-    def __add__(self, other: "Variable") -> "Variable":
+    def __add__(self, other: Variable) -> Variable:
         return add(self, other)
 
-    def __sub__(self, other: "Variable") -> "Variable":
+    def __sub__(self, other: Variable) -> Variable:
         return sub(self, other)
 
-    def __pow__(self, p: "Variable", modulo=None) -> "Variable":
+    def __pow__(self, p: Variable, modulo=None) -> Variable:
         return power(self, p)
 
 
