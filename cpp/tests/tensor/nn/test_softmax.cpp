@@ -4,8 +4,8 @@
 
 TEST_CASE("softmax")
 {
-   ts::Matrix log_probabilities = ts::Matrix::randn({32, 3});
-   ts::Matrix probabilities = ts::softmax(log_probabilities);
+   ts::MatrixF log_probabilities = ts::MatrixF::randn({32, 3});
+   ts::MatrixF probabilities = ts::softmax(log_probabilities);
 
    for (int i = 0; i < probabilities.shape(0); ++i) {
         auto row = probabilities(i);

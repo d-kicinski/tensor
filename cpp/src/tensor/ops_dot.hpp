@@ -4,10 +4,10 @@
 
 namespace ts {
 
-auto dot(Matrix const &, Vector const &) -> Vector;
+auto dot(MatrixF const &, VectorF const &) -> VectorF;
 
-auto dot(Matrix const & A, Matrix const & B, bool A_T=false, bool B_T=false) -> Matrix ;
+auto dot(MatrixF const & A, MatrixF const & B, bool A_T=false, bool B_T=false) -> MatrixF ;
 
-auto dot(Tensor<float, 3> const & A, Matrix const & B) -> Tensor<float, 3>;
+auto dot(Tensor<float, 3> const & A, MatrixF const & B) -> Tensor<float, 3>;
 
 }

@@ -5,41 +5,41 @@
 using namespace ts;
 
 
-TEST_CASE("dot: Matrix[2, 3] X Vector[3]")
+TEST_CASE("dot: MatrixF[2, 3] X VectorF[3]")
 {
-    Matrix matrix = {{1, 1, 1},
+    MatrixF matrix = {{1, 1, 1},
                      {2, 2, 2}};
-    Vector vector = {1, 1, 1};
-    Vector result = dot(matrix, vector);
-    Vector expected_result = {3, 6};
+    VectorF vector = {1, 1, 1};
+    VectorF result = dot(matrix, vector);
+    VectorF expected_result = {3, 6};
 
     REQUIRE(expected_result == result);
 }
 
 
-TEST_CASE("dot: Matrix[3, 3] X Vector[3]")
+TEST_CASE("dot: MatrixF[3, 3] X VectorF[3]")
 {
-    Matrix matrix = {
+    MatrixF matrix = {
         {3, 1, 3},
         {1, 5, 9},
         {2, 6, 5}
     };
-    Vector vector= { -1, -1, 1 };
-    Vector result = dot(matrix, vector);
-    Vector expected_result = {-1, 3, -3};
+    VectorF vector= { -1, -1, 1 };
+    VectorF result = dot(matrix, vector);
+    VectorF expected_result = {-1, 3, -3};
 
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("dot: Matrix[3, 3] X Matrix[3, 3]")
+TEST_CASE("dot: MatrixF[3, 3] X MatrixF[3, 3]")
 {
-    Matrix matrix = {
+    MatrixF matrix = {
         {3, 1, 3},
         {1, 5, 9},
         {2, 6, 5}
     };
-    Matrix result = dot(matrix, matrix);
-    Matrix expected_result = {
+    MatrixF result = dot(matrix, matrix);
+    MatrixF expected_result = {
         {16, 26, 33},
         {26, 80, 93},
         {22, 62, 85}
@@ -48,19 +48,19 @@ TEST_CASE("dot: Matrix[3, 3] X Matrix[3, 3]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("dot: Matrix[2, 3] X Matrix[3, 2]")
+TEST_CASE("dot: MatrixF[2, 3] X MatrixF[3, 2]")
 {
-    Matrix matrixA = {
+    MatrixF matrixA = {
         {3, 1, 3},
         {1, 5, 9},
     };
-    Matrix matrixB = {
+    MatrixF matrixB = {
         {3, 1},
         {1, 5},
         {2, 6}
     };
-    Matrix result = dot(matrixA, matrixB);
-    Matrix expected_result = {
+    MatrixF result = dot(matrixA, matrixB);
+    MatrixF expected_result = {
         {16, 26},
         {26, 80},
     };
@@ -68,20 +68,20 @@ TEST_CASE("dot: Matrix[2, 3] X Matrix[3, 2]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("dot: Matrix[3, 2].T X Matrix[3, 2]")
+TEST_CASE("dot: MatrixF[3, 2].T X MatrixF[3, 2]")
 {
-    Matrix matrixA = {
+    MatrixF matrixA = {
         {3, 1},
         {1, 5},
         {3, 9}
     };
-    Matrix matrixB = {
+    MatrixF matrixB = {
         {3, 1},
         {1, 5},
         {2, 6}
     };
-    Matrix result = dot(matrixA, matrixB, true);
-    Matrix expected_result = {
+    MatrixF result = dot(matrixA, matrixB, true);
+    MatrixF expected_result = {
         {16, 26},
         {26, 80},
     };
@@ -89,20 +89,20 @@ TEST_CASE("dot: Matrix[3, 2].T X Matrix[3, 2]")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("dot: Matrix[2, 3] X Matrix[2, 3].T")
+TEST_CASE("dot: MatrixF[2, 3] X MatrixF[2, 3].T")
 {
-    Matrix matrixA = {
+    MatrixF matrixA = {
         {3, 1, 3},
         {1, 5, 9},
     };
 
-    Matrix matrixB = {
+    MatrixF matrixB = {
         {3, 1, 2},
         {1, 5, 6}
     };
 
-    Matrix result = dot(matrixA, matrixB, false, true);
-    Matrix expected_result = {
+    MatrixF result = dot(matrixA, matrixB, false, true);
+    MatrixF expected_result = {
         {16, 26},
         {26, 80},
     };
@@ -110,7 +110,7 @@ TEST_CASE("dot: Matrix[2, 3] X Matrix[2, 3].T")
     REQUIRE(expected_result == result);
 }
 
-TEST_CASE("dot: Tensor[2, 2, 2] x Matrix[2, 3]")
+TEST_CASE("dot: Tensor[2, 2, 2] x MatrixF[2, 3]")
 {
     Tensor<float, 3> tensorA = {
         {{1, 1},
@@ -119,7 +119,7 @@ TEST_CASE("dot: Tensor[2, 2, 2] x Matrix[2, 3]")
         {{3, 3},
          {4, 4}}
     };
-    Matrix matrixB = {
+    MatrixF matrixB = {
         {3, 1, 3},
         {1, 5, 9},
     };

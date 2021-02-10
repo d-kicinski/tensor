@@ -14,6 +14,9 @@ template auto add(Tensor<float, 1> const &, Tensor<float, 1> const &) -> Tensor<
 template auto add(Tensor<float, 2> const &, Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto add(Tensor<float, 3> const &, Tensor<float, 3> const &) -> Tensor<float, 3>;
 
+template auto add(Tensor<float, 2> const &, Tensor<float, 1> const &) -> Tensor<float, 2>;
+template auto add(Tensor<int, 2> const &, Tensor<int, 1> const &) -> Tensor<int, 2>;
+
 template auto maximum(float, Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto maximum(float, Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto maximum(float, Tensor<float, 3> const &) -> Tensor<float, 3>;
@@ -82,10 +85,11 @@ auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tens
     return result;
 }
 
-auto add(Matrix const &matrix, Vector const &vector) -> Matrix
+template <typename Element>
+auto add(Matrix<Element> const &matrix, Vector<Element> const &vector) -> Matrix<Element>
 {
     // TODO: add(matrix, vector, axis=0)?
-    Matrix result(matrix.shape());
+    Matrix<Element> result(matrix.shape());
     for (int i = 0; i < matrix.shape(0); ++i) {
         auto row = matrix(i);
         std::transform(row.begin(), row.end(), vector.begin(),
@@ -94,10 +98,10 @@ auto add(Matrix const &matrix, Vector const &vector) -> Matrix
     return result;
 }
 
-auto divide(Matrix const &matrix, Vector const &vector) -> Matrix
+auto divide(MatrixF const &matrix, VectorF const &vector) -> MatrixF
 {
     // TODO: divide(matrix, vector, axis=1)?
-    Matrix result(matrix.shape());
+    MatrixF result(matrix.shape());
     for (int i = 0; i < vector.shape(0); ++i) {
         auto row = matrix(i);
         std::transform(row.begin(), row.end(),
@@ -172,10 +176,10 @@ auto multiply(Tensor<Element, Dim> const & t1, Tensor<Element, Dim> const & t2) 
     return result;
 }
 
-auto transpose(Matrix const &matrix) -> Matrix {
+auto transpose(MatrixF const &matrix) -> MatrixF {
     int m = matrix.shape(1);
     int n = matrix.shape(0);
-    Matrix transposed(m, n);
+    MatrixF transposed(m, n);
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < n; ++j) {
             transposed(i, j) = matrix(j, i);
@@ -184,12 +188,12 @@ auto transpose(Matrix const &matrix) -> Matrix {
     return transposed;
 }
 
-auto sum(Matrix const &matrix, int axis) -> Vector
+auto sum(MatrixF const &matrix, int axis) -> VectorF
 {
     if (axis == 0) {
         // np.sum(matrix, axis=0, keepdims=True);
 
-        Vector result(matrix.shape(1));
+        VectorF result(matrix.shape(1));
         for (int j = 0; j < matrix.shape(1); ++j) {
             for (int i = 0; i < matrix.shape(0); ++i) {
                 result(j) += matrix(i, j);
@@ -199,22 +203,22 @@ auto sum(Matrix const &matrix, int axis) -> Vector
     } else if (axis == 1) {
         // np.sum(matrix, axis=1, keepdims=True)
 
-        Vector result(matrix.shape(0));
+        VectorF result(matrix.shape(0));
         for (int i = 0; i < matrix.shape(0); ++i) {
            result(i) = ts::sum(matrix(i));
         }
         return result;
     }
     assert(false);
-    return Vector {};  // silencing gcc warning
+    return VectorF {};  // silencing gcc warning
 }
 
-auto sum_v2(Matrix const &matrix, int axis) -> Matrix
+auto sum_v2(MatrixF const &matrix, int axis) -> MatrixF
 {
     if (axis == 0) {
         // np.sum(matrix, axis=0, keepdims=True);
 
-        Matrix result(matrix.shape(0), 1);
+        MatrixF result(matrix.shape(0), 1);
         for (int j = 0; j < matrix.shape(1); ++j) {
             for (int i = 0; i < matrix.shape(0); ++i) {
                 result(j, 0) += matrix(i, j);
@@ -224,14 +228,14 @@ auto sum_v2(Matrix const &matrix, int axis) -> Matrix
     } else if (axis == 1) {
         // np.sum(matrix, axis=1, keepdims=True)
 
-        Matrix result(matrix.shape(0), 1);
+        MatrixF result(matrix.shape(0), 1);
         for (int i = 0; i < matrix.shape(0); ++i) {
             result(i, 0) = ts::sum(matrix(i));
         }
         return result;
     }
     assert(false);
-    return Matrix {};  // silencing gcc warning
+    return MatrixF {};  // silencing gcc warning
 }
 
 template<typename Element, int Dim>
@@ -250,9 +254,9 @@ auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<bool, 2>
     return one_hot;
 }
 
-auto get(Matrix const &matrix, Tensor<int, 1> const &indices) -> Vector
+auto get(MatrixF const &matrix, Tensor<int, 1> const &indices) -> VectorF
 {
-    Vector result(indices.shape());
+    VectorF result(indices.shape());
     for (int i = 0; i < matrix.shape(0); ++i) {
         result(i) = matrix(i, indices(i));
     }

@@ -181,7 +181,7 @@ TEST_CASE("construct from shape")
 
 TEST_CASE("operator<(Tensor, scalar)")
 {
-    Matrix matrix = {{1, -1, 1},
+    MatrixF matrix = {{1, -1, 1},
                      {1, -1, 1}};
     auto result = matrix > 0;
     Tensor<bool, 2> expected = {{true, false, true},
@@ -234,11 +234,11 @@ TEST_CASE("access element of a sub-array")
 
 TEST_CASE("unary operator-")
 {
-   Matrix matrix = {{1, 1, 1},
+   MatrixF matrix = {{1, 1, 1},
                     {1, 1, 1}};
-   Matrix expected = {{-1, -1, -1},
+   MatrixF expected = {{-1, -1, -1},
                       {-1, -1, -1}};
-   Matrix result = -matrix;
+   MatrixF result = -matrix;
 
    REQUIRE(result == expected);
 }

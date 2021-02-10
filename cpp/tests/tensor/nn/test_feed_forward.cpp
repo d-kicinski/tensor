@@ -14,7 +14,7 @@ TEST_CASE("Create FeedForward layer")
 TEST_CASE("FeedForward: forward, backward")
 {
     FeedForward layer(2, 3);
-    Matrix input(32, 2);
+    MatrixF input(32, 2);
     auto y = layer(input);
     {
         std::array<int, 2> expected_shape = {32, 3};

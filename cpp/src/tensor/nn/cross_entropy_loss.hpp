@@ -8,15 +8,15 @@ namespace ts {
 class CrossEntropyLoss {
 
   public:
-    auto operator()(Matrix const & probs, Tensor<int, 1> const &labels) -> float;
+    auto operator()(MatrixF const & probs, Tensor<int, 1> const &labels) -> float;
 
-    auto forward(Matrix const & probs, Tensor<int, 1> const &labels) -> float;
+    auto forward(MatrixF const & probs, Tensor<int, 1> const &labels) -> float;
 
-    auto backward() -> Matrix;
+    auto backward() -> MatrixF;
 
   private:
     Tensor<int, 1> _labels;
-    Matrix _scores;
+    MatrixF _scores;
 };
 
 }

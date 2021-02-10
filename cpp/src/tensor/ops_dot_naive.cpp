@@ -3,10 +3,10 @@
 
 namespace ts {
 
-auto dot(Matrix const &A, Vector const &x) -> Vector
+auto dot(MatrixF const &A, VectorF const &x) -> VectorF
 {
     // C(m) = A(m, k) * x(k)
-    Vector y(A.shape(0));
+    VectorF y(A.shape(0));
     int m = A.shape(0);
     int k = A.shape(1);
 
@@ -19,14 +19,14 @@ auto dot(Matrix const &A, Vector const &x) -> Vector
     return y;
 }
 
-auto dot(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
+auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
 {
     // C(m, n) = A(m, k) * B(k, n)
     int m = A_T ? A.shape(1): A.shape(0);
     int n = B_T ? B.shape(0): B.shape(1);
     int k = A_T ? A.shape(0): A.shape(1);
 
-    Matrix C(m, n);
+    MatrixF C(m, n);
 
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
@@ -44,7 +44,7 @@ auto dot(Matrix const &A, Matrix const &B, bool A_T, bool B_T) -> Matrix
     return C;
 }
 
-auto dot(Tensor<float, 3> const &A, Matrix const &B) -> Tensor<float, 3>
+auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>
 {
     int batch_size = A.shape(0);
     std::vector<Tensor<float, 2>> partial;

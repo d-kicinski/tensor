@@ -11,9 +11,10 @@ using Fn = std::function<Element(Element)>;
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &, Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
 
-auto add(Matrix const &, Vector const &) -> Matrix ;
+template <typename Element>
+auto add(Tensor<Element, 2> const &, Tensor<Element, 1> const &) -> Tensor<Element, 2> ;
 
-auto divide(Matrix const &, Vector const &) -> Matrix ;
+auto divide(MatrixF const &, VectorF const &) -> MatrixF ;
 
 template <typename Element, int Dim>
 auto maximum(Element, Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
@@ -33,18 +34,18 @@ auto multiply(Tensor<Element, Dim> const &, Element) -> Tensor<Element, Dim>;
 template <typename Element, int Dim>
 auto multiply(Tensor<Element, Dim> const &, Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
 
-auto transpose(Matrix const &) -> Matrix;
+auto transpose(MatrixF const &) -> MatrixF;
 
 template<typename Element, int Dim>
 auto sum(Tensor<Element, Dim> const &) -> Element;
 
-auto sum(Matrix const &, int) -> Vector;
+auto sum(MatrixF const &, int) -> VectorF;
 
-auto sum_v2(Matrix const &, int) -> Matrix;
+auto sum_v2(MatrixF const &, int) -> MatrixF;
 
 auto to_one_hot(Tensor<int, 1> const &) -> Tensor<bool, 2>;
 
-auto get(Matrix const &, Tensor<int, 1> const &) -> Vector;
+auto get(MatrixF const &, Tensor<int, 1> const &) -> VectorF;
 
 template <typename Element, int Dim>
 auto apply(Tensor<Element, Dim> const &, Fn<Element>) -> Tensor<Element, Dim>;

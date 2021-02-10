@@ -8,23 +8,23 @@ class FeedForward {
   public:
     FeedForward(int dim_in, int dim_out, bool activation=false, bool l2=false, float alpha=1e-10);
 
-    auto operator()(Matrix const &) -> Matrix;
+    auto operator()(MatrixF const &) -> MatrixF;
 
-    auto forward(Matrix const &) -> Matrix;
+    auto forward(MatrixF const &) -> MatrixF;
 
-    auto backward(Matrix) -> Matrix;
+    auto backward(MatrixF) -> MatrixF;
 
     auto update(float step_size) -> void;
 
-    auto weights() -> Matrix;
+    auto weights() -> MatrixF;
 
   private:
-    Matrix _x;
-    Matrix _y;
-    Matrix _weights;
-    Matrix _d_weights;
-    Vector _bias;
-    Vector _d_bias;
+    MatrixF _x;
+    MatrixF _y;
+    MatrixF _weights;
+    MatrixF _d_weights;
+    VectorF _bias;
+    VectorF _d_bias;
     float _alpha;
     bool _activation;
     bool _l2;

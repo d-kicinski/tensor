@@ -5,13 +5,13 @@ namespace ts {
 FeedForward::FeedForward(int dim_in, int dim_out, bool activation, bool l2, float alpha)
     : _alpha(alpha), _activation(activation), _l2(l2)
 {
-   _weights = ts::Matrix::randn({dim_in, dim_out});
-   _bias = ts::Vector(dim_out);
+   _weights = ts::MatrixF::randn({dim_in, dim_out});
+   _bias = ts::VectorF(dim_out);
 }
 
-auto FeedForward::operator()(Matrix const &inputs) -> Matrix { return forward(inputs); }
+auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(inputs); }
 
-auto FeedForward::forward(Matrix const &inputs) -> Matrix
+auto FeedForward::forward(MatrixF const &inputs) -> MatrixF
 {
     _x = inputs;
     _y = ts::add(ts::dot(_x, _weights), _bias);
@@ -21,7 +21,7 @@ auto FeedForward::forward(Matrix const &inputs) -> Matrix
     return _y;
 }
 
-auto FeedForward::backward(Matrix d_y) -> Matrix
+auto FeedForward::backward(MatrixF d_y) -> MatrixF
 {
     if (_activation) {
         d_y = ts::assign_if(d_y, _y <= 0, 0.0f);  // d_y[_y <= 0] = 0;
@@ -41,6 +41,6 @@ auto FeedForward::update(float step_size) -> void
     _bias += ts::multiply(_d_bias, -step_size);
 }
 
-auto FeedForward::weights() -> Matrix { return _weights; }
+auto FeedForward::weights() -> MatrixF { return _weights; }
 
 }

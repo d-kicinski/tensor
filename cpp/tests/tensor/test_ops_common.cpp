@@ -9,7 +9,7 @@
 using namespace ts;
 using namespace std::placeholders;
 
-TEST_CASE("multiply: Matrix[2, 3] X scalar")
+TEST_CASE("multiply: MatrixF[2, 3] X scalar")
 {
     Tensor<float, 2> matrix = {{1, 1, 1},
                                {1, 1, 1}};
@@ -22,37 +22,37 @@ TEST_CASE("multiply: Matrix[2, 3] X scalar")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("add: Matrix[2, 3] x Matrix[2, 3]")
+TEST_CASE("add: MatrixF[2, 3] x MatrixF[2, 3]")
 {
-    Matrix t1 = {{1, 1, 1},
+    MatrixF t1 = {{1, 1, 1},
                  {1, 1, 1}};
-    Matrix t2 = {{1, 1, 1},
+    MatrixF t2 = {{1, 1, 1},
                  {1, 1, 1}};
-    Matrix expected = {{2, 2, 2},
+    MatrixF expected = {{2, 2, 2},
                        {2, 2, 2}};
     auto result = ts::add(t1, t2);
 
     REQUIRE(result == expected);
 }
 
-TEST_CASE("add(Matrix, Vector, axis=0)")
+TEST_CASE("add(MatrixF, VectorF, axis=0)")
 {
-    Matrix matrix = {{1, 1, 1},
+    MatrixF matrix = {{1, 1, 1},
                      {0, 0, 0}};
-    Vector vector = {3, 3, 3};
-    Matrix expected = {{4, 4, 4},
+    VectorF vector = {3, 3, 3};
+    MatrixF expected = {{4, 4, 4},
                        {3, 3, 3}};
     auto result = ts::add(matrix, vector);
 
     REQUIRE(result == expected);
 }
 
-TEST_CASE("divide(Matrix, Vector, axis=0)")
+TEST_CASE("divide(MatrixF, VectorF, axis=0)")
 {
-    Matrix matrix = {{3, 6, 9},
+    MatrixF matrix = {{3, 6, 9},
                      {3, 6, 9}};
-    Vector vector = {3, 3};
-    Matrix expected = {{1, 2, 3},
+    VectorF vector = {3, 3};
+    MatrixF expected = {{1, 2, 3},
                        {1, 2, 3}};
     auto result = ts::divide(matrix, vector);
 
@@ -61,10 +61,10 @@ TEST_CASE("divide(Matrix, Vector, axis=0)")
 
 TEST_CASE("transpose")
 {
-    Matrix matrix = {{1, 1, 1},
+    MatrixF matrix = {{1, 1, 1},
                      {1, 1, 1}};
 
-    Matrix expected = {{1, 1},
+    MatrixF expected = {{1, 1},
                        {1, 1},
                        {1, 1}};
     auto result = ts::transpose(matrix);
@@ -72,11 +72,11 @@ TEST_CASE("transpose")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("maximum(scalar, Matrix)")
+TEST_CASE("maximum(scalar, MatrixF)")
 {
-    Matrix matrix = {{1, -1, 1},
+    MatrixF matrix = {{1, -1, 1},
                      {1, -1, 1}};
-    Matrix expected = {{1, 0, 1},
+    MatrixF expected = {{1, 0, 1},
                        {1, 0, 1}};
     auto result = ts::maximum(0.0f, matrix);
 
@@ -85,7 +85,7 @@ TEST_CASE("maximum(scalar, Matrix)")
 
 TEST_CASE("mask from tensor")
 {
-    Matrix matrix = {{1, -1, 1},
+    MatrixF matrix = {{1, -1, 1},
                      {1, -1, 1}};
     Tensor<bool, 2> expected = {{true, false, true},
                                 {true, false, true}};
@@ -97,9 +97,9 @@ TEST_CASE("mask from tensor")
 
 TEST_CASE("assign_if")
 {
-    Matrix matrix = {{1, -1, 1},
+    MatrixF matrix = {{1, -1, 1},
                      {1, -1, 1}};
-    Matrix expected = {{1, 1337, 1},
+    MatrixF expected = {{1, 1337, 1},
                        {1, 1337, 1}};
 
     auto result = assign_if(matrix, matrix < 0, 1337.0f);
@@ -107,22 +107,22 @@ TEST_CASE("assign_if")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("sum(Matrix, Vector, axis=0)")
+TEST_CASE("sum(MatrixF, VectorF, axis=0)")
 {
-    Matrix matrix = {{1, 1, 1},
+    MatrixF matrix = {{1, 1, 1},
                      {1, 1, 1}};
-    Vector expected = {2, 2, 2};
+    VectorF expected = {2, 2, 2};
 
     auto result = ts::sum(matrix, 0);
 
     REQUIRE(result == expected);
 }
 
-TEST_CASE("sum(Matrix, Vector, axis=1)")
+TEST_CASE("sum(MatrixF, VectorF, axis=1)")
 {
-    Matrix matrix = {{1, 1, 1},
+    MatrixF matrix = {{1, 1, 1},
                      {1, 1, 1}};
-    Vector expected = {3, 3};
+    VectorF expected = {3, 3};
 
     auto result = ts::sum(matrix, 1);
 
@@ -131,7 +131,7 @@ TEST_CASE("sum(Matrix, Vector, axis=1)")
 
 TEST_CASE("sum(Tensor)")
 {
-    Matrix matrix = {{1, 1, 1},
+    MatrixF matrix = {{1, 1, 1},
                      {1, 1, 1}};
     auto result = ts::sum(matrix);
     REQUIRE(result == 6);
@@ -140,7 +140,7 @@ TEST_CASE("sum(Tensor)")
 TEST_CASE("to_one_hot")
 {
     Tensor<int, 1> vector = {2, 0, 1};
-    Matrix matrix = {{1, 2, 3},
+    MatrixF matrix = {{1, 2, 3},
                      {1, 2, 3},
                      {1, 2, 3}};
 
@@ -155,9 +155,9 @@ TEST_CASE("to_one_hot")
 
 TEST_CASE("apply_if")
 {
-    Matrix matrix = {{1, -1, 1},
+    MatrixF matrix = {{1, -1, 1},
                      {1, -1, 1}};
-    Matrix expected = {{1, 1, 1},
+    MatrixF expected = {{1, 1, 1},
                        {1, 1, 1}};
 
     auto result = ts::apply_if(matrix, matrix < 0,
@@ -166,12 +166,12 @@ TEST_CASE("apply_if")
     REQUIRE(result == expected);
 }
 
-TEST_CASE("get(Matrix, Vector)")
+TEST_CASE("get(MatrixF, VectorF)")
 {
-    Matrix matrix = {{1, 2, 3},
+    MatrixF matrix = {{1, 2, 3},
                      {1, 2, 3}};
     Tensor<int, 1> vector = {2, 0};
-    Vector expected = {3, 1};
+    VectorF expected = {3, 1};
 
     auto result = ts::get(matrix, vector);
 
@@ -180,10 +180,10 @@ TEST_CASE("get(Matrix, Vector)")
 
 TEST_CASE("apply")
 {
-    Matrix matrix = {{1, 2, 3},
+    MatrixF matrix = {{1, 2, 3},
                      {1, 2, 3}};
 
-    Matrix expected = {{1, 4, 9},
+    MatrixF expected = {{1, 4, 9},
                        {1, 4, 9}};
 
     Tensor<float, 2> result = ts::apply<float, 2>(matrix, (Fn<float>)[](float e){ return std::pow(e, 2); });
@@ -193,7 +193,7 @@ TEST_CASE("apply")
 
 TEST_CASE("ts::log")
 {
-    Matrix matrix = {{1, 2, 3},
+    MatrixF matrix = {{1, 2, 3},
                      {1, 2, 3}};
     Tensor<float, 2> result = ts::log(matrix);
 }
@@ -209,7 +209,7 @@ TEST_CASE("randint")
 TEST_CASE("from_vector")
 {
    std::vector<float> std_v = {1,2,3,4,5};
-   Vector vector = ts::from_vector(std_v);
+   VectorF vector = ts::from_vector(std_v);
 
    REQUIRE(std::equal(std_v.begin(), std_v.end(), vector.begin()));
    REQUIRE(vector.shape() == std::array{5});
@@ -217,10 +217,10 @@ TEST_CASE("from_vector")
 
 TEST_CASE("concatenate vectors with axis = 1")
 {
-   Vector v0 = {0, 0, 0};
-   Vector v1 = {1, 1, 1};
-   Vector v2 = {2, 2, 2};
-   Matrix expected = {{0, 1, 2},
+   VectorF v0 = {0, 0, 0};
+   VectorF v1 = {1, 1, 1};
+   VectorF v2 = {2, 2, 2};
+   MatrixF expected = {{0, 1, 2},
                       {0, 1, 2},
                       {0, 1, 2}};
 
@@ -231,10 +231,10 @@ TEST_CASE("concatenate vectors with axis = 1")
 
 TEST_CASE("concatenate vectors with axis = 0")
 {
-    Vector v0 = {0, 0, 0};
-    Vector v1 = {1, 1, 1};
-    Vector v2 = {2, 2, 2};
-    Vector expected = {0, 0, 0, 1, 1, 1, 2, 2, 2};
+    VectorF v0 = {0, 0, 0};
+    VectorF v1 = {1, 1, 1};
+    VectorF v2 = {2, 2, 2};
+    VectorF expected = {0, 0, 0, 1, 1, 1, 2, 2, 2};
 
     Tensor<float, 1> result = ts::concatenate<float, 0>({v0, v1, v2});
 
@@ -243,10 +243,10 @@ TEST_CASE("concatenate vectors with axis = 0")
 
 TEST_CASE("concatenate vectors with axis = 0 and different sizes")
 {
-    Vector v0 = {0, 0, 0};
-    Vector v1 = {1, 1};
-    Vector v2 = {2};
-    Vector expected = {0, 0, 0, 1, 1, 2};
+    VectorF v0 = {0, 0, 0};
+    VectorF v1 = {1, 1};
+    VectorF v2 = {2};
+    VectorF expected = {0, 0, 0, 1, 1, 2};
 
     Tensor<float, 1> result = ts::concatenate<float, 0>({v0, v1, v2});
 
@@ -255,26 +255,26 @@ TEST_CASE("concatenate vectors with axis = 0 and different sizes")
 
 TEST_CASE("slice")
 {
-    Matrix matrix = {{0, 0, 0},
+    MatrixF matrix = {{0, 0, 0},
                      {1, 1, 1},
                      {2, 2, 2}};
 
     {
-        Matrix slice = ts::slice(matrix, 0, 2);
-        Matrix expected = {{0, 0, 0},
+        MatrixF slice = ts::slice(matrix, 0, 2);
+        MatrixF expected = {{0, 0, 0},
                            {1, 1, 1}};
         REQUIRE(slice == expected);
     }
 
     {
-        Matrix slice = ts::slice(matrix, 1, 3);
-        Matrix expected = {{1, 1, 1},
+        MatrixF slice = ts::slice(matrix, 1, 3);
+        MatrixF expected = {{1, 1, 1},
                            {2, 2, 2}};
         REQUIRE(slice == expected);
     }
 }
 
-TEST_CASE("argmax(Matrix)")
+TEST_CASE("argmax(MatrixF)")
 {
     Tensor<float, 2> matrix = {{0, 1, 0},
                                {3, 2, 1},
@@ -285,10 +285,10 @@ TEST_CASE("argmax(Matrix)")
     REQUIRE(indexes == expected);
 }
 
-TEST_CASE("swap(Matrix, Matrix")
+TEST_CASE("swap(MatrixF, MatrixF")
 {
-    Matrix m1 = {{1, 1}, {2, 2}};
-    Matrix m2 = {{3, 3, 3}, {4, 4,4}};
+    MatrixF m1 = {{1, 1}, {2, 2}};
+    MatrixF m2 = {{3, 3, 3}, {4, 4,4}};
 
     auto a = m1.clone();
     auto b = m2.clone();

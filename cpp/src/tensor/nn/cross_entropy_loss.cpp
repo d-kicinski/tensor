@@ -1,12 +1,12 @@
 #include "cross_entropy_loss.hpp"
 #include "softmax.hpp"
 
-auto ts::CrossEntropyLoss::operator()(const ts::Matrix &probs, ts::Tensor<int, 1> const &labels) -> float
+auto ts::CrossEntropyLoss::operator()(const ts::MatrixF &probs, ts::Tensor<int, 1> const &labels) -> float
 {
     return forward(probs, labels);
 }
 
-auto ts::CrossEntropyLoss::forward(const ts::Matrix &logits, ts::Tensor<int, 1> const &labels) -> float
+auto ts::CrossEntropyLoss::forward(const ts::MatrixF &logits, ts::Tensor<int, 1> const &labels) -> float
 {
     _labels = labels;
     _scores = ts::softmax(logits);
@@ -15,7 +15,7 @@ auto ts::CrossEntropyLoss::forward(const ts::Matrix &logits, ts::Tensor<int, 1> 
     return loss;
 }
 
-auto ts::CrossEntropyLoss::backward() -> ts::Matrix
+auto ts::CrossEntropyLoss::backward() -> ts::MatrixF
 {
     auto d_scores = ts::apply_if(
         _scores, ts::to_one_hot(_labels), (Fn<float>)[](float e) { return e - 1; });

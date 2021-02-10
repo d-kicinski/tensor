@@ -115,12 +115,22 @@ auto wrap_tensor1D(pybind11::module & m, char const * class_name)
 auto wrap_ops(pybind11::module & m)
 {
     m.def("dot",
-          py::overload_cast<ts::Matrix const &, ts::Matrix const &, bool , bool>(&ts::dot),
+          py::overload_cast<ts::MatrixF const &, ts::MatrixF const &, bool , bool>(&ts::dot),
           py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
 
-    m.def("add", &ts::add<float, 2>);
+    m.def("add_matrixf_matrixf", &ts::add<float, 2>);
 
-    m.def("multiply", py::overload_cast<ts::Matrix const &, ts::Matrix const&>(&ts::multiply<float, 2>));
+    m.def("add_matrixi_matrixi", &ts::add<int, 2>);
+
+    m.def("add_vectorf_vectorf", &ts::add<float, 1>);
+
+    m.def("add_vectori_vectori", &ts::add<int, 1>);
+
+    m.def("add_matrixf_vectorf", &ts::add<float>);
+
+    m.def("add_matrixi_vectori", &ts::add<int>);
+
+    m.def("multiply", py::overload_cast<ts::MatrixF const &, ts::MatrixF const&>(&ts::multiply<float, 2>));
 
     m.def("log", &ts::log<float, 2>);
 
@@ -130,10 +140,10 @@ auto wrap_ops(pybind11::module & m)
 
     m.def("transpose", &ts::transpose);
 
-    m.def("sum", py::overload_cast<ts::Matrix const &, int>(&ts::sum_v2));
+    m.def("sum", py::overload_cast<ts::MatrixF const &, int>(&ts::sum_v2));
 
-    m.def("get", [](ts::Matrix const & m, ts::Matrix const & i) {
-      return ts::Matrix({ts::get(m, i[0].cast<int>())});
+    m.def("get", [](ts::MatrixF const & m, ts::MatrixF const & i) {
+      return ts::MatrixF({ts::get(m, i[0].cast<int>())});
     });
 }
 
