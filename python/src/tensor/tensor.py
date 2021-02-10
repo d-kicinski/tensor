@@ -1,12 +1,14 @@
 from __future__ import annotations
+
+from numbers import Number
 from typing import Optional, Union, Sequence, List, Tuple, Any
 
 from . import libtensor as _ts
 import numpy as np
 
 DataT = Union[_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI]
-ArrayT = Union[DataT, np.array, List[List[float]]]
-ScalarT = int
+ArrayT = Union[DataT, np.array, List[List[Number]], List[Number]]
+ScalarT = Number
 
 
 def _is_instance_of_tensor(o: DataT) -> bool:
@@ -110,7 +112,8 @@ class Tensor:
     def __getitem__(self, item: Union[Tuple[int, int], int]) -> float:
         if isinstance(item, tuple):
             if len(item) != self.dim:
-                raise IndexError(f"Index {item} is not compatible with Tensor with shape {self.shape}")
+                raise IndexError(
+                    f"Index {item} is not compatible with Tensor with shape {self.shape}")
             return self._data[item]
         elif isinstance(item, int):
             return self._data[item]
