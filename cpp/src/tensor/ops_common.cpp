@@ -14,6 +14,10 @@ template auto add(Tensor<float, 1> const &, Tensor<float, 1> const &) -> Tensor<
 template auto add(Tensor<float, 2> const &, Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto add(Tensor<float, 3> const &, Tensor<float, 3> const &) -> Tensor<float, 3>;
 
+template auto add(Tensor<int, 1> const &, Tensor<int, 1> const &) -> Tensor<int, 1>;
+template auto add(Tensor<int, 2> const &, Tensor<int, 2> const &) -> Tensor<int, 2>;
+template auto add(Tensor<int, 3> const &, Tensor<int, 3> const &) -> Tensor<int, 3>;
+
 template auto add(Tensor<float, 2> const &, Tensor<float, 1> const &) -> Tensor<float, 2>;
 template auto add(Tensor<int, 2> const &, Tensor<int, 1> const &) -> Tensor<int, 2>;
 
