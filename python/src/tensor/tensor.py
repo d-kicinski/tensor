@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from numbers import Number
-from typing import Optional, Union, Sequence, List, Tuple, Any
+from typing import Optional, Union, Sequence, List, Tuple, Any, Type
 
 from . import libtensor as _ts
 import numpy as np
@@ -9,6 +9,7 @@ import numpy as np
 DataT = Union[_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI]
 ArrayT = Union[DataT, np.array, List[List[Number]], List[Number]]
 ScalarT = Number
+NumpyT = Union[np.int32, np.float32]
 
 
 def _is_instance_of_tensor(o: DataT) -> bool:
@@ -50,6 +51,15 @@ def _numpy_downcast(array: np.array) -> np.array:
         raise ValueError(f"Array type {dtype} is not supported!")
 
 
+def _map_ts_to_type(data: DataT) -> Type:
+    if type(data) in [_ts.VectorI, _ts.MatrixI]:
+        return int
+    elif type(data) in [_ts.VectorF, _ts.MatrixF]:
+        return float
+    else:
+        raise ValueError(f"Incompatible data type {type(data)}")
+
+
 def _check_shape(shape: Sequence[int]):
     if len(shape) not in [1, 2]:
         msg = f"Tensor with dims other that 2D are not supported yet! Note that {len(shape)=}"
@@ -62,6 +72,7 @@ class Tensor:
                  shape: Optional[Sequence[int]] = None):
 
         self._data: DataT
+        self._data_type: Union[int, float]
         self._shape: Sequence[int]
 
         if array is None and shape is None:
@@ -88,6 +99,7 @@ class Tensor:
             self._data = _map_dim_and_type_to_tensor(len(shape), float)(*shape)
 
         self._shape = tuple(self._data.shape())
+        self._data_type = _map_ts_to_type(self._data)
 
     @property
     def shape(self):
@@ -96,6 +108,10 @@ class Tensor:
     @property
     def dim(self):
         return len(self.shape)
+
+    @property
+    def dtype(self):
+        return self._data_type
 
     @property
     def data(self):
@@ -121,7 +137,28 @@ class Tensor:
             raise ValueError(f"Unsupported index: {item}")
 
     def __add__(self, other: Tensor) -> Tensor:
-        return Tensor(_ts.add(self._data, other._data))
+        if self.dim == other.dim and self.dim == 1:
+            if self.dtype is int:
+                return Tensor(_ts.add_vectori_vectori(self._data, other._data))
+            elif self.dtype is float:
+                return Tensor(_ts.add_vectorf_vectorf(self._data, other._data))
+
+        elif self.dim == other.dim and self.dim == 2:
+            if self.dtype is int:
+                return Tensor(_ts.add_matrixi_matrixi(self._data, other._data))
+            elif self.dtype is float:
+                return Tensor(_ts.add_matrixf_matrixf(self._data, other._data))
+
+        elif self.dim == 2 and other.dim == 1:
+            if self.dtype is int:
+                return Tensor(_ts.add_matrixi_vectori(self._data, other._data))
+            elif self.dtype is float:
+                return Tensor(_ts.add_matrixf_vectorf(self._data, other._data))
+
+        else:
+            raise ValueError(f"Incompatible tensors:"
+                             f" {self.dim=},{self.dtype},{self.shape}"
+                             f" {other.dim}, {other.dtype},{self.shape}")
 
     def __mul__(self, other: Union[float, Tensor]) -> Tensor:
         if isinstance(other, float):
