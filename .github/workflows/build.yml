@@ -1,4 +1,4 @@
-name: CMake
+name: Build C++/Python
 
 on: [push]
 
@@ -16,8 +16,14 @@ jobs:
         with:
           submodules: recursive
           lfs: true
+
       - name: Checkout LFS objects
         run: git lfs checkout
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{github.workspace}}/build
@@ -27,12 +33,47 @@ jobs:
         working-directory: ${{github.workspace}}/build
         run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTENSOR_ENABLE_COVERAGE=OFF  -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_EXTENSIONS=OFF
 
-      - name: Build
+      - name: Build C++
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
 
-      - name: Test
+      - name: Test C++
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: cd bin && ./tests && cd ..
+
+      - name: Prepare Python package
+        shell: bash
+        run: |
+          cp -r  ${{github.workspace}}/build/bin/libtensor.cpython*.so ${{github.workspace}}/python/src/tensor
+
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements-to-freeze.txt ]; then pip install -r requirements-to-freeze.txt; fi
+
+      - name: Install package
+        working-directory: ${{github.workspace}}/python
+        run: |
+          pip install .
+
+      - name: Test with pytest
+        working-directory: ${{github.workspace}}/python
+        run: |
+          pytest
+
+      - name: Python coverage
+        working-directory: ${{github.workspace}}/python
+        run: |
+          PYTHONPATH=./src pytest --cov-report=xml --cov=src/tensor tests
+
+      - name: Upload Python coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: ${{github.workspace}}/python/coverage.xml
+          name: "python-coverage"
+
+
+
