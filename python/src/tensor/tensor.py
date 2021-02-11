@@ -156,11 +156,27 @@ class Tensor:
                 return Tensor(_ts.add_matrixf_vectorf(self._data, other._data))
 
         else:
-            raise ValueError(f"Incompatible tensors:"
-                             f" {self.dim=},{self.dtype},{self.shape}"
-                             f" {other.dim}, {other.dtype},{self.shape}")
+            raise ValueError(f"Incompatible tensors:\n"
+                             f" {self.dim=}, {self.dtype}, {self.shape}\n"
+                             f" {other.dim=}, {other.dtype}, {other.shape}")
 
     def __mul__(self, other: Union[float, Tensor]) -> Tensor:
+        if isinstance(other, float):
+            if self.dim == 1:
+                return Tensor(_ts.multiply_vectorf_f(self._data, other))
+            elif self.dim == 2:
+                return Tensor(_ts.multiply_matrixf_f(self._data, other))
+        elif self.dim == other.dim and self.dim == 1:
+            if self.dtype is float:
+                return Tensor(_ts.multiply_vectorf_vectorf(self._data, other._data))
+
+        elif self.dim == other.dim and self.dim == 2:
+            if self.dtype is float:
+                return Tensor(_ts.multiply_matrixf_matrixf(self._data, other._data))
+        else:
+            raise ValueError(f"Incompatible tensors:\n"
+                             f" {self.dim=}, {self.dtype}, {self.shape}\n"
+                             f" {other.dim=}, {other.dtype}, {other.shape}")
         if isinstance(other, float):
             other = Tensor(np.full(self.shape, other))
         return Tensor(_ts.multiply(self._data, other._data))
@@ -172,7 +188,7 @@ class Tensor:
         return Tensor(_ts.dot(self._data, other._data))
 
     def __str__(self) -> str:
-        return f"Tensor({self._shape[0]}, {self._shape[1]})"
+        return f"Tensor({self.shape})"
 
 
 def log(tensor: Tensor) -> Tensor:
