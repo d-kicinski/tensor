@@ -205,3 +205,12 @@ def exp(tensor: Tensor) -> Tensor:
 
 def sum(tensor: Tensor, axis: int) -> Tensor:
     return Tensor(_ts.sum(tensor.data, axis))
+
+
+def argmax(tensor: Tensor) -> Tensor:
+    if tensor.dtype == int:
+        return Tensor(_ts.argmax_i(tensor.data))
+    elif tensor.dtype == float:
+        return Tensor(_ts.argmax_f(tensor.data))
+    else:
+        raise ValueError(f"Incompatible tensor dtype {tensor.dtype}")

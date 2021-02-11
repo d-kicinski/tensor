@@ -3,6 +3,7 @@
 
 #include <tensor/tensor.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
+#include <tensor/nn/softmax.hpp>
 
 namespace py = pybind11;
 
@@ -143,6 +144,9 @@ auto wrap_ops(pybind11::module & m)
     m.def("get", [](ts::MatrixF const & m, ts::MatrixF const & i) {
       return ts::MatrixF({ts::get(m, i[0].cast<int>())});
     });
+
+    m.def("argmax_f", &ts::argmax<float>);
+    m.def("argmax_i", &ts::argmax<int>);
 }
 
 auto wrap_nn(pybind11::module & m)
@@ -152,6 +156,8 @@ auto wrap_nn(pybind11::module & m)
         .def("__call__", &ts::CrossEntropyLoss::operator())
         .def("forward", &ts::CrossEntropyLoss::forward)
         .def("backward", &ts::CrossEntropyLoss::backward);
+
+    m.def("softmax", &ts::softmax);
 }
 
 PYBIND11_MODULE(libtensor, m)
