@@ -1,12 +1,9 @@
+import csv
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Tuple, List
-import csv
+from typing import List, Tuple
 
 import tensor.autograd.tensor_grad as tsg
-import numpy as np
-
-TRAIN_DATASET_PATH = Path("resources/train_planar_data.tsv")
 
 
 class Dataset(Iterator):
@@ -37,34 +34,14 @@ class Dataset(Iterator):
         self._begin += self._batch_size
         return data
 
+    @property
+    def x(self):
+        return self._x
 
-def main():
-    epochs = 100
-    batch_size = 300
-    dataset = Dataset(TRAIN_DATASET_PATH, batch_size=batch_size)
-    batch_num = len(dataset) // batch_size
-    print(f"examples: {len(dataset)}")
-    print(f"batches: {batch_num}")
+    @property
+    def y(self):
+        return self._y
 
-    w0 = tsg.var(np.random.randn(2, 100))
-    b0 = tsg.var(np.random.randn(100))
-    w1 = tsg.var(np.random.randn(100, 3))
-    lr: float = 1e-0
-
-    for i_epoch in range(epochs):
-        for x, labels in dataset:
-            y = (x @ w0 + b0) @ w1
-
-            loss = tsg.cross_entropy_loss(y, labels)
-            loss.backward()
-
-            w0.value += -lr * w0.grad
-            b0.value += -lr * b0.grad
-            w1.value += -lr * w1.grad
-
-        if i_epoch % 10:
-            print(f"[{i_epoch}/{epochs}] loss: {loss.value.data[0]}")
-
-
-if __name__ == '__main__':
-    main()
+    @y.setter
+    def y(self, y: List[int]):
+        self._y = y
