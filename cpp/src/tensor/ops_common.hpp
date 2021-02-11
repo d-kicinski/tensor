@@ -41,7 +41,7 @@ auto sum(Tensor<Element, Dim> const &) -> Element;
 
 auto sum(MatrixF const &, int) -> VectorF;
 
-auto sum_v2(MatrixF const &, int) -> MatrixF;
+auto sum_v2(MatrixF const &, int) -> VectorF;
 
 auto to_one_hot(Tensor<int, 1> const &) -> Tensor<bool, 2>;
 

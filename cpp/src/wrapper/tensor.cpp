@@ -119,18 +119,16 @@ auto wrap_ops(pybind11::module & m)
           py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
 
     m.def("add_matrixf_matrixf", &ts::add<float, 2>);
-
     m.def("add_matrixi_matrixi", &ts::add<int, 2>);
-
     m.def("add_vectorf_vectorf", &ts::add<float, 1>);
-
     m.def("add_vectori_vectori", &ts::add<int, 1>);
-
     m.def("add_matrixf_vectorf", &ts::add<float>);
-
     m.def("add_matrixi_vectori", &ts::add<int>);
 
-    m.def("multiply", py::overload_cast<ts::MatrixF const &, ts::MatrixF const&>(&ts::multiply<float, 2>));
+    m.def("multiply_vectorf_vectorf", py::overload_cast<ts::VectorF const &, ts::VectorF const&>(&ts::multiply<float, 1>));
+    m.def("multiply_matrixf_matrixf", py::overload_cast<ts::MatrixF const &, ts::MatrixF const&>(&ts::multiply<float, 2>));
+    m.def("multiply_vectorf_f", py::overload_cast<ts::VectorF const &, float>(&ts::multiply<float, 1>));
+    m.def("multiply_matrixf_f", py::overload_cast<ts::MatrixF const &, float>(&ts::multiply<float, 2>));
 
     m.def("log", &ts::log<float, 2>);
 

@@ -57,6 +57,7 @@ template auto multiply(Tensor<float, 1> const & tensor, float value) -> Tensor<f
 template auto multiply(Tensor<float, 2> const & tensor, float value) -> Tensor<float, 2>;
 template auto multiply(Tensor<float, 3> const & tensor, float value) -> Tensor<float, 3>;
 
+template auto multiply(Tensor<float, 1> const &, Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto multiply(Tensor<float, 2> const &, Tensor<float, 2> const &) -> Tensor<float, 2>;
 
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 1>;
@@ -217,29 +218,29 @@ auto sum(MatrixF const &matrix, int axis) -> VectorF
     return VectorF {};  // silencing gcc warning
 }
 
-auto sum_v2(MatrixF const &matrix, int axis) -> MatrixF
+auto sum_v2(MatrixF const &matrix, int axis) -> VectorF
 {
     if (axis == 0) {
         // np.sum(matrix, axis=0, keepdims=True);
 
-        MatrixF result(matrix.shape(0), 1);
+        VectorF result(matrix.shape(1));
         for (int j = 0; j < matrix.shape(1); ++j) {
             for (int i = 0; i < matrix.shape(0); ++i) {
-                result(j, 0) += matrix(i, j);
+                result(j) += matrix(i, j);
             }
         }
         return result;
     } else if (axis == 1) {
         // np.sum(matrix, axis=1, keepdims=True)
 
-        MatrixF result(matrix.shape(0), 1);
+        VectorF result(matrix.shape(0));
         for (int i = 0; i < matrix.shape(0); ++i) {
-            result(i, 0) = ts::sum(matrix(i));
+            result(i) = ts::sum(matrix(i));
         }
         return result;
     }
     assert(false);
-    return MatrixF {};  // silencing gcc warning
+    return VectorF {};  // silencing gcc warning
 }
 
 template<typename Element, int Dim>
