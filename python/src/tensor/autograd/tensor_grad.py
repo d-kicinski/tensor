@@ -5,6 +5,7 @@ from typing import Optional, List, Iterable, Union, TypeVar
 
 import numpy as np
 from tensor import tensor as ts
+import tensor.libtensor as _ts
 
 T = TypeVar("T")
 IterT = Union[T, Iterable[T]]
@@ -21,12 +22,16 @@ class Variable:
     def value(self):
         return self._value
 
+    @value.setter
+    def value(self, value: ts.Tensor):
+        self._value = value
+
     @property
     def grad(self):
         return self._grad
 
     @grad.setter
-    def grad(self, value):
+    def grad(self, value: ts.Tensor):
         self._grad = value
 
     def backward(self):
@@ -55,6 +60,9 @@ class Op(metaclass=ABCMeta):
     @property
     def inputs(self) -> List[Variable]:
         return self._inputs
+
+    def __call__(self, *args: Variable):
+        return self.forward(*args)
 
     @abstractmethod
     def forward(self, *args: Variable):
@@ -90,6 +98,9 @@ class Add(Op):
     EXPECTED_GRADS_LENGTH: int = 1
 
     def forward(self, *inputs: Variable) -> Variable:
+        x: Variable
+        b: Variable
+
         x, b = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
         self._inputs.extend([x, b])
         return Variable(x.value + b.value, self)
@@ -117,6 +128,9 @@ class Dot(Op):
     EXPECTED_GRADS_LENGTH: int = 1
 
     def forward(self, *inputs: Variable):
+        a: Variable
+        b: Variable
+
         a, b = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
         self._inputs.extend([a, b])
         return Variable(a.value @ b.value, self)
@@ -135,6 +149,8 @@ class Log(Op):
     EXPECTED_GRADS_LENGTH: int = 1
 
     def forward(self, *inputs: Variable):
+        x: Variable
+
         x = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
         self._inputs.extend([x])
         return Variable(ts.log(x.value), self)
@@ -147,19 +163,55 @@ class Log(Op):
         return f"Log(x)"
 
 
+class CrossEntropyLoss(Op):
+    EXPECTED_INPUTS_LENGTH: int = 2
+    EXPECTED_GRADS_LENGTH: int = 1
+
+    def __init__(self):
+        super().__init__()
+        self._loss = _ts.CrossEntropyLoss()
+
+    def forward(self, *inputs: Variable):
+        logits: Variable
+        labels: Variable
+
+        logits, labels = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
+        self._inputs.extend([logits, labels])
+
+        loss_value = self._loss.forward(logits.value.data, labels.value.data)
+        return Variable(ts.Tensor(loss_value), self)
+
+    def backward(self, *grads: ts.Tensor):
+        self._check_grads(*grads, num=self.EXPECTED_GRADS_LENGTH)
+        grad: _ts.MatrixF = self._loss.backward()
+        self.inputs[0].grad = ts.Tensor(grad)
+
+    def __str__(self):
+        return f"CrossEntropyLoss(y, labels)"
+
+
 def dot(x: Variable, y: Variable) -> Variable:
     op = Dot()
-    return op.forward(x, y)
+    return op(x, y)
 
 
 def add(x: Variable, y: Variable) -> Variable:
     op = Add()
-    return op.forward(x, y)
+    return op(x, y)
 
 
 def log(x: Variable) -> Variable:
     op = Log()
-    return op.forward(x)
+    return op(x)
+
+
+def cross_entropy_loss(y: Variable, labels: Variable) -> Variable:
+    loss_fn = CrossEntropyLoss()
+    return loss_fn(y, labels)
+
+
+def var(*args, **kwargs) -> Variable:
+    return Variable(ts.Tensor(*args), **kwargs)
 
 
 def traverse(var: Variable):
