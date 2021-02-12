@@ -1,10 +1,8 @@
-from pathlib import Path
-
 import pytest
 from graphviz import Digraph
 
-import tensor.autograd.tensor_grad as tsg
-from tensor import viz
+import tensor.autograd.autograd as tsg
+from tensor.autograd import viz
 import numpy as np
 
 

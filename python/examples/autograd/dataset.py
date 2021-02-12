@@ -3,7 +3,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import List, Tuple
 
-import tensor.autograd.tensor_grad as tsg
+import tensor.autograd.autograd as tsg
 
 
 class Dataset(Iterator):

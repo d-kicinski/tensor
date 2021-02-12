@@ -1,8 +1,6 @@
-from collections import defaultdict
-from typing import Dict
 import subprocess
 
-import tensor.autograd.tensor_grad as tsg
+import tensor.autograd.autograd as tsg
 
 from graphviz import Digraph
 
@@ -24,6 +22,7 @@ def viz(variable: tsg.Variable, filename: str) -> Digraph:
                     f.node(str(id(i)), f"{str(i)}\n{i.value.shape}")
                     f.edge(str(id(i)), str(id(var.op)))
                     loop(i)
+
     loop(variable)
 
     return f
@@ -34,4 +33,3 @@ def is_viz_available() -> bool:
     if ret != 0:
         return False
     return True
-

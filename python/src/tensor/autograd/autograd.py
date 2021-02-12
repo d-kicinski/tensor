@@ -175,7 +175,8 @@ class CrossEntropyLoss(Op):
         logits: Variable
         labels: Variable
 
-        logits, labels = self._check_inputs(*inputs, num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
+        logits, labels = self._check_inputs(*inputs,
+                                            num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
         self._inputs.extend([logits, labels])
 
         loss_value = self._loss.forward(logits.value.data, labels.value.data)

@@ -3,7 +3,7 @@ from typing import List
 
 from tqdm import tqdm
 
-import tensor.autograd.tensor_grad as tsg
+import tensor.autograd.autograd as tsg
 from tensor import nn
 from tensor import tensor as ts
 import numpy as np
