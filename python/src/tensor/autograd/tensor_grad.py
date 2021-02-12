@@ -38,7 +38,7 @@ class Variable:
         traverse(self)
 
     def __str__(self):
-        return f"Variable({self.value.shape=}, {self._grad.shape=})"
+        return f"Variable"
 
     def __neg__(self) -> Variable:
         var = Variable(-self._value, self.op)
@@ -46,7 +46,7 @@ class Variable:
         return var
 
     def __matmul__(self, other: Variable) -> Variable:
-        return dot(self, other)
+        return matmul(self, other)
 
     def __add__(self, other: Variable) -> Variable:
         return add(self, other)
@@ -120,10 +120,10 @@ class Add(Op):
             raise ValueError(f"Add(Op): Unsupported input shapes! {x.value.shape}, {b.value.shape}")
 
     def __str__(self):
-        return f"Add(x, y)"
+        return f"Add"
 
 
-class Dot(Op):
+class MatMul(Op):
     EXPECTED_INPUTS_LENGTH: int = 2
     EXPECTED_GRADS_LENGTH: int = 1
 
@@ -141,7 +141,7 @@ class Dot(Op):
         self._inputs[1].grad = self._inputs[0].value.T @ grad
 
     def __str__(self):
-        return f"Dot(a, b)"
+        return f"MatMul"
 
 
 class Log(Op):
@@ -160,7 +160,7 @@ class Log(Op):
         self._inputs[0].grad = self._inputs[0].value * grad
 
     def __str__(self):
-        return f"Log(x)"
+        return f"Log"
 
 
 class CrossEntropyLoss(Op):
@@ -187,11 +187,11 @@ class CrossEntropyLoss(Op):
         self.inputs[0].grad = ts.Tensor(grad)
 
     def __str__(self):
-        return f"CrossEntropyLoss(y, labels)"
+        return f"CrossEntropyLoss"
 
 
-def dot(x: Variable, y: Variable) -> Variable:
-    op = Dot()
+def matmul(x: Variable, y: Variable) -> Variable:
+    op = MatMul()
     return op(x, y)
 
 
