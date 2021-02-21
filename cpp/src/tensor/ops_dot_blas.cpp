@@ -5,6 +5,15 @@
 
 namespace ts {
 
+auto dot(VectorF const &A, VectorF const &X) -> float
+{
+    // A or X could be just view on higher dimensional tensor, if I want to use raw pointer to
+    // underlining data I have to take that into account
+    auto A_data = A.data()->data() + std::distance(A.data().get()->begin(), A.begin());
+    auto X_data = X.data()->data() + std::distance(X.data().get()->begin(), X.begin());
+    return cblas_sdot(A.data_size(), A_data, 1, X_data, 1);
+}
+
 auto dot(MatrixF const &A, VectorF const &X) -> VectorF
 {
 

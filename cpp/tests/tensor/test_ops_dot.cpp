@@ -4,6 +4,15 @@
 
 using namespace ts;
 
+TEST_CASE("dot: VectorF[3] X VectorF[3]")
+{
+    VectorF a = {1, 2, 3};
+    VectorF b = {10, 10, 10};
+    float result = dot(a, b);
+    float expected_result = 60;
+    REQUIRE(expected_result == result);
+}
+
 
 TEST_CASE("dot: MatrixF[2, 3] X VectorF[3]")
 {

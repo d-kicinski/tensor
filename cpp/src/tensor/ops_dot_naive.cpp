@@ -3,6 +3,11 @@
 
 namespace ts {
 
+auto dot(VectorF const &a, VectorF const &b) -> float
+{
+    return std::inner_product(a.begin(), a.end(), b.begin(), 0.0f);
+}
+
 auto dot(MatrixF const &A, VectorF const &x) -> VectorF
 {
     // C(m) = A(m, k) * x(k)
@@ -22,9 +27,9 @@ auto dot(MatrixF const &A, VectorF const &x) -> VectorF
 auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
 {
     // C(m, n) = A(m, k) * B(k, n)
-    int m = A_T ? A.shape(1): A.shape(0);
-    int n = B_T ? B.shape(0): B.shape(1);
-    int k = A_T ? A.shape(0): A.shape(1);
+    int m = A_T ? A.shape(1) : A.shape(0);
+    int n = B_T ? B.shape(0) : B.shape(1);
+    int k = A_T ? A.shape(0) : A.shape(1);
 
     MatrixF C(m, n);
 

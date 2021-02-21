@@ -4,6 +4,8 @@
 
 namespace ts {
 
+auto dot(VectorF const &, VectorF const &) -> float;
+
 auto dot(MatrixF const &, VectorF const &) -> VectorF;
 
 auto dot(MatrixF const & A, MatrixF const & B, bool A_T=false, bool B_T=false) -> MatrixF ;
