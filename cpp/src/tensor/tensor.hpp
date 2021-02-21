@@ -107,6 +107,21 @@ template <typename Element, int Dim> class Tensor {
        return t;
     }
 
+    auto flatten() -> Vector<Element>
+    {
+        auto t = Vector<Element>(_data_size);
+        t._data = _data;
+        t._dimensions = std::array<int, 1>{_data_size};
+        t._data_size = _data_size;
+        t._begin = t.data()->begin();
+        t._end = t.data()->end();
+
+        std::advance(t._begin, std::distance(_data->begin(), _begin));
+        std::advance(t._end, std::distance(_end, _data->end()));
+
+        return t;
+    }
+
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
   private:

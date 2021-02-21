@@ -250,5 +250,41 @@ TEST_CASE("cast")
    Tensor<int, 2> matrix_i = {{1, 2},
                               {3, 4}};
 
-    REQUIRE(matrix_i == matrix_f.cast<int>());
+   REQUIRE(matrix_i == matrix_f.cast<int>());
+}
+
+TEST_CASE("flatten: MatrixF -> VectorF")
+{
+    MatrixF matrix = {{1, 2},
+                      {3, 4}};
+    VectorF expected = {1, 2, 3, 4};
+    auto result = matrix.flatten();
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("flatten: TensorF -> VectorF")
+{
+    Tensor<float, 3> tensor = {
+        {{1, 2},
+         {3, 4}},
+        {{5, 6},
+         {7, 8}}
+    };
+    REQUIRE(tensor.data().use_count() == 2);
+    {
+        VectorF expected = {1, 2, 3, 4, 5, 6, 7, 8};
+        auto result = tensor.flatten();
+        REQUIRE(tensor.data().use_count() == 3);
+        REQUIRE(result == expected);
+    }
+    REQUIRE(tensor.data().use_count() == 2);
+    {
+        auto matrix = tensor(1);
+        REQUIRE(tensor.data().use_count() == 3);
+        VectorF expected = {5, 6, 7, 8};
+        auto result = matrix.flatten();
+        REQUIRE(tensor.data().use_count() == 4);
+        REQUIRE(result == expected);
+    }
 }
