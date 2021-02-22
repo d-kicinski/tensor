@@ -47,17 +47,17 @@ template <typename Element, int Dim> class Tensor {
 
     Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list);
 
-    Tensor(std::vector<Tensor<Element, Dim - 1>> list);
+    explicit Tensor(std::vector<Tensor<Element, Dim - 1>> list);
 
-    Tensor(std::array<size_type, Dim> const &shape);
+    explicit Tensor(std::array<size_type, Dim> const &shape);
 
-    template <typename... Sizes> Tensor(size_type first, Sizes... rest);
+    template <typename... Sizes> explicit Tensor(size_type first, Sizes... rest);
 
     Tensor(Tensor const &tensor, bool deep_copy);
 
     Tensor(Tensor const &tensor) : Tensor(tensor, false) {};
 
-    Tensor(Tensor && tensor);
+    Tensor(Tensor && tensor) noexcept ;
 
     Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
@@ -75,7 +75,9 @@ template <typename Element, int Dim> class Tensor {
 
     auto operator=(Tensor const &tensor) -> Tensor &;
 
-    auto operator=(Tensor &&tensor) -> Tensor &;
+    auto operator=(Tensor &&tensor)  noexcept -> Tensor &;
+
+    auto operator=(std::initializer_list<Element> list) -> Tensor &;
 
     auto operator<(Element const &value) -> Tensor<bool, Dim>;
 
@@ -125,7 +127,7 @@ template <typename Element, int Dim> class Tensor {
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
   private:
-    size_type _data_size;
+    size_type _data_size{};
     std::array<size_type, Dim> _dimensions;
     std::shared_ptr<std::vector<Element>> _data;
     iterator _begin;
@@ -157,11 +159,14 @@ Tensor<Element, Dim>::Tensor(Tensor::size_type first, Sizes... rest)
 template <typename Element, int Dim>
 Tensor<Element, Dim>::Tensor(Tensor<Element, Dim + 1> const &tensor, Tensor::size_type index)
 {
-    std::copy(tensor.shape().begin() + 1, tensor.shape().end(), _dimensions.begin());
+    auto shape_cpy(tensor.shape());  // TODO: why without this tests fail?
+    std::copy(shape_cpy.begin() + 1, shape_cpy.end(), _dimensions.begin());
+
     _data_size = tensor.data_size() / tensor.shape(0);
     _data = tensor.data();
-    _begin = _data->begin() + index * _data_size;
-    _end = _begin + _data_size; // TODO: I added +1 and nothing tests didn't break :/
+    _begin = tensor.begin() + (int) index * _data_size;
+    _end = _begin + _data_size;
+
 }
 
 template <typename Element, int Dim>
@@ -423,7 +428,7 @@ Tensor<Element, Dim>::Tensor(const Tensor &tensor, bool deep_copy)
 }
 
 template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(Tensor &&tensor)
-:   _data_size(tensor._data_size),
+ noexcept :   _data_size(tensor._data_size),
     _begin(std::move(tensor._begin)),
     _end(std::move(tensor._end)),
     _dimensions(std::move(tensor._dimensions)),
@@ -433,7 +438,7 @@ template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(Tensor &&tenso
 }
 
 template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator=(Tensor &&tensor) -> Tensor &
+auto Tensor<Element, Dim>::operator=(Tensor &&tensor) noexcept -> Tensor &
 {
     if (&tensor == this)
         return *this;
@@ -446,6 +451,17 @@ auto Tensor<Element, Dim>::operator=(Tensor &&tensor) -> Tensor &
 
     tensor._data_size = 0;
 
+    return *this;
+}
+
+template <typename Element, int Dim>
+auto Tensor<Element, Dim>::operator=(std::initializer_list<Element> list) -> Tensor &
+{
+    if (_data_size != list.size()) {
+        std::cerr << "operator=(std::initializer_list)" << std::endl;
+        exit(-1);
+    }
+    std::copy(list.begin(), list.end(), _begin);
     return *this;
 }
 
