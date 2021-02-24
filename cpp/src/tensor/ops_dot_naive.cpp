@@ -3,6 +3,17 @@
 
 namespace ts {
 
+auto outer_product(VectorF const & x, VectorF const & y) -> MatrixF
+{
+    MatrixF result(x.data_size(), y.data_size());
+    for (int i = 0; i < x.data_size(); ++i) {
+        for (int j = 0; j < y.data_size(); ++j) {
+            result(i, j) = x(i) * y(j);
+        }
+    }
+    return result;
+}
+
 auto dot(VectorF const &a, VectorF const &b) -> float
 {
     return std::inner_product(a.begin(), a.end(), b.begin(), 0.0f);

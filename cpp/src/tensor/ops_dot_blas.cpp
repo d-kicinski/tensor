@@ -5,6 +5,29 @@
 
 namespace ts {
 
+
+auto outer_product(VectorF const x, VectorF const & y) -> MatrixF
+{
+    // x or y could be just view on higher dimensional tensor, if I want to use raw pointer to
+    // underlining data I have to take that into account
+    auto x_data = x.data()->data() + std::distance(x.data().get()->begin(), x.begin());
+    auto y_data = y.data()->data() + std::distance(y.data().get()->begin(), y.begin());
+
+    MatrixF result(x.data_size(), y.data_size());
+    cblas_sger(CBLAS_ORDER::CblasRowMajor,
+               x.data_size(),
+               y.data_size(),
+               1.0,
+               x_data,
+               1,
+               y_data,
+               1,
+               result.data()->data(),
+               y.data_size());
+
+    return result;
+}
+
 auto dot(VectorF const &A, VectorF const &X) -> float
 {
     // A or X could be just view on higher dimensional tensor, if I want to use raw pointer to

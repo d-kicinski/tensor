@@ -4,6 +4,19 @@
 
 using namespace ts;
 
+TEST_CASE("outer_product")
+{
+    VectorF x = {0, 1, 2, 3};
+    VectorF y = {2, -2};
+    MatrixF result = ts::outer_product(x, y);
+    MatrixF expected = {{0, 0},
+                        {2, -2},
+                        {4, -4},
+                        {6, -6}};
+    REQUIRE(result == expected);
+
+}
+
 TEST_CASE("dot: VectorF[3] X VectorF[3]")
 {
     VectorF a = {1, 2, 3};

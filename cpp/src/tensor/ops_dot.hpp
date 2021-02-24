@@ -4,6 +4,8 @@
 
 namespace ts {
 
+auto outer_product(VectorF const &, VectorF const &) -> MatrixF;
+
 auto dot(VectorF const &, VectorF const &) -> float;
 
 auto dot(MatrixF const &, VectorF const &) -> VectorF;
