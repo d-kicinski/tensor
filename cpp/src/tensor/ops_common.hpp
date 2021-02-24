@@ -9,6 +9,9 @@ template<typename Element>
 using Fn = std::function<Element(Element)>;
 
 template <typename Element, int Dim>
+auto add_(Tensor<Element, Dim> const &, Tensor<Element, Dim> const &) -> void;
+
+template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &, Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
 
 template <typename Element>

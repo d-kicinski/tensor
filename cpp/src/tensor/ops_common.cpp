@@ -10,6 +10,10 @@ template auto mask<float, 1>(Tensor<float, 1> const &, std::function<bool (float
 template auto mask<float, 2>(Tensor<float, 2> const &, std::function<bool (float)>) -> Tensor<bool, 2> ;
 template auto mask<float, 3>(Tensor<float, 3> const &, std::function<bool (float)>) -> Tensor<bool, 3> ;
 
+template auto add_(Tensor<float, 1> const &, Tensor<float, 1> const &) -> void;
+template auto add_(Tensor<float, 2> const &, Tensor<float, 2> const &) -> void;
+template auto add_(Tensor<float, 3> const &, Tensor<float, 3> const &) -> void;
+
 template auto add(Tensor<float, 1> const &, Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto add(Tensor<float, 2> const &, Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto add(Tensor<float, 3> const &, Tensor<float, 3> const &) -> Tensor<float, 3>;
@@ -81,6 +85,12 @@ template auto slice(Tensor<int, 2> tensor, int from, int to) -> Tensor<int, 2>;
 template auto argmax(Tensor<float, 2> const &) -> Tensor<int, 1>;
 template auto argmax(Tensor<int, 2> const &) -> Tensor<int, 1>;
 
+
+template <typename Element, int Dim>
+auto add_(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> void
+{
+    std::transform(t1.begin(), t1.end(), t2.begin(), t1.begin(), std::plus<>());
+}
 
 template <typename Element, int Dim>
 auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tensor<Element, Dim>
@@ -160,7 +170,7 @@ auto apply_if(Tensor<Element, Dim> tensor,
 template <typename Element, int Dim>
 auto multiply(Tensor<Element, Dim> const &tensor, Element value) -> Tensor<Element, Dim>
 {
-   auto result(tensor);
+   auto result = tensor.clone();
    std::transform(tensor.begin(), tensor.end(), result.begin(),
                   [&](Element & e) {
                     return e * value;
