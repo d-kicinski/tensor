@@ -21,7 +21,8 @@ auto ts::conv_2d(ts::Tensor<float, 3> const &image, ts::Tensor<float, 2> const &
     for (int i = 0; i < dim_out; ++i) {
         for (int j = 0; j < dim_out; ++j) {
             ts::VectorF tile = _get_flatten_tile(image, kernel_size, i * stride, j * stride);
-            result(i, j) = ts::dot(ts::transpose(kernel), tile);
+            auto tile_output = ts::dot(ts::transpose(kernel), tile);
+            std::copy(tile_output.begin(), tile_output.end(), result(i, j).begin());
         }
     }
     return result;

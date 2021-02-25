@@ -443,17 +443,11 @@ auto Tensor<Element, Dim>::operator=(Tensor &&tensor) noexcept -> Tensor &
     if (&tensor == this)
         return *this;
 
-    if (_data == nullptr) {
-        _data = std::move(tensor._data);
-        _begin = std::move(tensor._begin);
-        _end = std::move(tensor._end);
-        _dimensions = std::move(tensor._dimensions);
-        _data_size = tensor._data_size;
-    } else {
-        assert(_data_size == tensor._data_size);
-        assert(_dimensions == tensor._dimensions);
-        std::copy(tensor.begin(), tensor.end(), begin());
-    }
+    _data = std::move(tensor._data);
+    _begin = std::move(tensor._begin);
+    _end = std::move(tensor._end);
+    _dimensions = std::move(tensor._dimensions);
+    _data_size = tensor._data_size;
 
     // Invalidate moved object
     tensor._data_size = 0;

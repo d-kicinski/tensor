@@ -7,7 +7,8 @@ auto ts::_get_flatten_tile(Tensor<float, 3> const &image, int size, int row, int
     MatrixF tile(std::pow(size, 2), image.shape(2));
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
-            tile(j + i * size) = image(i + row, j + col);
+            VectorF vec = image(i + row, j + col);
+            std::copy(vec.begin(), vec.end(), tile(j + i * size).begin());
         }
     }
     return tile.flatten();
