@@ -3,7 +3,7 @@
 #include <tensor/nn/functional.hpp>
 
 
-TEST_CASE("conv_2d(Tensor<float, 2>, ...")
+TEST_CASE("conv_2d(Tensor<float, 3>, ...")
 {
     // shape: (H, W, C_in)
     ts::Tensor<float, 3> input =
