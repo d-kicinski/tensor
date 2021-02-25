@@ -41,6 +41,8 @@ auto FeedForward::update(float step_size) -> void
     _bias += ts::multiply(_d_bias, -step_size);
 }
 
-auto FeedForward::weights() -> MatrixF { return _weights; }
+auto FeedForward::weight() -> MatrixF { return _weights; }
+
+auto FeedForward::bias() -> VectorF { return _bias; }
 
 }

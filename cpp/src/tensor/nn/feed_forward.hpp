@@ -16,7 +16,9 @@ class FeedForward {
 
     auto update(float step_size) -> void;
 
-    auto weights() -> MatrixF;
+    auto weight() -> MatrixF;
+
+    auto bias() -> VectorF ;
 
   private:
     MatrixF _x;
