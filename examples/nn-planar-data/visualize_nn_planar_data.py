@@ -39,12 +39,12 @@ def visualize(train_data_path: str, test_data_path: Optional[TestDataPath] = Non
                                 color(Colors.color2, 0.7),
                                 color(Colors.color3, 0.7)])
 
-    data_train = np.genfromtxt(train_data_path, delimiter="\t")
+    data_train = np.genfromtxt(train_data_path, delimiter="\t", skip_header=1)
     inputs_train = data_train[:, :2]
     labels_train = data_train[:, 2:]
 
     if test_data_path:
-        inputs_test = np.genfromtxt(test_data_path.input_data, delimiter="\t")[:, :2]
+        inputs_test = np.genfromtxt(test_data_path.input_data, delimiter="\t", skip_header=1)[:, :2]
         labels_test = np.genfromtxt(test_data_path.labels, delimiter="\t")
 
         plt.scatter(inputs_test[:, 0], inputs_test[:, 1], c=labels_test, s=10,

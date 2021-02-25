@@ -58,16 +58,13 @@ auto train(Model &model, ts::PlanarDataset &dataset) -> float
 
 auto label(Model &model, ts::PlanarDataset &dataset) -> Model::VectorI
 {
-    ts::Tensor<int, 1> labels;
+    std::vector<ts::Tensor<int, 1>> labels;
 
     for (auto [inputs, _] : dataset) {
         auto batch_labels = model.predict(inputs);
-        if (labels.data_size() == 0) {
-            labels = batch_labels;
-        }
-        labels = ts::concatenate<int, 0>({labels, batch_labels});
+        labels.push_back(batch_labels);
     }
-    return labels;
+    return ts::concatenate<int, 0>(labels);
 }
 
 int main()
