@@ -109,7 +109,7 @@ template <typename Element, int Dim> class Tensor {
        return t;
     }
 
-    auto flatten() -> Vector<Element>
+    auto flatten() const -> Vector<Element>
     {
         auto t = Vector<Element>(_data_size);
         t._data = _data;
