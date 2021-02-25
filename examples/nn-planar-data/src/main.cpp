@@ -28,7 +28,7 @@ class Model {
     }
 
   private:
-    ts::FeedForward _layer1 = ts::FeedForward(2, 100, true);
+    ts::FeedForward _layer1 = ts::FeedForward(2, 100, ts::FeedForward::Activations::relu());
     ts::FeedForward _layer2 = ts::FeedForward(100, 3);
     ts::CrossEntropyLoss _loss = ts::CrossEntropyLoss();
 

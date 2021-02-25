@@ -1,9 +1,11 @@
 #include "feed_forward.hpp"
 
+#include <utility>
+
 namespace ts {
 
-FeedForward::FeedForward(int dim_in, int dim_out, bool activation, bool l2, float alpha)
-    : _alpha(alpha), _activation(activation), _l2(l2)
+FeedForward::FeedForward(int dim_in, int dim_out, FeedForward::OptActivation activation, bool l2, float alpha)
+    : _alpha(alpha), _activation(std::move(activation)), _l2(l2)
 {
    _weights = ts::MatrixF::randn({dim_in, dim_out});
    _bias = ts::VectorF(dim_out);
@@ -16,17 +18,18 @@ auto FeedForward::forward(MatrixF const &inputs) -> MatrixF
     _x = inputs;
     _y = ts::add(ts::dot(_x, _weights), _bias);
     if (_activation) {
-        _y = ts::maximum(0.0f, _y);  // np.maximum(0, _y)
+        _y = _activation->forward(inputs);
     }
     return _y;
 }
 
-auto FeedForward::backward(MatrixF d_y) -> MatrixF
+auto FeedForward::backward(MatrixF const & d_y) -> MatrixF
 {
+    auto input(d_y);  // cheap, not a deep copy
     if (_activation) {
-        d_y = ts::assign_if(d_y, _y <= 0, 0.0f);  // d_y[_y <= 0] = 0;
+        input = _activation->backward(d_y);
     }
-    _d_weights = ts::dot(_x, d_y, true);
+    _d_weights = ts::dot(_x, input, true);
     _d_bias = ts::sum(d_y, 0);
 
     return ts::dot(d_y, _weights, false, true);

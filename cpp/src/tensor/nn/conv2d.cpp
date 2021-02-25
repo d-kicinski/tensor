@@ -1,8 +1,8 @@
 #include "conv2d.hpp"
 #include "functional.hpp"
 
-ts::Conv2D::Conv2D(int in_channels, int out_channels, int kernel_size, int stride, bool use_bias)
-    : _stride(stride), _kernel_size(kernel_size), _use_bias(use_bias)
+ts::Conv2D::Conv2D(int in_channels, int out_channels, int kernel_size, int stride, OptActivation activation, bool use_bias)
+    : _stride(stride), _kernel_size(kernel_size), _activation(std::move(activation)), _use_bias(use_bias)
 {
     _weight = ts::MatrixF::randn({kernel_size * kernel_size * in_channels, out_channels});
     if (_use_bias)
@@ -16,17 +16,24 @@ auto ts::Conv2D::operator()(const ts::Tensor<float, 3> & input) -> Tensor<float,
 
 auto ts::Conv2D::forward(const ts::Tensor<float, 3> & input) -> ts::Tensor<float, 3>
 {
+    _input = input;
     auto output =  ts::conv_2d(input, _weight, _kernel_size, _stride);
     if (_use_bias) {
        output = ts::add(output, _bias) ;
     }
-    _input = input;
+    if (_activation) {
+        output = _activation->forward(output);
+    }
     return output;
 }
 
 auto ts::Conv2D::backward(const ts::Tensor<float, 3> & d_output) -> ts::Tensor<float, 3>
 {
-    auto [d_input, d_weight] =  ts::conv_2d_backward(_input, _weight, d_output, _kernel_size, _stride);
+    auto d_output_(d_output); // cheap, not a deep copy
+    if (_activation) {
+        d_output_ = _activation->backward(d_output_);
+    }
+    auto [d_input, d_weight] =  ts::conv_2d_backward(_input, _weight, d_output_, _kernel_size, _stride);
     _d_weight = std::move(d_weight);
 
     if (_use_bias) {

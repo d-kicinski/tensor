@@ -1,24 +1,29 @@
 #pragma once
 
+#include "activations.hpp"
 #include <tensor/tensor.hpp>
 
 namespace ts {
 
 class FeedForward {
   public:
-    FeedForward(int dim_in, int dim_out, bool activation=false, bool l2=false, float alpha=1e-10);
+    using OptActivation = std::optional<Activation<float, 2>>;
+    using Activations = ActivationFactory<float, 2>;
+
+    FeedForward(int dim_in, int dim_out, OptActivation activation = std::nullopt, bool l2 = false,
+                float alpha = 1e-10);
 
     auto operator()(MatrixF const &) -> MatrixF;
 
     auto forward(MatrixF const &) -> MatrixF;
 
-    auto backward(MatrixF) -> MatrixF;
+    auto backward(MatrixF const &) -> MatrixF;
 
     auto update(float step_size) -> void;
 
     auto weight() -> MatrixF;
 
-    auto bias() -> VectorF ;
+    auto bias() -> VectorF;
 
   private:
     MatrixF _x;
@@ -27,11 +32,9 @@ class FeedForward {
     MatrixF _d_weights;
     VectorF _bias;
     VectorF _d_bias;
+    OptActivation _activation;
     float _alpha;
-    bool _activation;
     bool _l2;
-
 };
 
-}
-
+} // namespace ts
