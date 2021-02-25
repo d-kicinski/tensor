@@ -23,7 +23,10 @@ template auto add(Tensor<int, 2> const &, Tensor<int, 2> const &) -> Tensor<int,
 template auto add(Tensor<int, 3> const &, Tensor<int, 3> const &) -> Tensor<int, 3>;
 
 template auto add(Tensor<float, 2> const &, Tensor<float, 1> const &) -> Tensor<float, 2>;
+template auto add(Tensor<float, 3> const &, Tensor<float, 1> const &) -> Tensor<float, 3> ;
 template auto add(Tensor<int, 2> const &, Tensor<int, 1> const &) -> Tensor<int, 2>;
+template auto add(Tensor<int, 3> const &, Tensor<int, 1> const &) -> Tensor<int, 3> ;
+
 
 template auto maximum(float, Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto maximum(float, Tensor<float, 2> const &) -> Tensor<float, 2>;
@@ -103,12 +106,25 @@ auto add(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> Tens
 template <typename Element>
 auto add(Matrix<Element> const &matrix, Vector<Element> const &vector) -> Matrix<Element>
 {
-    // TODO: add(matrix, vector, axis=0)?
     Matrix<Element> result(matrix.shape());
     for (int i = 0; i < matrix.shape(0); ++i) {
-        auto row = matrix(i);
+        Vector<Element> row = matrix(i);
         std::transform(row.begin(), row.end(), vector.begin(),
                        result.begin() + (i * row.data_size()), std::plus());
+    }
+    return result;
+}
+
+template <typename Element>
+auto add(Tensor<Element, 3> const &tensor, Vector<Element> const &vector) -> Tensor<Element, 3>
+{
+    Tensor<Element, 3> result(tensor.shape());
+    for (int i = 0; i < tensor.shape(0); ++i) {
+        for (int j = 0; j < tensor.shape(1); ++j) {
+            Vector<Element> values = tensor(i, j);
+            std::transform(values.begin(), values.end(), vector.begin(),
+                           result(i, j).begin(), std::plus());
+        }
     }
     return result;
 }
