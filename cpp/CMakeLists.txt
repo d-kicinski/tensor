@@ -45,7 +45,8 @@ add_library(nn
         src/tensor/nn/functional.hpp
         src/tensor/nn/functional.cpp
         src/tensor/nn/functional_helpers.hpp
-        src/tensor/nn/functional_helpers.cpp)
+        src/tensor/nn/functional_helpers.cpp
+        src/tensor/nn/softmax.cpp)
 add_library(tensor::nn ALIAS nn)
 target_link_libraries(nn tensor)
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)

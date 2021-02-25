@@ -5,9 +5,6 @@
 
 namespace ts {
 
-auto softmax(MatrixF const &logits) -> MatrixF
-{
-    return ts::divide(ts::exp(logits), ts::sum(ts::exp(logits), 1));
-}
+auto softmax(MatrixF const &logits) -> MatrixF;
 
 }
