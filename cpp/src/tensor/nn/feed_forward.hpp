@@ -7,7 +7,7 @@ namespace ts {
 
 class FeedForward {
   public:
-    using OptActivation = std::optional<Activation<float, 2>>;
+    using OptActivation = std::optional<std::unique_ptr<Activation<float, 2>>>;
     using Activations = ActivationFactory<float, 2>;
 
     FeedForward(int dim_in, int dim_out, OptActivation activation = std::nullopt, bool l2 = false,
@@ -27,7 +27,6 @@ class FeedForward {
 
   private:
     MatrixF _x;
-    MatrixF _y;
     MatrixF _weights;
     MatrixF _d_weights;
     VectorF _bias;

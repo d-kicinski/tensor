@@ -6,11 +6,20 @@ namespace ts {
 
 template <typename Element, int Dim> class Activation {
   public:
-    auto operator()(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim> { return forward(input); }
+    auto operator()(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim>
+    {
+        return forward(input);
+    }
 
-    virtual auto backward(Tensor<Element, Dim> const &d_output) -> Tensor<Element, Dim> { return d_output; }
+    virtual auto backward(Tensor<Element, Dim> const &d_output) -> Tensor<Element, Dim>
+    {
+        return d_output;
+    }
 
-    virtual auto forward(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim> { return input; }
+    virtual auto forward(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim>
+    {
+        return input;
+    }
 };
 
 template <typename Element, int Dim> class ReLU : public Activation<Element, Dim> {
@@ -28,13 +37,14 @@ template <typename Element, int Dim> class ReLU : public Activation<Element, Dim
 
   private:
     Tensor<Element, Dim> _input;
-
 };
 
-template<typename Element, int Dim>
-class ActivationFactory {
+template <typename Element, int Dim> class ActivationFactory {
   public:
-    static auto relu() -> Activation<Element ,Dim> { return ReLU<Element, Dim>(); }
+    static auto relu() -> std::unique_ptr<ReLU<Element, Dim>>
+    {
+        return std::make_unique<ReLU<Element, Dim>>(ReLU<Element, Dim>());
+    }
 };
 
 } // namespace ts

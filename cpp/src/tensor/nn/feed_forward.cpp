@@ -16,23 +16,23 @@ auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(
 auto FeedForward::forward(MatrixF const &inputs) -> MatrixF
 {
     _x = inputs;
-    _y = ts::add(ts::dot(_x, _weights), _bias);
+    auto _y = ts::add(ts::dot(_x, _weights), _bias);
     if (_activation) {
-        _y = _activation->forward(inputs);
+        _y = _activation.value()->forward(_y);
     }
     return _y;
 }
 
 auto FeedForward::backward(MatrixF const & d_y) -> MatrixF
 {
-    auto input(d_y);  // cheap, not a deep copy
+    MatrixF d_output = d_y.clone() ;
     if (_activation) {
-        input = _activation->backward(d_y);
+        d_output = _activation.value()->backward(d_output);
     }
-    _d_weights = ts::dot(_x, input, true);
-    _d_bias = ts::sum(d_y, 0);
+    _d_weights = ts::dot(_x, d_output, true);
+    _d_bias = ts::sum(d_output, 0);
 
-    return ts::dot(d_y, _weights, false, true);
+    return ts::dot(d_output, _weights, false, true);
 }
 
 auto FeedForward::update(float step_size) -> void

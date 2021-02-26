@@ -2,16 +2,18 @@
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/feed_forward.hpp>
 #include <tensor/nn/planar_dataset.hpp>
+#include <tensor/nn/activations.hpp>
 
 class Model {
 
   public:
-    using MatrixF = ts::Tensor<float, 2>;
-    using VectorI = ts::Tensor<int, 1>;
+    Model()
+    : _layer1(2, 100, ts::FeedForward::Activations::relu()),
+      _layer2(100, 3) {}
 
-    auto predict(MatrixF const &inputs) -> VectorI { return ts::argmax(_forward(inputs)); }
+    auto predict(ts::MatrixF const &inputs) -> ts::VectorI { return ts::argmax(_forward(inputs)); }
 
-    auto update(MatrixF const &inputs, VectorI const &labels, float learning_rate) -> float
+    auto update(ts::MatrixF const &inputs, ts::VectorI const &labels, float learning_rate) -> float
     {
         // forward pass
         auto logits = _forward(inputs);
@@ -28,11 +30,11 @@ class Model {
     }
 
   private:
-    ts::FeedForward _layer1 = ts::FeedForward(2, 100, ts::FeedForward::Activations::relu());
-    ts::FeedForward _layer2 = ts::FeedForward(100, 3);
-    ts::CrossEntropyLoss _loss = ts::CrossEntropyLoss();
+    ts::FeedForward _layer1;
+    ts::FeedForward _layer2;
+    ts::CrossEntropyLoss _loss;
 
-    auto _forward(MatrixF const &inputs) -> MatrixF
+    auto _forward(ts::MatrixF const &inputs) -> ts::MatrixF
     {
         return _layer2(_layer1(inputs));
     }
@@ -56,7 +58,7 @@ auto train(Model &model, ts::PlanarDataset &dataset) -> float
     return loss;
 }
 
-auto label(Model &model, ts::PlanarDataset &dataset) -> Model::VectorI
+auto label(Model &model, ts::PlanarDataset &dataset) ->ts::VectorI
 {
     std::vector<ts::Tensor<int, 1>> labels;
 
