@@ -1,14 +1,14 @@
 #include "feed_forward.hpp"
 
-#include <utility>
 
 namespace ts {
 
-FeedForward::FeedForward(int dim_in, int dim_out, FeedForward::OptActivation activation, bool l2, float alpha)
-    : _alpha(alpha), _activation(std::move(activation)), _l2(l2)
+FeedForward::FeedForward(int dim_in, int dim_out, Activation activation, bool l2, float alpha)
+    : _alpha(alpha), _l2(l2)
 {
    _weights = ts::MatrixF::randn({dim_in, dim_out});
    _bias = ts::VectorF(dim_out);
+   _activation = Activations::get(activation);
 }
 
 auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(inputs); }

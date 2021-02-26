@@ -7,11 +7,10 @@ namespace ts {
 
 class Conv2D {
   public:
-    using OptActivation = std::optional<Activation<float, 3>>;
     using Activations = ActivationFactory<float, 3>;
 
     Conv2D(int in_channels, int out_channels, int kernel_size, int stride,
-           OptActivation activation = std::nullopt,
+           Activation activation = Activation::NONE,
            bool use_bias = true);
 
     auto operator()(Tensor<float, 3> const &) -> Tensor<float, 3>;
@@ -32,7 +31,7 @@ class Conv2D {
     MatrixF _d_weight;
     VectorF _bias;
     VectorF _d_bias;
-    OptActivation _activation;
+    Activations::OptActivationPtr _activation;
     int _stride;
     int _kernel_size;
     bool _use_bias;

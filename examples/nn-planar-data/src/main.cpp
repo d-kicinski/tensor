@@ -8,7 +8,7 @@ class Model {
 
   public:
     Model()
-    : _layer1(2, 100, ts::FeedForward::Activations::relu()),
+    : _layer1(2, 100, ts::Activation::RELU),
       _layer2(100, 3) {}
 
     auto predict(ts::MatrixF const &inputs) -> ts::VectorI { return ts::argmax(_forward(inputs)); }

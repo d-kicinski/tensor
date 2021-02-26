@@ -4,7 +4,7 @@
 
 namespace ts {
 
-template <typename Element, int Dim> class Activation {
+template <typename Element, int Dim> class ActivationBase {
   public:
     auto operator()(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim>
     {
@@ -22,7 +22,7 @@ template <typename Element, int Dim> class Activation {
     }
 };
 
-template <typename Element, int Dim> class ReLU : public Activation<Element, Dim> {
+template <typename Element, int Dim> class ReLU : public ActivationBase<Element, Dim> {
   public:
     auto backward(Tensor<Element, Dim> const &d_output) -> Tensor<Element, Dim> override
     {
@@ -39,8 +39,28 @@ template <typename Element, int Dim> class ReLU : public Activation<Element, Dim
     Tensor<Element, Dim> _input;
 };
 
+
+enum class Activation {
+    RELU,
+    NONE
+};
+
+
 template <typename Element, int Dim> class ActivationFactory {
   public:
+    using ActivationPtr = std::unique_ptr<ActivationBase<Element, Dim>>;
+    using OptActivationPtr = std::optional<ActivationPtr>;
+
+    static auto get(Activation activation) -> std::optional<ActivationPtr>
+    {
+        switch (activation) {
+        case Activation::RELU:
+            return relu();
+        default:
+            return std::nullopt;
+        }
+    }
+
     static auto relu() -> std::unique_ptr<ReLU<Element, Dim>>
     {
         return std::make_unique<ReLU<Element, Dim>>(ReLU<Element, Dim>());
