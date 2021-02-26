@@ -118,10 +118,16 @@ auto wrap_tensor1D(pybind11::module & m, char const * class_name)
 
 auto wrap_ops(pybind11::module & m)
 {
+    // ops_dot.hpp
+    m.def("outer_product", &ts::outer_product);
+    m.def("dot", py::overload_cast<ts::VectorF const&, ts::VectorF const&>(&ts::dot));
+    m.def("dot", py::overload_cast<ts::MatrixF const&, ts::VectorF const&>(&ts::dot));
     m.def("dot",
           py::overload_cast<ts::MatrixF const &, ts::MatrixF const &, bool , bool>(&ts::dot),
           py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
+    m.def("dot", py::overload_cast<ts::Tensor<float, 3> const&, ts::MatrixF const&>(&ts::dot));
 
+    // ops_common.hpp
     m.def("add_matrixf_matrixf", &ts::add<float, 2>);
     m.def("add_matrixi_matrixi", &ts::add<int, 2>);
     m.def("add_vectorf_vectorf", &ts::add<float, 1>);
