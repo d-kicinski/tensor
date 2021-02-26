@@ -1,9 +1,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <tensor/tensor.hpp>
+#include <tensor/nn/activations.hpp>
+#include <tensor/nn/conv2d.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
+#include <tensor/nn/feed_forward.hpp>
 #include <tensor/nn/softmax.hpp>
+#include <tensor/tensor.hpp>
 
 namespace py = pybind11;
 
@@ -149,6 +152,16 @@ auto wrap_ops(pybind11::module & m)
     m.def("argmax_i", &ts::argmax<int>);
 }
 
+template<typename Element, int Dim>
+auto wrap_nn_activations(pybind11::module & m, std::string postfix)
+{
+    py::class_<ts::ReLU<Element, Dim>>(m, ("ReLU" + postfix).c_str())
+        .def(py::init<>())
+        .def("__call__", &ts::ReLU<Element, Dim>::operator())
+        .def("forward", &ts::ReLU<Element, Dim>::forward)
+        .def("backward", &ts::ReLU<Element, Dim>::backward);
+}
+
 auto wrap_nn(pybind11::module & m)
 {
     py::class_<ts::CrossEntropyLoss>(m, "CrossEntropyLoss")
@@ -156,6 +169,32 @@ auto wrap_nn(pybind11::module & m)
         .def("__call__", &ts::CrossEntropyLoss::operator())
         .def("forward", &ts::CrossEntropyLoss::forward)
         .def("backward", &ts::CrossEntropyLoss::backward);
+
+    py::enum_<ts::Activation>(m, "Activation")
+        .value("RELU", ts::Activation::RELU)
+        .value("NONE", ts::Activation::NONE);
+
+    wrap_nn_activations<float, 2>(m, "_f2");
+    wrap_nn_activations<float, 3>(m, "_f3");
+
+    py::class_<ts::FeedForward>(m, "FeedForward")
+        .def(py::init<int, int, ts::Activation, bool, float>())
+        .def("__call__", &ts::FeedForward::operator())
+        .def("forward", &ts::FeedForward::forward)
+        .def("backward", &ts::FeedForward::backward)
+        .def("update", &ts::FeedForward::update)
+        .def("weight", &ts::FeedForward::weight)
+        .def("bias", &ts::FeedForward::bias);
+
+    py::class_<ts::Conv2D>(m, "Conv2D")
+        .def(py::init<int, int, int, int, ts::Activation, bool>())
+        .def("__call__", &ts::Conv2D::operator())
+        .def("forward", &ts::Conv2D::forward)
+        .def("backward", &ts::Conv2D::backward)
+        .def("update", &ts::Conv2D::update)
+        .def("weight", &ts::Conv2D::weight)
+        .def("bias", &ts::Conv2D::bias);
+
 
     m.def("softmax", &ts::softmax);
 }
