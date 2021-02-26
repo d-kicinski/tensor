@@ -22,7 +22,7 @@ class Model:
         self.w1 = tsg.var(np.random.randn(100, 3))
 
     def __call__(self, x: tsg.Variable):
-        return (x @ self.w0 + self.b0) @ self.w1
+        return nn.relu(x @ self.w0 + self.b0) @ self.w1
 
     def update(self, lr: float = 1e-3):
         self.w0.value += -lr * self.w0.grad

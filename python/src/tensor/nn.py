@@ -34,3 +34,8 @@ class ReLU(Op):
         d_input = self._relu.backward(d_output.data)
         self._inputs[0].grad = ts.Tensor(d_input)
 
+
+def relu(x: Variable):
+    op = ReLU()
+    return op(x)
+
