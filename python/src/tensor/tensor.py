@@ -4,11 +4,12 @@ from dataclasses import dataclass
 from numbers import Number
 from typing import Optional, Union, Sequence, List, Tuple, Any, Type, Callable, Final
 
-from . import libtensor as _ts
+import tensor.libtensor as _ts
 import numpy as np
+from numpy.typing import ArrayLike
 
 DataT = Union[_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI]
-ArrayT = Union[DataT, np.array, List[List[Number]], List[Number]]
+ArrayT = Union[DataT, ArrayLike]
 ScalarT = Number
 NumpyT = Union[np.int32, np.float32]
 
@@ -27,23 +28,21 @@ def _is_instance_of_tensor(o: DataT) -> bool:
     return False
 
 
-def _map_dim_and_type_to_tensor(dim: int, t: Any) -> DataT:
-    if dim == 1:
-        if t == np.float32 or t is float:
-            return _ts.VectorF
-        if t == np.int32 or t is int:
-            return _ts.VectorI
-        else:
-            raise ValueError(f"Type {t} is not supported!")
-    elif dim == 2:
-        if t == np.float32 or t is float:
-            return _ts.MatrixF
-        if t == np.int32 or t is int:
-            return _ts.MatrixI
-        else:
-            raise ValueError(f"Type {t} is not supported!")
-    else:
+def _map_dim_and_type_to_tensor(dim: int, t: ArrayLike) -> Type[DataT]:
+    dim_map = {1: "Vector", 2: "Matrix"}
+    try:
+        name = dim_map[dim]
+    except KeyError:
         raise ValueError(f"Dim {dim} is not supported!")
+
+    if t in (np.float32, float):
+        name += "F"
+    elif t in (np.int32, int):
+        name += "I"
+    else:
+        raise ValueError(f"Type {t} is not supported!")
+
+    return getattr(_ts, name)
 
 
 def _numpy_downcast(array: np.array) -> np.array:
