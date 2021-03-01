@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from numbers import Number
-from typing import Optional, Union, Sequence, List, Tuple, Any, Type
+from typing import Optional, Union, Sequence, List, Tuple, Any, Type, Callable, Final
 
 from . import libtensor as _ts
 import numpy as np
@@ -10,6 +11,12 @@ DataT = Union[_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI]
 ArrayT = Union[DataT, np.array, List[List[Number]], List[Number]]
 ScalarT = Number
 NumpyT = Union[np.int32, np.float32]
+
+
+@dataclass
+class _NumberWrapper:
+    data: Number
+    dim: Final[int] = 0
 
 
 def _is_instance_of_tensor(o: DataT) -> bool:
@@ -64,6 +71,16 @@ def _check_shape(shape: Sequence[int]):
     if len(shape) not in [1, 2]:
         msg = f"Tensor with dims other that 2D are not supported yet! Note that {len(shape)=}"
         raise ValueError(msg)
+
+
+def _dispatch_native_method(prefix: str, dtype: Type, *dims: int) -> Callable:
+    type_id = "i" if dtype is int else "f"
+    dim_map = {0: "", 1: "vector", 2: "matrix", 3: "tensor3"}
+
+    name = f"{prefix}"
+    for dim in dims:
+        name += f"_{dim_map[dim]}{type_id}"
+    return getattr(_ts, name)
 
 
 class Tensor:
@@ -137,49 +154,14 @@ class Tensor:
             raise ValueError(f"Unsupported index: {item}")
 
     def __add__(self, other: Tensor) -> Tensor:
-        if self.dim == other.dim and self.dim == 1:
-            if self.dtype is int:
-                return Tensor(_ts.add_vectori_vectori(self._data, other._data))
-            elif self.dtype is float:
-                return Tensor(_ts.add_vectorf_vectorf(self._data, other._data))
-
-        elif self.dim == other.dim and self.dim == 2:
-            if self.dtype is int:
-                return Tensor(_ts.add_matrixi_matrixi(self._data, other._data))
-            elif self.dtype is float:
-                return Tensor(_ts.add_matrixf_matrixf(self._data, other._data))
-
-        elif self.dim == 2 and other.dim == 1:
-            if self.dtype is int:
-                return Tensor(_ts.add_matrixi_vectori(self._data, other._data))
-            elif self.dtype is float:
-                return Tensor(_ts.add_matrixf_vectorf(self._data, other._data))
-
-        else:
-            raise ValueError(f"Incompatible tensors:\n"
-                             f" {self.dim=}, {self.dtype}, {self.shape}\n"
-                             f" {other.dim=}, {other.dtype}, {other.shape}")
+        other = _NumberWrapper(other) if isinstance(other, Number) else other
+        method = _dispatch_native_method("add", self.dtype, self.dim, other.dim)
+        return Tensor(method(self._data, other.data))
 
     def __mul__(self, other: Union[float, Tensor]) -> Tensor:
-        if isinstance(other, float):
-            if self.dim == 1:
-                return Tensor(_ts.multiply_vectorf_f(self._data, other))
-            elif self.dim == 2:
-                return Tensor(_ts.multiply_matrixf_f(self._data, other))
-        elif self.dim == other.dim and self.dim == 1:
-            if self.dtype is float:
-                return Tensor(_ts.multiply_vectorf_vectorf(self._data, other._data))
-
-        elif self.dim == other.dim and self.dim == 2:
-            if self.dtype is float:
-                return Tensor(_ts.multiply_matrixf_matrixf(self._data, other._data))
-        else:
-            raise ValueError(f"Incompatible tensors:\n"
-                             f" {self.dim=}, {self.dtype}, {self.shape}\n"
-                             f" {other.dim=}, {other.dtype}, {other.shape}")
-        if isinstance(other, float):
-            other = Tensor(np.full(self.shape, other))
-        return Tensor(_ts.multiply(self._data, other._data))
+        other = _NumberWrapper(other) if isinstance(other, Number) else other
+        method = _dispatch_native_method("multiply", self.dtype, self.dim, other.dim)
+        return Tensor(method(self._data, other.data))
 
     def __rmul__(self, other: Union[float, Tensor]) -> Tensor:
         return self * other
