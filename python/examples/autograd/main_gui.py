@@ -31,6 +31,7 @@ class Classifier:
         self.model = Model()
 
     def train(self, points: List[PointInt], labels: List[int]):
+        self.model = Model()
         dataset = Dataset(batch_size=10)
         dataset.x = [[((x - 50) / 200) - 1, ((y - 50) / 200) - 1] for x, y in points]
         dataset.y = labels
@@ -58,7 +59,6 @@ class AutoGradExample(tk.Frame):
         self.buttons: List[tk.Button] = []
         self.reset_color: str = self.cget("background")
 
-        self.training_points: List[PointInt]
         self.labels: List[int]
         self.points, self.labels = self.load_training_point()
         self.points_test = _generate_grid(0.05)
@@ -110,6 +110,7 @@ class AutoGradExample(tk.Frame):
         self.buttons[self.selected]["background"] = COLOR_MAP[self.selected]
 
     def canvas_clicked(self, event: tk.Event):
+        print(f"adding: {event.x}, {event.y}")
         self.points.append((event.x, event.y))
         self.labels.append(self.selected)
         self.draw_point(event.x, event.y, self.selected)
@@ -121,8 +122,8 @@ class AutoGradExample(tk.Frame):
 
     def load_training_point(self):
         points, labels = Dataset.load(TRAIN_DATASET_PATH)
-        x = (200 * (np.array(points)[:, 0] + 1) + 50).astype(np.int)
-        y = (200 * (np.array(points)[:, 1] + 1) + 50).astype(np.int)
+        x = (200 * (np.array(points)[:, 0] + 1) + 50).astype(int)
+        y = (200 * (np.array(points)[:, 1] + 1) + 50).astype(int)
 
         points = list(zip(x.tolist(), y.tolist()))
         return points, labels
