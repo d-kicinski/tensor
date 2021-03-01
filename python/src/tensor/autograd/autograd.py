@@ -41,9 +41,9 @@ class Variable:
         return f"Variable"
 
     def __neg__(self) -> Variable:
-        var = Variable(-self._value, self.op)
-        var._grad = self._grad
-        return var
+        variable = Variable(-self._value, self.op)
+        variable._grad = self._grad
+        return variable
 
     def __matmul__(self, other: Variable) -> Variable:
         return matmul(self, other)
@@ -215,15 +215,15 @@ def var(*args, **kwargs) -> Variable:
     return Variable(ts.Tensor(*args), **kwargs)
 
 
-def traverse(var: Variable):
-    if var.op:
-        var.op.backward(var.grad)
-        if inputs := var.op.inputs:
+def traverse(variable: Variable):
+    if variable.op:
+        variable.op.backward(variable.grad)
+        if inputs := variable.op.inputs:
             for i in inputs:
                 traverse(i)
 
 
-def print_graph(var: Variable, prefix=""):
+def print_graph(variable: Variable, prefix=""):
     delimiter = "    "
 
     def loop(v: Variable, p=""):
@@ -236,4 +236,4 @@ def print_graph(var: Variable, prefix=""):
                 for i in inputs:
                     print_graph(i, p)
 
-    loop(var, prefix)
+    loop(variable, prefix)
