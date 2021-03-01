@@ -30,13 +30,13 @@ class Model:
         self.w1.value += -lr * self.w1.grad
 
 
-def train(model: Model, dataset: Dataset, epochs: int = 500) -> Model:
+def train(model: Model, dataset: Dataset, epochs: int = 100) -> Model:
     for i_epoch in range(epochs):
         for x, labels in dataset:
             y = model(x)
             loss = tsg.cross_entropy_loss(y, labels)
             loss.backward()
-            model.update()
+            model.update(1e-1)
 
         if i_epoch % 100 == 0:
             print(f"[{i_epoch + 1}/{epochs}] loss: {loss.value.data[0]}")
@@ -54,13 +54,14 @@ def label_test_dataset(model: Model, dataset: Dataset) -> List[int]:
 
 
 def main():
-    dataset = Dataset(TRAIN_DATASET_PATH, batch_size=300)
+    dataset = Dataset(TRAIN_DATASET_PATH, batch_size=10)
+    dataset.shuffle()
 
     print("Training model...")
     model: Model = train(Model(), dataset)
     print("Done!")
 
-    dataset_test = Dataset(TEST_DATASET_PATH, batch_size=1)
+    dataset_test = Dataset(TEST_DATASET_PATH, batch_size=500)
     labels: List[int] = label_test_dataset(model, dataset_test)
     dataset_test.y = labels
 

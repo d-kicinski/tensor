@@ -25,6 +25,9 @@ class Dataset(Iterator):
     def __next__(self) -> Tuple[tsg.Variable, tsg.Variable]:
         end = self._begin + self._batch_size
         if end > len(self):
+            end = len(self)
+
+        if self._begin >= len(self):
             self._begin = 0
             raise StopIteration
 
