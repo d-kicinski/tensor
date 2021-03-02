@@ -1,0 +1,63 @@
+name: Build Python
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+  CXX: g++-10
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          lfs: true
+
+      - name: Checkout LFS objects
+        run: git lfs checkout
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Build python extension
+        shell: bash
+        working-directory: ${{github.workspace}}/build
+        run: |
+          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTENSOR_BUILD_EXAMPLES=OFF -DTENSOR_BUILD_TESTS=OFF -D -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_EXTENSIONS=OFF
+          cmake --build . --config $BUILD_TYPE
+          cp -r  ${{github.workspace}}/build/bin/libtensor.cpython*.so ${{github.workspace}}/python/src/tensor
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements-to-freeze.txt ]; then pip install -r requirements-to-freeze.txt; fi
+
+      - name: Install package
+        working-directory: ${{github.workspace}}/python
+        run: |
+          pip install .
+
+      - name: Test with pytest
+        working-directory: ${{github.workspace}}/python
+        run: |
+          pytest
+
+      - name: Python coverage
+        working-directory: ${{github.workspace}}
+        run: PYTHONPATH=./python/src pytest --cov-report=xml --cov=python/src/tensor python/tests
+
+      - name: Upload Python coverage
+        working-directory: ${{github.workspace}}
+        run: bash <(curl -s https://codecov.io/bash) -c -F python
+
+
+
