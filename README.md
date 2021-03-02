@@ -2,8 +2,8 @@
 
 | package | build/tests | coverage |
 |---------|-------------|----------|
-| C++    | ![Build C++/Python](https://github.com/d-kicinski/tensor/workflows/Build%20C++/Python/badge.svg?branch=master) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg)](https://codecov.io/gh/d-kicinski/tensor) |
-| Python | ![Build C++/Python](https://github.com/d-kicinski/tensor/workflows/Build%20C++/Python/badge.svg?branch=master) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg)](https://codecov.io/gh/d-kicinski/tensor) |
+| C++    | ![Build C++/Python](https://github.com/d-kicinski/tensor/workflows/Build%20C++/Python/badge.svg?branch=master) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg?flag=cpp)](https://codecov.io/gh/d-kicinski/tensor) |
+| Python | ![Build C++/Python](https://github.com/d-kicinski/tensor/workflows/Build%20C++/Python/badge.svg?branch=master) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg?flag=python)](https://codecov.io/gh/d-kicinski/tensor) |
 
 
 This library provides a two main features:
