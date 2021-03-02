@@ -6,7 +6,7 @@
 namespace ts {
 
 
-auto outer_product(VectorF const x, VectorF const & y) -> MatrixF
+auto outer_product(VectorF const & x, VectorF const & y) -> MatrixF
 {
     // x or y could be just view on higher dimensional tensor, if I want to use raw pointer to
     // underlining data I have to take that into account
