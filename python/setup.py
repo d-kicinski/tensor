@@ -2,8 +2,8 @@ import setuptools
 from setuptools import Extension
 
 extensions = []
-_torch = Extension(name="tensor.libtensor", sources=[])
-extensions.append(_torch)
+libtensor = Extension(name="tensor.libtensor", sources=[])
+extensions.append(libtensor)
 
 setuptools.setup(
     ext_modules=extensions

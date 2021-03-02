@@ -1,4 +1,4 @@
-__version__ = "0.1.0"
+"""Python wrapper for tensor C++ library"""
 
+from tensor.version import __version__
 from tensor import tensor, nn, fft
-
