@@ -1,21 +1,16 @@
 coverage:
-  precision: 2
-  round: nearest
-  range: "60...90"
   status:
     project:
       default:
+        target: auto
         threshold: 2%
-    patch:
-      default:
-        target: 80%
+        base: auto
   ignore:
     - "projects/SelfTest"
     - "cpp/tests"
-
 
 codecov:
   branch: master
 
 comment:
-  layout: "diff"
+  layout: "reach, fags"
