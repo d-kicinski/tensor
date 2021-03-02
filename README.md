@@ -1,5 +1,4 @@
 # tensor
-[![Build Status](https://travis-ci.org/d-kicinski/tensor.svg?branch=master)](https://travis-ci.org/d-kicinski/tensor)
 ![Build C++/Python](https://github.com/d-kicinski/tensor/workflows/Build%20C++/Python/badge.svg?branch=master)
 [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg)](https://codecov.io/gh/d-kicinski/tensor)
 

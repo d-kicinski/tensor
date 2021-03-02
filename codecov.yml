@@ -11,6 +11,7 @@ coverage:
         target: 80%
   ignore:
     - "projects/SelfTest"
+    - "cpp/tests"
 
 
 codecov:
