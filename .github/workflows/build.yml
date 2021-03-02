@@ -3,7 +3,7 @@ name: Build C++/Python
 on: [push]
 
 env:
-  BUILD_TYPE: Release
+  BUILD_TYPE: Debug
   CXX: g++-10
 
 jobs:
