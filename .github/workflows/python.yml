@@ -32,7 +32,7 @@ jobs:
         shell: bash
         working-directory: ${{github.workspace}}/build
         run: |
-          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTENSOR_BUILD_EXAMPLES=OFF -DTENSOR_BUILD_TESTS=OFF -D -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_EXTENSIONS=OFF
+          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTENSOR_USE_BLAS=ON -DTENSOR_BUILD_SHARED_LIBS=OFF -DTENSOR_BUILD_PYTHON_WRAPPER=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_EXTENSIONS=OFF
           cmake --build . --config $BUILD_TYPE
           cp -r  ${{github.workspace}}/build/bin/libtensor.cpython*.so ${{github.workspace}}/python/src/tensor
 
