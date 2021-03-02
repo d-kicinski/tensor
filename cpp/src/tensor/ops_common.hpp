@@ -20,6 +20,9 @@ auto add(Tensor<Element, 2> const &, Tensor<Element, 1> const &) -> Tensor<Eleme
 template <typename Element>
 auto add(Tensor<Element, 3> const &, Tensor<Element, 1> const &) -> Tensor<Element, 3> ;
 
+template <typename Element>
+auto add_(Tensor<Element, 3> const &, Tensor<Element, 1> const &) -> void;
+
 auto divide(MatrixF const &, VectorF const &) -> MatrixF ;
 
 template <typename Element, int Dim>

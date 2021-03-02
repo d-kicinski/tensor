@@ -6,9 +6,10 @@
 namespace ts {
 
 // To preserve my sanity:
-template auto mask<float, 1>(Tensor<float, 1> const &, std::function<bool (float)>) -> Tensor<bool, 1> ;
-template auto mask<float, 2>(Tensor<float, 2> const &, std::function<bool (float)>) -> Tensor<bool, 2> ;
-template auto mask<float, 3>(Tensor<float, 3> const &, std::function<bool (float)>) -> Tensor<bool, 3> ;
+template auto mask<float, 1>(Tensor<float, 1> const &, std::function<bool (float)>) -> Tensor<bool, 1>;
+template auto mask<float, 2>(Tensor<float, 2> const &, std::function<bool (float)>) -> Tensor<bool, 2>;
+template auto mask<float, 3>(Tensor<float, 3> const &, std::function<bool (float)>) -> Tensor<bool, 3>;
+template auto mask<float, 4>(Tensor<float, 4> const &, std::function<bool (float)>) -> Tensor<bool, 4>;
 
 template auto add_(Tensor<float, 1> const &, Tensor<float, 1> const &) -> void;
 template auto add_(Tensor<float, 2> const &, Tensor<float, 2> const &) -> void;
@@ -23,14 +24,18 @@ template auto add(Tensor<int, 2> const &, Tensor<int, 2> const &) -> Tensor<int,
 template auto add(Tensor<int, 3> const &, Tensor<int, 3> const &) -> Tensor<int, 3>;
 
 template auto add(Tensor<float, 2> const &, Tensor<float, 1> const &) -> Tensor<float, 2>;
-template auto add(Tensor<float, 3> const &, Tensor<float, 1> const &) -> Tensor<float, 3> ;
+template auto add(Tensor<float, 3> const &, Tensor<float, 1> const &) -> Tensor<float, 3>;
 template auto add(Tensor<int, 2> const &, Tensor<int, 1> const &) -> Tensor<int, 2>;
-template auto add(Tensor<int, 3> const &, Tensor<int, 1> const &) -> Tensor<int, 3> ;
+template auto add(Tensor<int, 3> const &, Tensor<int, 1> const &) -> Tensor<int, 3>;
+
+template auto add_(Tensor<float, 3> const &, Tensor<float, 1> const &) -> void;
+
 
 
 template auto maximum(float, Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto maximum(float, Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto maximum(float, Tensor<float, 3> const &) -> Tensor<float, 3>;
+template auto maximum(float, Tensor<float, 4> const &) -> Tensor<float, 4>;
 
 template auto log(Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto log(Tensor<float, 2> const &) -> Tensor<float, 2>;
@@ -51,6 +56,7 @@ template auto sum(Tensor<float, 3> const &) -> float;
 template auto assign_if(Tensor<float, 1> const &, Tensor<bool, 1> const &, float) -> Tensor<float, 1>;
 template auto assign_if(Tensor<float, 2> const &, Tensor<bool, 2> const &, float) -> Tensor<float, 2>;
 template auto assign_if(Tensor<float, 3> const &, Tensor<bool, 3> const &, float) -> Tensor<float, 3>;
+template auto assign_if(Tensor<float, 4> const &, Tensor<bool, 4> const &, float) -> Tensor<float, 4>;
 
 template auto apply_if(Tensor<float, 1>, Tensor<bool, 1>, Fn<float>) -> Tensor<float, 1>;
 template auto apply_if(Tensor<float, 2>, Tensor<bool, 2>, Fn<float>) -> Tensor<float, 2>;
@@ -127,6 +133,18 @@ auto add(Tensor<Element, 3> const &tensor, Vector<Element> const &vector) -> Ten
         }
     }
     return result;
+}
+
+template <typename Element>
+auto add_(Tensor<Element, 3> const &tensor, Vector<Element> const &vector) -> void
+{
+    for (int i = 0; i < tensor.shape(0); ++i) {
+        for (int j = 0; j < tensor.shape(1); ++j) {
+            Vector<Element> values = tensor(i, j);
+            std::transform(values.begin(), values.end(), vector.begin(),
+                           values.begin(), std::plus());
+        }
+    }
 }
 
 auto divide(MatrixF const &matrix, VectorF const &vector) -> MatrixF

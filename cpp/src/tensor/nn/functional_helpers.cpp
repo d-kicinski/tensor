@@ -2,6 +2,23 @@
 
 using namespace ts;
 
+auto ts::_get_flatten_tile(Tensor<float, 4> const &images, int size, int row, int col) -> MatrixF
+{
+    std::vector<VectorF> tiles;
+    for (int b = 0; b < images.shape(0); ++b) {
+        auto image = images(b);
+        MatrixF tile(std::pow(size, 2), image.shape(2));
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++j) {
+                VectorF vec = image(i + row, j + col);
+                std::copy(vec.begin(), vec.end(), tile(j + i * size).begin());
+            }
+        }
+        tiles.push_back(std::move(tile.flatten()));
+    }
+    return MatrixF(tiles);  // (B, k*k*C_in)
+}
+
 auto ts::_get_flatten_tile(Tensor<float, 3> const &image, int size, int row, int col) -> VectorF
 {
     MatrixF tile(std::pow(size, 2), image.shape(2));
@@ -12,6 +29,24 @@ auto ts::_get_flatten_tile(Tensor<float, 3> const &image, int size, int row, int
         }
     }
     return tile.flatten();
+}
+
+auto ts::_add_flatten_tile(Tensor<float, 4> &images, Tensor<float, 2> const &tiles, int size, int row,
+                           int col) -> void
+{
+    for (int b = 0; b < images.shape(0); ++b) {
+        auto image = images(b);
+        auto tile = tiles(b);
+        int c = image.shape(3);
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++j) {
+                for (int k = 0; k < c; ++k) {
+                    int tile_idx = k + j * c + i * c * size;
+                    image(i + row, j + col, k) += tile(tile_idx);
+                }
+            }
+        }
+    }
 }
 
 auto ts::_add_flatten_tile(Tensor<float, 3> &image, Tensor<float, 1> const &tile, int size, int row,

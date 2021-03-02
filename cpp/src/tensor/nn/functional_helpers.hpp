@@ -3,7 +3,12 @@
 
 namespace ts {
 
+auto _get_flatten_tile(Tensor<float, 4> const &image, int size, int row, int col) -> MatrixF;
+
 auto _get_flatten_tile(Tensor<float, 3> const &image, int size, int row, int col) -> VectorF;
+
+auto _add_flatten_tile(Tensor<float, 4> &images, Tensor<float, 2> const &tiles, int size,
+                       int row, int col) -> void;
 
 auto _add_flatten_tile(Tensor<float, 3> &image, Tensor<float, 1> const &tile, int size,
                        int row, int col) -> void;

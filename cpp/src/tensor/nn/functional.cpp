@@ -12,6 +12,27 @@ auto ts::pad(ts::MatrixF const &matrix, int pad_row, int pad_col) -> ts::MatrixF
     return matrix_padded;
 }
 
+auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel,
+                 int kernel_size, int stride) -> ts::Tensor<float, 4>
+{
+    int batch_size = images.shape(0);
+    int dim_out = ts::_calculate_output_dim(images.shape(1), kernel_size, 0, stride, 1);
+    ts::Tensor<float, 4> results(batch_size, dim_out, dim_out, kernel.shape(1));
+
+    for (int b = 0; b < batch_size; ++b) {
+        auto image = images(b);
+        auto result = results(b);
+        for (int i = 0; i < dim_out; ++i) {
+            for (int j = 0; j < dim_out; ++j) {
+                VectorF tile = _get_flatten_tile(image, kernel_size, i * stride, j * stride);
+                VectorF tile_output = ts::dot(ts::transpose(kernel), tile);
+                std::copy(tile_output.begin(), tile_output.end(), result(i, j).begin());
+            }
+        }
+    }
+    return results;
+}
+
 auto ts::conv_2d(ts::Tensor<float, 3> const &image, ts::Tensor<float, 2> const &kernel,
                  int kernel_size, int stride) -> ts::Tensor<float, 3>
 {
@@ -44,6 +65,37 @@ auto ts::conv_2d(ts::MatrixF const &matrix, ts::MatrixF const &kernel, int strid
         }
     }
     return result;
+}
+
+auto ts::conv_2d_backward(ts::Tensor<float, 4> const &inputs, ts::Tensor<float, 2> const &kernel,
+                          ts::Tensor<float, 4> const &d_outputs, int kernel_size, int stride)
+-> std::tuple<ts::Tensor<float, 4>, ts::Tensor<float, 2>>
+{
+    int batch_size = inputs.shape(0);
+    int dim_in = inputs.shape(1);
+    int channels_in = inputs.shape(3);
+    int channels_out = d_outputs.shape(3);
+
+    ts::Tensor<float, 4> d_inputs(batch_size, dim_in, dim_in, channels_in);
+    ts::Tensor<float, 2> d_kernel(kernel_size * kernel_size * channels_in, channels_out);
+    for (int b = 0; b < batch_size; ++b) {
+        auto d_output = d_outputs(b);
+        auto input = inputs(b);
+        auto d_input = d_inputs(b);
+        for (int i = 0; i < d_output.shape(0); ++i) {
+            for (int j = 0; j < d_output.shape(1); ++j) {
+                ts::VectorF d_tile = d_output(i, j);
+                ts::VectorF tile = _get_flatten_tile(input, kernel_size, i * stride, j * stride);
+
+                auto d_tile_kernel = ts::outer_product(tile, d_tile);
+                auto d_tile_input = ts::dot(kernel, d_tile);
+
+                _add_flatten_tile(d_input, d_tile_input, kernel_size, i * stride, j * stride);
+                ts::add_(d_kernel, d_tile_kernel);
+            }
+        }
+    }
+    return std::make_tuple(std::move(d_inputs), std::move(d_kernel));
 }
 
 auto ts::conv_2d_backward(ts::Tensor<float, 3> const &input, ts::Tensor<float, 2> const &kernel,

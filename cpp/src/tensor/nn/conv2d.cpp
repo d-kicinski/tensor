@@ -7,20 +7,22 @@ ts::Conv2D::Conv2D(int in_channels, int out_channels, int kernel_size, int strid
     _activation = Activations::get(activation);
     _weight = ts::MatrixF::randn({kernel_size * kernel_size * in_channels, out_channels});
     if (_use_bias)
-        _bias = ts::VectorF(in_channels);
+        _bias = ts::VectorF(out_channels);
 }
 
-auto ts::Conv2D::operator()(const ts::Tensor<float, 3> & input) -> Tensor<float, 3>
+auto ts::Conv2D::operator()(const ts::Tensor<float, 4> & input) -> Tensor<float, 4>
 {
     return forward(input);
 }
 
-auto ts::Conv2D::forward(const ts::Tensor<float, 3> & input) -> ts::Tensor<float, 3>
+auto ts::Conv2D::forward(const ts::Tensor<float, 4> & input) -> ts::Tensor<float, 4>
 {
     _input = input;
     auto output =  ts::conv_2d(input, _weight, _kernel_size, _stride);
     if (_use_bias) {
-       output = ts::add(output, _bias) ;
+        for (int b = 0; b < output.shape(0); ++b) {
+            ts::add_(output(b), _bias);
+        }
     }
     if (_activation) {
         output = _activation.value()->forward(output);
@@ -28,7 +30,7 @@ auto ts::Conv2D::forward(const ts::Tensor<float, 3> & input) -> ts::Tensor<float
     return output;
 }
 
-auto ts::Conv2D::backward(const ts::Tensor<float, 3> & d_output) -> ts::Tensor<float, 3>
+auto ts::Conv2D::backward(const ts::Tensor<float, 4> & d_output) -> ts::Tensor<float, 4>
 {
     auto d_output_(d_output); // cheap, not a deep copy
     if (_activation) {
@@ -38,9 +40,11 @@ auto ts::Conv2D::backward(const ts::Tensor<float, 3> & d_output) -> ts::Tensor<f
     _d_weight = std::move(d_weight);
 
     if (_use_bias) {
-        for (int i = 0; i < d_output.shape(0); ++i) {
-            for (int j = 0; j < d_output.shape(1); ++j) {
-                ts::add_(_d_bias, d_output(i, j));
+        for (int b = 0; b < d_output.shape(0); ++b) {
+            for (int i = 0; i < d_output.shape(1); ++i) {
+                for (int j = 0; j < d_output.shape(2); ++j) {
+                    ts::add_(_d_bias, d_output(b, i, j));
+                }
             }
         }
     }
