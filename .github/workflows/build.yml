@@ -51,7 +51,7 @@ jobs:
       - name: Upload C++ coverage
         working-directory: ${{github.workspace}}/build
         shell: bash
-        run: bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
+        run: bash <(curl -s https://codecov.io/bash) -X gcov -c -F cpp
 
       - name: Prepare Python package
         shell: bash
@@ -79,7 +79,8 @@ jobs:
         run: PYTHONPATH=./python/src pytest --cov-report=xml --cov=python/src/tensor python/tests
 
       - name: Upload Python coverage
-        uses: codecov/codecov-action@v1
+        working-directory: ${{github.workspace}}
+        run: bash <(curl -s https://codecov.io/bash) -c -F python
 
 
 
