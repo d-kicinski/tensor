@@ -75,9 +75,8 @@ jobs:
           pytest
 
       - name: Python coverage
-        working-directory: ${{github.workspace}}/python
-        run: |
-          PYTHONPATH=./src pytest --cov-report=xml --cov=src/tensor tests
+        working-directory: ${{github.workspace}}
+        run: PYTHONPATH=./python/src pytest --cov-report=xml --cov=python/src/tensor python/tests
 
       - name: Upload Python coverage
         uses: codecov/codecov-action@v1
