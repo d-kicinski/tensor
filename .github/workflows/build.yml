@@ -31,7 +31,7 @@ jobs:
       - name: Configure CMake
         shell: bash
         working-directory: ${{github.workspace}}/build
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTENSOR_ENABLE_COVERAGE=OFF  -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_EXTENSIONS=OFF
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTENSOR_ENABLE_COVERAGE=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_EXTENSIONS=OFF
 
       - name: Build C++
         working-directory: ${{github.workspace}}/build
@@ -42,6 +42,11 @@ jobs:
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: cd bin && ./tests && cd ..
+
+      - name: Coverage C++
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        run: make gcov
 
       - name: Prepare Python package
         shell: bash
@@ -69,11 +74,8 @@ jobs:
         run: |
           PYTHONPATH=./src pytest --cov-report=xml --cov=src/tensor tests
 
-      - name: Upload Python coverage
+      - name: Upload coverage
         uses: codecov/codecov-action@v1
-        with:
-          files: ${{github.workspace}}/python/coverage.xml
-          name: "python-coverage"
 
 
 
