@@ -5,15 +5,57 @@ import pytest
 
 def test_not_tensor_create_not_supported():
     with pytest.raises(ValueError) as e:
-        ts.Tensor(shape=(2, 2, 2))
-    expected = f"Tensor with dims other that 2D are not supported yet! Note that len(shape)=3"
+        ts.Tensor(shape=(1, 2, 3, 4, 5))
+    expected = "Tensor with dims higher than 4 are not supported yet! Note that len(shape)=5"
     assert str(e.value) == expected
 
 
-def test_tensor_scalar():
+def test_scalar():
     scalar = ts.Tensor(7)
     assert scalar.shape == (1,)
     assert scalar[0] == 7
+
+
+def test_vector():
+    vector = ts.Tensor([1, 2, 3])
+    assert vector.shape == (3,)
+    assert vector[1] == 2
+
+
+def test_matrix():
+    matrix = ts.Tensor([[1, 2, 3], [4, 5, 6]])
+    assert matrix.shape == (2, 3)
+    assert matrix[0, 0] == 1
+    assert matrix[0, 1] == 2
+    assert matrix[1, 0] == 4
+    assert matrix[1, 2] == 6
+    # assert matrix[0] == [1, 2, 3]
+    # assert matrix[1] == [4, 5, 6]
+
+
+def test_tensor3():
+    tensor3 = ts.Tensor([[[1, -1], [2, -2], [3, -3]],
+                         [[4, -4], [5, -5], [6, -6]]])
+    assert tensor3.shape == (2, 3, 2)
+    # assert tensor3[0] == [[1, -1], [2, -2], [3, -3]]
+    # assert tensor3[0, 2] == [3, -3]
+    assert tensor3[0, 2, 1] == -3
+
+
+def test_tensor4():
+    tensor3 = ts.Tensor(
+        [[
+            [[1, -1], [2, -2], [3, -3]],
+            [[4, -4], [5, -5], [6, -6]]
+         ],
+         [
+            [[7, -7], [8, -8], [9, -9]],
+            [[10, -10], [11, -11], [12, -12]]
+        ]]
+    )
+    assert tensor3.shape == (2, 2, 3, 2)
+    # assert tensor3[1, 1, 1] == [11, -11]
+    assert tensor3[1, 1, 1, 1] == -11
 
 
 def test_tensor_shape():

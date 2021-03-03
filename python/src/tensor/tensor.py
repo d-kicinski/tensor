@@ -2,16 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from numbers import Number
-from typing import Optional, Union, Sequence, List, Tuple, Any, Type, Callable, Final
+from typing import Optional, Union, Sequence, List, Tuple, Type, Callable, Final
 
 import tensor.libtensor as _ts
 import numpy as np
 from numpy.typing import ArrayLike
 
-DataT = Union[_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI]
+DataT = Union[_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI, _ts.Tensor3F, _ts.Tensor4F,
+              _ts.Tensor3I, _ts.Tensor4I]
 ArrayT = Union[DataT, ArrayLike]
 ScalarT = Number
 NumpyT = Union[np.int32, np.float32]
+IndexT = Union[Tuple[int, int, int, int], Tuple[int, int, int], Tuple[int, int], int]
 
 
 @dataclass
@@ -21,7 +23,8 @@ class _NumberWrapper:
 
 
 def _is_instance_of_tensor(o: DataT) -> bool:
-    types = [_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI]
+    types = [_ts.MatrixF, _ts.MatrixI, _ts.VectorF, _ts.VectorI, _ts.Tensor3F, _ts.Tensor4F,
+             _ts.Tensor3I, _ts.Tensor4I]
     for t in types:
         if isinstance(o, t):
             return True
@@ -29,7 +32,7 @@ def _is_instance_of_tensor(o: DataT) -> bool:
 
 
 def _map_dim_and_type_to_tensor(dim: int, t: ArrayLike) -> Type[DataT]:
-    dim_map = {1: "Vector", 2: "Matrix"}
+    dim_map = {1: "Vector", 2: "Matrix", 3: "Tensor3", 4: "Tensor4"}
     try:
         name = dim_map[dim]
     except KeyError:
@@ -58,23 +61,23 @@ def _numpy_downcast(array: np.array) -> np.array:
 
 
 def _map_ts_to_type(data: DataT) -> Type:
-    if type(data) in [_ts.VectorI, _ts.MatrixI]:
+    if type(data) in [_ts.VectorI, _ts.MatrixI, _ts.Tensor3I, _ts.Tensor4I]:
         return int
-    elif type(data) in [_ts.VectorF, _ts.MatrixF]:
+    elif type(data) in [_ts.VectorF, _ts.MatrixF, _ts.Tensor3F, _ts.Tensor4F]:
         return float
     else:
         raise ValueError(f"Incompatible data type {type(data)}")
 
 
 def _check_shape(shape: Sequence[int]):
-    if len(shape) not in [1, 2]:
-        msg = f"Tensor with dims other that 2D are not supported yet! Note that {len(shape)=}"
+    if len(shape) not in [1, 2, 3, 4]:
+        msg = f"Tensor with dims higher than 4 are not supported yet! Note that {len(shape)=}"
         raise ValueError(msg)
 
 
 def _dispatch_native_method(prefix: str, dtype: Type, *dims: int) -> Callable:
     type_id = "i" if dtype is int else "f"
-    dim_map = {0: "", 1: "vector", 2: "matrix", 3: "tensor3"}
+    dim_map = {0: "", 1: "vector", 2: "matrix", 3: "tensor3", 4: "tensor4"}
 
     name = f"{prefix}"
     for dim in dims:
@@ -141,16 +144,15 @@ class Tensor:
     def numpy(self):
         return np.array(self._data)
 
-    def __getitem__(self, item: Union[Tuple[int, int], int]) -> float:
-        if isinstance(item, tuple):
-            if len(item) != self.dim:
-                raise IndexError(
-                    f"Index {item} is not compatible with Tensor with shape {self.shape}")
-            return self._data[item]
-        elif isinstance(item, int):
-            return self._data[item]
+    def __getitem__(self, item: IndexT) -> ArrayT:
+        if not isinstance(item, Number) and len(item) != self.dim:
+            raise IndexError("Slices are not supported yet")
+
+        tensor_or_scalar = self._data[item]
+        if isinstance(tensor_or_scalar, Number):
+            return tensor_or_scalar
         else:
-            raise ValueError(f"Unsupported index: {item}")
+            return Tensor(tensor_or_scalar)
 
     def __add__(self, other: Tensor) -> Tensor:
         other = _NumberWrapper(other) if isinstance(other, Number) else other

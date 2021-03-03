@@ -12,6 +12,117 @@ namespace py = pybind11;
 
 using size_type = ts::Tensor<float, 2>::size_type;
 
+
+template <typename Element>
+auto wrap_tensor4D(pybind11::module & m, char const * class_name)
+{
+    py::class_<ts::Tensor<Element, 4>>(m, class_name, py::buffer_protocol())
+        .def(py::init<size_type , size_type, size_type, size_type>())
+
+        // Construct from a buffer
+        .def(py::init([](py::buffer const b) {
+          py::buffer_info info = b.request();
+          if (info.format != py::format_descriptor<Element>::format() || info.ndim != 4)
+              throw std::runtime_error("Incompatible buffer format!");
+
+          auto v = new ts::Tensor<Element, 4>(info.shape[0], info.shape[1], info.shape[2], info.shape[3]);
+          memcpy(v->data()->data(),
+                 info.ptr,
+                 sizeof(Element) * (size_t)(v->shape(0) * v->shape(1) * v->shape(2) * v->shape(3)));
+          return v;
+        }))
+
+        .def("shape", [](ts::Tensor<Element, 4> const  &t) -> std::array<int, 4> {
+          return t.shape();
+        })
+
+        .def("data_size", &ts::Tensor<Element, 4>::data_size)
+
+        // Bare bones interface
+        .def("__getitem__",
+             [](ts::Tensor<Element, 4> const &t,
+                std::tuple<py::ssize_t, py::ssize_t, py::ssize_t, py::size_t> i) {
+               auto [dim_0, dim_1, dim_2, dim_3] = i;
+               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2) || dim_3 >= t.shape(3))
+                   throw py::index_error();
+               return t(dim_0, dim_1, dim_2, dim_3);
+             })
+
+        .def("__setitem__",
+             [](ts::Tensor<Element, 4> &t,
+                std::tuple<py::ssize_t, py::ssize_t, py::ssize_t, py::size_t> i, Element v) {
+               auto [dim_0, dim_1, dim_2, dim_3] = i;
+               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2) || dim_3 >= t.shape(3))
+                   throw py::index_error();
+               t(dim_0, dim_1, dim_2, dim_3) = v;
+             })
+
+        // Provide buffer access
+        .def_buffer([](ts::Tensor<Element, 4> &t) -> py::buffer_info {
+          return py::buffer_info(
+              t.data()->data(),                                                                 // Pointer to buffer
+              {t.shape(0), t.shape(1), t.shape(2), t.shape(3)},                                 // Buffer dimensions
+              {sizeof(Element) * size_t(t.shape(1)) * size_t(t.shape(2)) * size_t(t.shape(3)),  // Strides (in bytes) for each index
+               sizeof(Element) * size_t(t.shape(2)) * size_t(t.shape(3)),
+               sizeof(Element) * size_t(t.shape(3)),
+               sizeof(Element)});
+        });
+}
+
+
+template <typename Element>
+auto wrap_tensor3D(pybind11::module & m, char const * class_name)
+{
+    py::class_<ts::Tensor<Element, 3>>(m, class_name, py::buffer_protocol())
+        .def(py::init<size_type , size_type, size_type>())
+
+            // Construct from a buffer
+        .def(py::init([](py::buffer const b) {
+          py::buffer_info info = b.request();
+          if (info.format != py::format_descriptor<Element>::format() || info.ndim != 3)
+              throw std::runtime_error("Incompatible buffer format!");
+
+          auto v = new ts::Tensor<Element, 3>(info.shape[0], info.shape[1], info.shape[2]);
+          memcpy(v->data()->data(),
+                 info.ptr,
+                 sizeof(Element) * (size_t)(v->shape(0) * v->shape(1) * v->shape(2)));
+          return v;
+        }))
+
+        .def("shape", [](ts::Tensor<Element, 3> const  &t) -> std::array<int, 3> {
+          return t.shape();
+        })
+
+        .def("data_size", &ts::Tensor<Element, 3>::data_size)
+
+        // Bare bones interface
+        .def("__getitem__",
+             [](ts::Tensor<Element, 3> const &t, std::tuple<py::ssize_t, py::ssize_t, py::ssize_t> i) {
+                 auto [dim_0, dim_1, dim_2] = i;
+               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2))
+                   throw py::index_error();
+               return t(dim_0, dim_1, dim_2);
+             })
+
+        .def("__setitem__",
+             [](ts::Tensor<Element, 3> &t, std::tuple<py::ssize_t, py::ssize_t, py::ssize_t> i, Element v) {
+               auto [dim_0, dim_1, dim_2] = i;
+               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2))
+                   throw py::index_error();
+               t(dim_0, dim_1, dim_2) = v;
+             })
+
+        // Provide buffer access
+        .def_buffer([](ts::Tensor<Element, 3> &t) -> py::buffer_info {
+          return py::buffer_info(
+              t.data()->data(),                          // Pointer to buffer
+              {t.shape(0), t.shape(1), t.shape(2)},      // Buffer dimensions
+              {sizeof(Element) * size_t(t.shape(1)) * size_t(t.shape(2)),     // Strides (in bytes) for each index
+               sizeof(Element) * size_t(t.shape(2)),
+               sizeof(Element)});
+        });
+}
+
 template <typename Element>
 auto wrap_tensor2D(pybind11::module & m, char const * class_name)
 {
@@ -207,6 +318,10 @@ auto wrap_nn(pybind11::module & m)
 
 PYBIND11_MODULE(libtensor, m)
 {
+    wrap_tensor4D<int>(m, "Tensor4I");
+    wrap_tensor4D<float>(m, "Tensor4F");
+    wrap_tensor3D<int>(m, "Tensor3I");
+    wrap_tensor3D<float>(m, "Tensor3F");
     wrap_tensor2D<int>(m, "MatrixI");
     wrap_tensor2D<float>(m, "MatrixF");
     wrap_tensor1D<int>(m, "VectorI");
