@@ -145,7 +145,7 @@ class Tensor:
         return np.array(self._data)
 
     def __getitem__(self, item: IndexT) -> ArrayT:
-        if not isinstance(item, Number) and len(item) != self.dim:
+        if not isinstance(item, int) and len(item) != self.dim:
             raise IndexError("Slices are not supported yet")
 
         tensor_or_scalar = self._data[item]
