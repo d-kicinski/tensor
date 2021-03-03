@@ -14,21 +14,33 @@
 
 namespace ts {
 
+template <typename Element>
+class DataHolder {
+  public:
+    using vector_t = std::vector<Element>;
+    using data_t = std::shared_ptr<vector_t>;
+    using iterator = typename vector_t::iterator;
+
+    virtual auto data() const -> data_t = 0;
+    virtual auto begin() const -> iterator = 0;
+    virtual auto end() const -> iterator = 0;
+};
+
 /**
  *
  * @tparam Element is the type of array element
  * @tparam Dim is the number of dimensions
  */
 
-template <typename Element, int Dim> class Tensor {
+template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     template<typename AnyElement, int AnyDim> friend class Tensor;
 
   public:
+    using vector_t = typename DataHolder<Element>::vector_t;
+    using data_t = typename DataHolder<Element>::data_t;
+    using iterator = typename DataHolder<Element>::iterator;
     using size_type = int;
-    using vector_t = std::vector<Element>;
-    using data_t = std::shared_ptr<vector_t>;
-    using iterator = typename vector_t::iterator;
 
     auto data() const -> data_t { return _data; };
     auto shape() const -> std::array<size_type, Dim> { return _dimensions; }

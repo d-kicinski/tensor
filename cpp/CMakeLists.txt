@@ -49,7 +49,10 @@ add_library(nn
         src/tensor/nn/functional_helpers.cpp
         src/tensor/nn/softmax.cpp
         src/tensor/nn/activations.cpp
-        src/tensor/nn/activations.hpp)
+        src/tensor/nn/activations.hpp
+        src/tensor/nn/optimizers.cpp
+        src/tensor/nn/optimizers.hpp
+        )
 add_library(tensor::nn ALIAS nn)
 target_link_libraries(nn tensor)
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
@@ -71,7 +74,12 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/nn/test_cross_entropy_loss.cpp
             tests/tensor/nn/test_softmax.cpp
             tests/tensor/nn/test_conv2d.cpp
-            tests/tensor/nn/test_planar_dataset.cpp tests/tensor/nn/test_functional.cpp tests/tensor/nn/test_functional_helpers.cpp tests/tensor/nn/test_activation.cpp)
+            tests/tensor/nn/test_planar_dataset.cpp
+            tests/tensor/nn/test_functional.cpp
+            tests/tensor/nn/test_functional_helpers.cpp
+            tests/tensor/nn/test_activation.cpp
+            tests/tensor/nn/test_optimizers.cpp
+            )
 
     target_link_libraries(tests tensor nn Catch2::Catch2)
 
