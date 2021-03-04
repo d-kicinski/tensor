@@ -1,5 +1,12 @@
 # tensor [![Documentation Status](https://readthedocs.org/projects/tensor-library/badge/?version=latest)](https://tensor-library.readthedocs.io/en/latest/?badge=latest)
 
+| package | build/tests | coverage |
+|---------|-------------|----------|
+| C++    | [![Build C++](https://github.com/d-kicinski/tensor/actions/workflows/build.yml/badge.svg)](https://github.com/d-kicinski/tensor/actions/workflows/build.yml) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg?flag=cpp)](https://codecov.io/gh/d-kicinski/tensor) |
+| Python | [![Build Python](https://github.com/d-kicinski/tensor/actions/workflows/python.yml/badge.svg)](https://github.com/d-kicinski/tensor/actions/workflows/python.yml) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg?flag=python)](https://codecov.io/gh/d-kicinski/tensor) |
+
+--------------------------
+
 This library provides a two main features:
 - A class for interacting with multidimensional arrays (For backend library uses BLAS/LAPACK libraries with fallback to
 own naive implementations).
@@ -8,13 +15,6 @@ own naive implementations).
 The design goal is to create a numpy/pytorch alike interface for interacting
 with multidimensional arrays packaged in a simple, relatively lightweight, library with limited external dependencies that
 could be used on platforms like android phones and microcontrollers.
-
-#### Status
-
-| package | build/tests | coverage |
-|---------|-------------|----------|
-| C++    | [![Build C++](https://github.com/d-kicinski/tensor/actions/workflows/build.yml/badge.svg)](https://github.com/d-kicinski/tensor/actions/workflows/build.yml) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg?flag=cpp)](https://codecov.io/gh/d-kicinski/tensor) |
-| Python | [![Build Python](https://github.com/d-kicinski/tensor/actions/workflows/python.yml/badge.svg)](https://github.com/d-kicinski/tensor/actions/workflows/python.yml) | [![codecov](https://codecov.io/gh/d-kicinski/tensor/branch/master/graph/badge.svg?flag=python)](https://codecov.io/gh/d-kicinski/tensor) |
 
 #### How to use in your project
 If you're using cmake see [tensor-example](https://github.com/dawidkski/tensor-example) for example usage.
