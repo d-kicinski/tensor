@@ -28,7 +28,7 @@ For example usage jump to [nn-planar-data example](https://github.com/d-kicinski
 See this [repository](https://github.com/d-kicinski/tensor-example-embedded)
 
 #### Example usages of `tensor` module
-For basic usages see this [doc]
+For basic usages see this [doc](https://tensor-library.readthedocs.io/en/latest/usage.html)
 
 ### Usage of Python wrapper
 Install the latest release `pip install https://github.com/d-kicinski/tensor/releases/download/v0.2.0/tensor-0.2.0-cp38-cp38-linux_x86_64.whl`.
