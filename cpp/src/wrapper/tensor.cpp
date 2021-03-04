@@ -295,20 +295,18 @@ auto wrap_nn(pybind11::module & m)
     wrap_nn_activations<float, 3>(m, "_f3");
 
     py::class_<ts::FeedForward>(m, "FeedForward")
-        .def(py::init<int, int, ts::Activation, bool, float>())
+        .def(py::init(&ts::FeedForward::create))
         .def("__call__", &ts::FeedForward::operator())
         .def("forward", &ts::FeedForward::forward)
         .def("backward", &ts::FeedForward::backward)
-        .def("update", &ts::FeedForward::update)
         .def("weight", &ts::FeedForward::weight)
         .def("bias", &ts::FeedForward::bias);
 
     py::class_<ts::Conv2D>(m, "Conv2D")
-        .def(py::init<int, int, int, int, ts::Activation, bool>())
+        .def(py::init(&ts::Conv2D::create))
         .def("__call__", &ts::Conv2D::operator())
         .def("forward", &ts::Conv2D::forward)
         .def("backward", &ts::Conv2D::backward)
-        .def("update", &ts::Conv2D::update)
         .def("weight", &ts::Conv2D::weight)
         .def("bias", &ts::Conv2D::bias);
 

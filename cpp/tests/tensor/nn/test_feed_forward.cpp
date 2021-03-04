@@ -24,5 +24,4 @@ TEST_CASE("FeedForward: forward, backward")
         std::array<int, 2> expected_shape = {32, 2};
         REQUIRE(d_y.shape() == expected_shape);
     }
-    layer.update(0.001);
 }

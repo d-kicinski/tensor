@@ -1,15 +1,15 @@
 #pragma once
 
+#include <tensor/tensor.hpp>
 #include "activations.hpp"
 #include "variable.hpp"
-#include <tensor/tensor.hpp>
 
 namespace ts {
 
 class FeedForward {
   public:
     using Activations = ActivationFactory<float, 2>;
-    using VectorRef = std::vector<std::reference_wrapper<ts::GradHolder<float>>>;
+    using VectorRef = std::vector<std::reference_wrapper<GradHolder<float>>>;
 
     static auto create(int dim_in, int dim_out, Activation activation = Activation::NONE, bool l2 = false,
                 float alpha = 1e-10) -> FeedForward;
@@ -19,8 +19,6 @@ class FeedForward {
     auto forward(MatrixF const &) -> MatrixF;
 
     auto backward(MatrixF const &) -> MatrixF;
-
-    auto update(float step_size) -> void;
 
     auto weight() -> Variable<float, 2> &;
 
