@@ -1,0 +1,7 @@
+breathe
+commonmark
+recommonmark
+sphinx
+sphinx_rtd_theme
+sphinxcontrib-moderncmakedomain
+sphinxcontrib-svg2pdfconverter
