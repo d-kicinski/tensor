@@ -8,10 +8,16 @@ Welcome to tensor's documentation!
 
 .. include:: readme.rst
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
+.. only:: not latex
+
+    Contents:
+
+.. toctree::
+   :caption: The Basics
+   :maxdepth: 2
+
+   usage
 
 
 Indices and tables
