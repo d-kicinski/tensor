@@ -21,7 +21,7 @@ class DataHolder {
     using data_t = std::shared_ptr<vector_t>;
     using iterator = typename vector_t::iterator;
 
-    virtual auto data() const -> data_t = 0;
+    virtual auto get() const -> data_t = 0;
     virtual auto begin() const -> iterator = 0;
     virtual auto end() const -> iterator = 0;
 };
@@ -43,6 +43,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
     using size_type = int;
 
     auto data() const -> data_t { return _data; };
+    auto get() const -> data_t { return _data; };
     auto shape() const -> std::array<size_type, Dim> { return _dimensions; }
     [[nodiscard]] auto shape(size_type index) const -> size_type { return _dimensions[index]; }
     [[nodiscard]] auto data_size() const -> size_type { return _data_size; }

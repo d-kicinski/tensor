@@ -1,6 +1,7 @@
 #pragma once
 
 #include "activations.hpp"
+#include "variable.hpp"
 #include <tensor/tensor.hpp>
 
 namespace ts {
@@ -8,9 +9,10 @@ namespace ts {
 class FeedForward {
   public:
     using Activations = ActivationFactory<float, 2>;
+    using VectorRef = std::vector<std::reference_wrapper<ts::GradHolder<float>>>;
 
-    FeedForward(int dim_in, int dim_out, Activation activation = Activation::NONE, bool l2 = false,
-                float alpha = 1e-10);
+    static auto create(int dim_in, int dim_out, Activation activation = Activation::NONE, bool l2 = false,
+                float alpha = 1e-10) -> FeedForward;
 
     auto operator()(MatrixF const &) -> MatrixF;
 
@@ -20,16 +22,21 @@ class FeedForward {
 
     auto update(float step_size) -> void;
 
-    auto weight() -> MatrixF;
+    auto weight() -> Variable<float, 2> &;
 
-    auto bias() -> VectorF;
+    auto bias() -> Variable<float, 1> &;
+
+    auto weights() -> VectorRef;
 
   private:
+    FeedForward(Variable<float, 2> weight,
+                Variable<float, 1> bias,
+                Activation activation = Activation::NONE,
+                bool l2 = false, float alpha = 1e-10);
+
     MatrixF _x;
-    MatrixF _weights;
-    MatrixF _d_weights;
-    VectorF _bias;
-    VectorF _d_bias;
+    Variable<float, 2> _weight;
+    Variable<float, 1> _bias;
     Activations::OptActivationPtr _activation;
     float _alpha;
     bool _l2;

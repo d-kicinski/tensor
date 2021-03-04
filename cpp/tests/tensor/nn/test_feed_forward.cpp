@@ -6,13 +6,13 @@ using namespace ts;
 
 TEST_CASE("Create FeedForward layer")
 {
-    FeedForward layer(2, 100);
+    auto layer = FeedForward::create(2, 100);
     REQUIRE(true);
 }
 
 TEST_CASE("FeedForward: forward, backward")
 {
-    FeedForward layer(2, 3);
+    auto layer = FeedForward::create(2, 3);
     MatrixF input(32, 2);
     auto y = layer(input);
     {

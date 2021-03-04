@@ -3,12 +3,11 @@
 
 namespace ts {
 
-FeedForward::FeedForward(int dim_in, int dim_out, Activation activation, bool l2, float alpha)
-    : _alpha(alpha), _l2(l2)
+FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Activation activation,
+                         bool l2, float alpha)
+    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)),
+      _alpha(alpha), _l2(l2)
 {
-   _weights = ts::MatrixF::randn({dim_in, dim_out});
-   _bias = ts::VectorF(dim_out);
-   _activation = Activations::get(activation);
 }
 
 auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(inputs); }
@@ -16,36 +15,56 @@ auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(
 auto FeedForward::forward(MatrixF const &inputs) -> MatrixF
 {
     _x = inputs;
-    auto _y = ts::add(ts::dot(_x, _weights), _bias);
+    auto _y = ts::add(ts::dot(_x, _weight.weight()), _bias.weight());
     if (_activation) {
         _y = _activation.value()->forward(_y);
     }
     return _y;
 }
 
-auto FeedForward::backward(MatrixF const & d_y) -> MatrixF
+auto FeedForward::backward(MatrixF const &d_y) -> MatrixF
 {
-    MatrixF d_output = d_y.clone() ;
+    MatrixF d_output = d_y.clone();
     if (_activation) {
         d_output = _activation.value()->backward(d_output);
     }
-    _d_weights = ts::dot(_x, d_output, true);
-    _d_bias = ts::sum(d_output, 0);
+    _weight.grad() = ts::dot(_x, d_output, true);
+    _bias.grad() = ts::sum(d_output, 0);
 
-    return ts::dot(d_output, _weights, false, true);
+    return ts::dot(d_output, _weight.weight(), false, true);
 }
 
 auto FeedForward::update(float step_size) -> void
 {
     if (_l2) {
-        _weights += ts::multiply(_weights, -_alpha);
+        _weight.weight() += ts::multiply(_weight.weight(), -_alpha);
     }
-    _weights +=  ts::multiply(_d_weights, -step_size);
-    _bias += ts::multiply(_d_bias, -step_size);
+    _weight.weight() += ts::multiply(_weight.grad(), -step_size);
+    _bias.weight() += ts::multiply(_bias.grad(), -step_size);
 }
 
-auto FeedForward::weight() -> MatrixF { return _weights; }
+auto FeedForward::weight() -> Variable<float, 2> & { return _weight; }
 
-auto FeedForward::bias() -> VectorF { return _bias; }
+auto FeedForward::bias() -> Variable<float, 1> & { return _bias; }
+
+auto FeedForward::create(int dim_in, int dim_out, Activation activation, bool l2, float alpha)
+    -> FeedForward
+{
+    auto weight =
+        Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::MatrixF::randn({dim_in, dim_out})),
+                           std::make_unique<ts::MatrixF>(ts::MatrixF(dim_in, dim_out)));
+
+    auto bias = Variable<float, 1>(std::make_unique<ts::VectorF>(ts::VectorF(dim_out)),
+                                   std::make_unique<ts::VectorF>(ts::VectorF(dim_out)));
+    return FeedForward(std::move(weight), std::move(bias), activation, l2, alpha);
+}
+
+auto FeedForward::weights() -> VectorRef
+{
+    std::vector<std::reference_wrapper<ts::GradHolder<float>>> vars;
+    vars.emplace_back(std::ref(weight()));
+    vars.emplace_back(std::ref(bias()));
+    return vars;
+}
 
 }

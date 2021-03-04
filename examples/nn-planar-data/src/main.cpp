@@ -1,32 +1,43 @@
 
+#include <tensor/nn/activations.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/feed_forward.hpp>
+#include <tensor/nn/optimizers.hpp>
 #include <tensor/nn/planar_dataset.hpp>
-#include <tensor/nn/activations.hpp>
 
 class Model {
 
   public:
+    using VectorRef = std::vector<std::reference_wrapper<ts::GradHolder<float>>>;
+
     Model()
-    : _layer1(2, 100, ts::Activation::RELU),
-      _layer2(100, 3) {}
+    : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)),
+      _layer2(ts::FeedForward::create(100, 3)) {}
 
     auto predict(ts::MatrixF const &inputs) -> ts::VectorI { return ts::argmax(_forward(inputs)); }
 
-    auto update(ts::MatrixF const &inputs, ts::VectorI const &labels, float learning_rate) -> float
+    auto loss(ts::MatrixF const &inputs, ts::VectorI const &labels) -> float
     {
-        // forward pass
         auto logits = _forward(inputs);
-        float loss = _loss(logits, labels);
+        return _loss(logits, labels);
+    }
 
-        // backward pass
+    auto backward() -> void {
         _layer1.backward(_layer2.backward(_loss.backward()));
+    }
 
-        // parameters update
-        _layer1.update(learning_rate);
-        _layer2.update(learning_rate);
+    auto weights() -> VectorRef
+    {
+        std::vector<std::reference_wrapper<ts::GradHolder<float>>> vars;
+        // TODO: Why I'm getting std::length_error when using this:
+        //   vars.insert(vars.end(), _layer1.weights().begin(), _layer1.weights().end());
+        //   vars.insert(vars.end(), _layer2.weights().begin(), _layer2.weights().end());
 
-        return loss;
+        vars.emplace_back(_layer1.weight());
+        vars.emplace_back(_layer1.bias());
+        vars.emplace_back(_layer2.weight());
+        vars.emplace_back(_layer2.bias());
+        return vars;
     }
 
   private:
@@ -40,15 +51,16 @@ class Model {
     }
 };
 
-auto train(Model &model, ts::PlanarDataset &dataset) -> float
+auto train(Model &model, ts::SGD<float> &optimizer, ts::PlanarDataset &dataset) -> float
 {
     constexpr int epoch_num = 100; // Let's overfit to validate our code
-    constexpr float learning_rate = 1e-0;
     float loss = std::numeric_limits<float>::max();
 
     for (int epoch_i = 0; epoch_i < epoch_num; ++epoch_i) {
         for (auto [inputs, labels] : dataset) {
-            loss = model.update(inputs, labels, learning_rate);
+            loss = model.loss(inputs, labels);
+            model.backward();
+            optimizer.step();
             if (epoch_i % 10 == 0)
                 std::cout << "epoch: " << epoch_i << "/" << epoch_num << " loss: " << loss
                           << std::endl;
@@ -71,13 +83,13 @@ auto label(Model &model, ts::PlanarDataset &dataset) ->ts::VectorI
 
 int main()
 {
-
     ts::PlanarDataset dataset_train("resources/train_planar_data.tsv", true, 300);
     ts::PlanarDataset dataset_test("resources/test_planar_data.tsv", true, 1);
     Model model;
+    ts::SGD<float> optimizer(1e-0, model.weights());
 
     std::cout << "Training... " << std::endl;
-    float loss = train(model, dataset_train);
+    float loss = train(model, optimizer, dataset_train);
     std::cout << std::endl;
 
     std::cout << "Labeling test dataset... ";

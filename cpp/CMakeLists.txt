@@ -52,7 +52,7 @@ add_library(nn
         src/tensor/nn/activations.hpp
         src/tensor/nn/optimizers.cpp
         src/tensor/nn/optimizers.hpp
-        )
+        src/tensor/nn/variable.cpp src/tensor/nn/variable.hpp)
 add_library(tensor::nn ALIAS nn)
 target_link_libraries(nn tensor)
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
