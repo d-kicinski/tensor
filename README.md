@@ -1,4 +1,4 @@
-# tensor
+# tensor [![Documentation Status](https://readthedocs.org/projects/tensor-library/badge/?version=latest)](https://tensor-library.readthedocs.io/en/latest/?badge=latest)
 
 | package | build/tests | coverage |
 |---------|-------------|----------|
