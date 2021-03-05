@@ -11,9 +11,18 @@ class GradHolder
   public:
     using DataHolderRef = DataHolder<Element> &;
 
-    virtual auto grad() -> DataHolderRef  = 0;
+    DataHolder<Element> _grad;
+    DataHolder<Element> _weight;
 
-    virtual auto weight() -> DataHolderRef = 0;
+    GradHolder() : _grad(DataHolder<Element>()), _weight(DataHolder<Element>()) {}
+
+    virtual auto grad() -> DataHolderRef  {
+        return _grad;
+    };
+
+    virtual auto weight() -> DataHolderRef {
+        return _weight;
+    };
 };
 
 

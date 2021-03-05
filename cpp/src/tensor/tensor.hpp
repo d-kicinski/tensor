@@ -20,10 +20,14 @@ class DataHolder {
     using vector_t = std::vector<Element>;
     using data_t = std::shared_ptr<vector_t>;
     using iterator = typename vector_t::iterator;
+    data_t _vector;
 
-    virtual auto get() const -> data_t = 0;
-    virtual auto begin() const -> iterator = 0;
-    virtual auto end() const -> iterator = 0;
+
+    DataHolder() : _vector(nullptr) {};
+
+    virtual auto get() const -> data_t { return _vector; }
+    virtual auto begin() const -> iterator {return _vector->begin(); }
+    virtual auto end() const -> iterator { return _vector->end(); }
 };
 
 /**

@@ -5,6 +5,7 @@
 #include <tensor/nn/conv2d.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/feed_forward.hpp>
+#include <tensor/nn/optimizers.hpp>
 #include <tensor/nn/softmax.hpp>
 #include <tensor/tensor.hpp>
 
@@ -281,6 +282,19 @@ auto wrap_nn_activations(pybind11::module & m, std::string postfix)
 
 auto wrap_nn(pybind11::module & m)
 {
+    py::class_<ts::DataHolder<float>>(m, "DataHolder")
+        .def(py::init<>())
+        .def("get_one", &ts::DataHolder<float>::get_one);
+
+    py::class_<ts::GradHolder<float>>(m, "GradHolder")
+        .def(py::init<>())
+        .def("weight", &ts::GradHolder<float>::weight, py::return_value_policy::reference_internal)
+        .def("grad", &ts::GradHolder<float>::grad, py::return_value_policy::reference_internal);
+
+    py::class_<ts::SGD<float>>(m, "SGD")
+        .def(py::init<float, std::vector<std::reference_wrapper<ts::GradHolder<float>>>>())
+        .def("step", &ts::SGD<float>::step);
+
     py::class_<ts::CrossEntropyLoss>(m, "CrossEntropyLoss")
         .def(py::init<>())
         .def("__call__", &ts::CrossEntropyLoss::operator())
@@ -300,6 +314,7 @@ auto wrap_nn(pybind11::module & m)
         .def("forward", &ts::FeedForward::forward)
         .def("backward", &ts::FeedForward::backward)
         .def("weight", &ts::FeedForward::weight)
+        .def("weights", &ts::FeedForward::weights)
         .def("bias", &ts::FeedForward::bias);
 
     py::class_<ts::Conv2D>(m, "Conv2D")
@@ -308,6 +323,7 @@ auto wrap_nn(pybind11::module & m)
         .def("forward", &ts::Conv2D::forward)
         .def("backward", &ts::Conv2D::backward)
         .def("weight", &ts::Conv2D::weight)
+        .def("weights", &ts::Conv2D::weights)
         .def("bias", &ts::Conv2D::bias);
 
 

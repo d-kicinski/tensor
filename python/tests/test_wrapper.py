@@ -67,3 +67,12 @@ def test_cross_entropy_loss():
     loss.backward()
 
     assert loss_value != 0.0
+
+
+def test_sgd():
+    feed_forward = _ts.FeedForward(3, 32, _ts.Activation.NONE, False, 1e-10)
+    optimizer = _ts.SGD(10, feed_forward.weights())
+    optimizer.step()
+    optimizer.step()
+    optimizer.step()
+
