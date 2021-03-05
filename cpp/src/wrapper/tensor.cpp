@@ -283,8 +283,7 @@ auto wrap_nn_activations(pybind11::module & m, std::string postfix)
 auto wrap_nn(pybind11::module & m)
 {
     py::class_<ts::DataHolder<float>>(m, "DataHolder")
-        .def(py::init<>())
-        .def("get_one", &ts::DataHolder<float>::get_one);
+        .def(py::init<>());
 
     py::class_<ts::GradHolder<float>>(m, "GradHolder")
         .def(py::init<>())
