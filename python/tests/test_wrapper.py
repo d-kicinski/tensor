@@ -69,6 +69,12 @@ def test_cross_entropy_loss():
     assert loss_value != 0.0
 
 
+def test_variable():
+    variable = _ts.Variable3F([3, 5, 6])
+    assert variable.tensor().shape() == [3, 5, 6]
+    assert variable.grad().shape() == [3, 5, 6]
+
+
 def test_sgd():
     feed_forward = _ts.FeedForward(3, 32, _ts.Activation.NONE, False, 1e-10)
     optimizer = _ts.SGD(10, feed_forward.weights())

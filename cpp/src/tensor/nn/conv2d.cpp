@@ -29,10 +29,10 @@ auto ts::Conv2D::operator()(const ts::Tensor<float, 4> &input) -> Tensor<float, 
 auto ts::Conv2D::forward(const ts::Tensor<float, 4> &input) -> ts::Tensor<float, 4>
 {
     _input = input;
-    auto output = ts::conv_2d(input, _weight.weight(), _kernel_size, _stride);
+    auto output = ts::conv_2d(input, _weight.tensor(), _kernel_size, _stride);
     if (_bias.has_value()) {
         for (int b = 0; b < output.shape(0); ++b) {
-            ts::add_(output(b), _bias.value().weight());
+            ts::add_(output(b), _bias.value().tensor());
         }
     }
     if (_activation) {
@@ -48,7 +48,7 @@ auto ts::Conv2D::backward(const ts::Tensor<float, 4> &d_output) -> ts::Tensor<fl
         d_output_ = _activation.value()->backward(d_output_);
     }
     auto [d_input, d_weight] =
-        ts::conv_2d_backward(_input, _weight.weight(), d_output_, _kernel_size, _stride);
+        ts::conv_2d_backward(_input, _weight.tensor(), d_output_, _kernel_size, _stride);
     _weight.grad() = std::move(d_weight);
 
     if (_bias.has_value()) {

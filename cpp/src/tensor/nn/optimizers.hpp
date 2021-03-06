@@ -16,7 +16,7 @@ class SGD
 
     auto step() -> void {
         for (auto var : _variables) {
-            std::transform(var.get().weight().begin(), var.get().weight().end(), var.get().grad().begin(), var.get().weight().begin(),
+            std::transform(var.get().tensor().begin(), var.get().tensor().end(), var.get().grad().begin(), var.get().tensor().begin(),
                            [&](Element & w, Element & d_w) {
                              return w + (d_w * -_lr);
                            });

@@ -20,7 +20,7 @@ class GradHolder
         return _grad;
     };
 
-    virtual auto weight() -> DataHolderRef {
+    virtual auto tensor() -> DataHolderRef {
         return _weight;
     };
 };
@@ -35,13 +35,27 @@ class Variable : public GradHolder<Element>
     DataHolderPtr _weight;
     DataHolderPtr _grad;
 
-    Variable(DataHolderPtr weight, DataHolderPtr grad)
+    template <typename... Sizes>
+    static auto create(Sizes... args) -> Variable {
+        auto weight = std::make_unique<Tensor<Element, Dim>>(Tensor<Element, Dim>(args...));
+        auto grad = std::make_unique<Tensor<Element, Dim>>(Tensor<Element, Dim>(weight->shape()));
+        return Variable(std::move(weight), std::move(grad));
+    }
+
+    Variable(): _weight(nullptr), _grad(nullptr) {}
+
+    explicit Variable(std::array<int , Dim> const & shape) {
+        _weight = std::make_unique<Tensor<Element, Dim>>(Tensor<Element, Dim>(shape));
+        _grad = std::make_unique<Tensor<Element, Dim>>(Tensor<Element, Dim>(_weight->shape()));
+    }
+
+    Variable(DataHolderPtr && weight, DataHolderPtr && grad)
         : _weight(std::move(weight)), _grad(std::move(grad)) {}
 
     auto grad() -> DataHolderRef {
         return *_grad;
     }
-    auto weight() -> DataHolderRef {
+    auto tensor() -> DataHolderRef {
         return *_weight;
     }
 

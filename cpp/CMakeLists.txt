@@ -79,7 +79,7 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/nn/test_functional_helpers.cpp
             tests/tensor/nn/test_activation.cpp
             tests/tensor/nn/test_optimizers.cpp
-            )
+            tests/tensor/nn/test_variable.cpp)
 
     target_link_libraries(tests tensor nn Catch2::Catch2)
 

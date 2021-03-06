@@ -13,7 +13,7 @@ auto FeedForward::create(int dim_in, int dim_out, Activation activation, bool l2
 {
     auto weight =
         Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::MatrixF::randn({dim_in, dim_out})),
-                           std::make_unique<ts::MatrixF>(ts::MatrixF(dim_in, dim_out)));
+                           std::make_unique<ts::MatrixF>(ts::MatrixF::randn({dim_in, dim_out})));
 
     auto bias = Variable<float, 1>(std::make_unique<ts::VectorF>(ts::VectorF(dim_out)),
                                    std::make_unique<ts::VectorF>(ts::VectorF(dim_out)));
@@ -25,7 +25,7 @@ auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(
 auto FeedForward::forward(MatrixF const &inputs) -> MatrixF
 {
     _x = inputs;
-    auto _y = ts::add(ts::dot(_x, _weight.weight()), _bias.weight());
+    auto _y = ts::add(ts::dot(_x, _weight.tensor()), _bias.tensor());
     if (_activation) {
         _y = _activation.value()->forward(_y);
     }
@@ -41,7 +41,7 @@ auto FeedForward::backward(MatrixF const &d_y) -> MatrixF
     _weight.grad() = ts::dot(_x, d_output, true);
     _bias.grad() = ts::sum(d_output, 0);
 
-    return ts::dot(d_output, _weight.weight(), false, true);
+    return ts::dot(d_output, _weight.tensor(), false, true);
 }
 
 auto FeedForward::weight() -> Variable<float, 2> & { return _weight; }

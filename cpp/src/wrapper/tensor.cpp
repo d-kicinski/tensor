@@ -280,15 +280,40 @@ auto wrap_nn_activations(pybind11::module & m, std::string postfix)
         .def("backward", &ts::ReLU<Element, Dim>::backward);
 }
 
+template <typename Element>
+auto wrap_grad_holder(pybind11:: module &m, char const * class_name)
+{
+    py::class_<ts::GradHolder<Element>>(m, class_name)
+        .def(py::init<>())
+        .def("tensor", &ts::GradHolder<Element>::tensor, py::return_value_policy::reference_internal)
+        .def("grad", &ts::GradHolder<Element>::grad, py::return_value_policy::reference_internal);
+}
+
+template <typename Element, int Dim>
+auto wrap_variable(pybind11::module & m, char const * class_name)
+{
+   py::class_<ts::Variable<Element, Dim>, ts::GradHolder<Element>>(m, class_name)
+        .def(py::init<std::array<int, Dim>>())
+        .def("tensor", &ts::Variable<Element, Dim>::tensor, py::return_value_policy::reference_internal)
+        .def("grad", &ts::Variable<Element, Dim>::grad, py::return_value_policy::reference_internal);
+}
+
 auto wrap_nn(pybind11::module & m)
 {
     py::class_<ts::DataHolder<float>>(m, "DataHolder")
         .def(py::init<>());
 
-    py::class_<ts::GradHolder<float>>(m, "GradHolder")
-        .def(py::init<>())
-        .def("weight", &ts::GradHolder<float>::weight, py::return_value_policy::reference_internal)
-        .def("grad", &ts::GradHolder<float>::grad, py::return_value_policy::reference_internal);
+    wrap_grad_holder<float>(m, "GradHolderF");
+    wrap_grad_holder<int>(m, "GradHolderI");
+
+    wrap_variable<float, 1>(m, "Variable1F");
+    wrap_variable<float, 2>(m, "Variable2F");
+    wrap_variable<float, 3>(m, "Variable3F");
+    wrap_variable<float, 4>(m, "Variable4F");
+    wrap_variable<int, 1>(m, "Variable1I");
+    wrap_variable<int, 2>(m, "Variable2I");
+    wrap_variable<int, 3>(m, "Variable3I");
+    wrap_variable<int, 4>(m, "Variable4I");
 
     py::class_<ts::SGD<float>>(m, "SGD")
         .def(py::init<float, std::vector<std::reference_wrapper<ts::GradHolder<float>>>>())
@@ -312,18 +337,18 @@ auto wrap_nn(pybind11::module & m)
         .def("__call__", &ts::FeedForward::operator())
         .def("forward", &ts::FeedForward::forward)
         .def("backward", &ts::FeedForward::backward)
-        .def("weight", &ts::FeedForward::weight)
-        .def("weights", &ts::FeedForward::weights)
-        .def("bias", &ts::FeedForward::bias);
+        .def("bias", &ts::FeedForward::bias, py::return_value_policy::reference_internal)
+        .def("weight", &ts::FeedForward::weight, py::return_value_policy::reference_internal)
+        .def("weights", &ts::FeedForward::weights);
 
     py::class_<ts::Conv2D>(m, "Conv2D")
         .def(py::init(&ts::Conv2D::create))
         .def("__call__", &ts::Conv2D::operator())
         .def("forward", &ts::Conv2D::forward)
         .def("backward", &ts::Conv2D::backward)
-        .def("weight", &ts::Conv2D::weight)
-        .def("weights", &ts::Conv2D::weights)
-        .def("bias", &ts::Conv2D::bias);
+        .def("bias", &ts::Conv2D::bias, py::return_value_policy::reference_internal)
+        .def("weight", &ts::Conv2D::weight, py::return_value_policy::reference_internal)
+        .def("weights", &ts::Conv2D::weights);
 
 
     m.def("softmax", &ts::softmax);
