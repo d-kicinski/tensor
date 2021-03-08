@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from tqdm import tqdm
 
 import tensor as ts
 from tensor.autograd import Variable
@@ -31,16 +32,18 @@ def train():
         transforms.Normalize((0.1307,), (0.3081,))
     ])
     dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset, batch_size=64)
+    train_loader = torch.utils.data.DataLoader(dataset, batch_size=4)
 
     model = Net()
+    loss_fn = ts.nn.CrossEntropyLoss()
 
-    for batch_idx, (data, target) in enumerate(train_loader):
-        x = np.moveaxis(data.numpy(), 1, -1)
-        output = model.forward(ts.autograd.var(x))
+    for batch_idx, (data, target) in tqdm(enumerate(train_loader)):
+        x = ts.autograd.var(np.moveaxis(data.numpy(), 1, -1))
+        y = ts.autograd.var(target.numpy())
 
-        if batch_idx == 10:
-            exit()
+        output = model.forward(x)
+        loss = loss_fn(output, y)
+        loss.backward()
 
 
 if __name__ == '__main__':

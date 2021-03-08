@@ -3,9 +3,8 @@ from typing import List
 
 from tqdm import tqdm
 
-import tensor.autograd.autograd as tsg
-from tensor import nn
-from tensor import tensor as ts
+import tensor as ts
+import tensor.autograd as tsg
 import numpy as np
 
 from dataset import Dataset
@@ -22,7 +21,7 @@ class Model:
         self.w1 = tsg.var(np.random.randn(100, 3))
 
     def __call__(self, x: tsg.Variable):
-        return nn.relu(x @ self.w0 + self.b0) @ self.w1
+        return ts.nn.relu(x @ self.w0 + self.b0) @ self.w1
 
     def update(self, lr: float = 1e-3):
         self.w0.value += -lr * self.w0.grad
@@ -34,7 +33,7 @@ def train(model: Model, dataset: Dataset, epochs: int = 100) -> Model:
     for i_epoch in range(epochs):
         for x, labels in dataset:
             y = model(x)
-            loss = tsg.cross_entropy_loss(y, labels)
+            loss = ts.nn.cross_entropy_loss(y, labels)
             loss.backward()
             model.update(1e-1)
 
@@ -48,7 +47,7 @@ def train(model: Model, dataset: Dataset, epochs: int = 100) -> Model:
 def label_test_dataset(model: Model, dataset: Dataset) -> List[int]:
     labels: List[int] = []
     for x, _ in tqdm(dataset, desc="Labeling"):
-        y = ts.argmax(nn.softmax(model(x).value))
+        y = ts.argmax(ts.nn.softmax(model(x).value))
         labels.extend(y.numpy.tolist())
     return labels
 
