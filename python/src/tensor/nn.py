@@ -89,6 +89,35 @@ class ReLU(Op):
         self._inputs[0].grad = ts.Tensor(d_input)
 
 
+class CrossEntropyLoss(Op):
+    EXPECTED_INPUTS_LENGTH: int = 2
+    EXPECTED_GRADS_LENGTH: int = 1
+
+    def __init__(self):
+        super().__init__()
+        self._loss = _ts.CrossEntropyLoss()
+
+    def forward(self, *inputs: Variable):
+        logits: Variable
+        labels: Variable
+
+        logits, labels = self._check_inputs(*inputs,
+                                            num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
+        if len(self._inputs) == 0:
+            self._inputs.extend([logits, labels])
+
+        loss_value = self._loss.forward(logits.value.data, labels.value.data)
+        return Variable(ts.Tensor(loss_value), self)
+
+    def backward(self, *grads: ts.Tensor):
+        self._check_grads(*grads, num=self.EXPECTED_GRADS_LENGTH)
+        grad: _ts.MatrixF = self._loss.backward()
+        self.inputs[0].grad = ts.Tensor(grad)
+
+    def __str__(self):
+        return f"CrossEntropyLoss"
+
+
 def relu(x: Variable):
     op = ReLU()
     return op(x)
@@ -96,3 +125,8 @@ def relu(x: Variable):
 
 def softmax(tensor: ts.Tensor) -> ts.Tensor:
     return ts.Tensor(_ts.softmax(tensor.data))
+
+
+def cross_entropy_loss(y: Variable, labels: Variable) -> Variable:
+    loss_fn = CrossEntropyLoss()
+    return loss_fn(y, labels)

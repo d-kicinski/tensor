@@ -163,32 +163,24 @@ class Log(Op):
         return f"Log"
 
 
-class CrossEntropyLoss(Op):
-    EXPECTED_INPUTS_LENGTH: int = 2
-    EXPECTED_GRADS_LENGTH: int = 1
-
-    def __init__(self):
-        super().__init__()
-        self._loss = _ts.CrossEntropyLoss()
+class Reshape(Op):
+    def __init__(self, shape: List[int]):
+        super(Reshape, self).__init__()
+        self._shape_after = shape
 
     def forward(self, *inputs: Variable):
-        logits: Variable
-        labels: Variable
-
-        logits, labels = self._check_inputs(*inputs,
-                                            num=self.EXPECTED_INPUTS_LENGTH)  # type: ignore
-        self._inputs.extend([logits, labels])
-
-        loss_value = self._loss.forward(logits.value.data, labels.value.data)
-        return Variable(ts.Tensor(loss_value), self)
+        x: Variable
+        x = self._check_inputs(*inputs, num=1)  # type: ignore
+        if len(self._inputs) == 0:
+            self._inputs.append(x)
+        return Variable(x.value.reshape(self._shape_after), self)
 
     def backward(self, *grads: ts.Tensor):
-        self._check_grads(*grads, num=self.EXPECTED_GRADS_LENGTH)
-        grad: _ts.MatrixF = self._loss.backward()
-        self.inputs[0].grad = ts.Tensor(grad)
+        grad = self._check_grads(*grads, num=1)
+        self._inputs[0].grad = grad.reshape(self._inputs[0].value.shape)
 
     def __str__(self):
-        return f"CrossEntropyLoss"
+        return f"Reshape"
 
 
 def matmul(x: Variable, y: Variable) -> Variable:
@@ -206,9 +198,9 @@ def log(x: Variable) -> Variable:
     return op(x)
 
 
-def cross_entropy_loss(y: Variable, labels: Variable) -> Variable:
-    loss_fn = CrossEntropyLoss()
-    return loss_fn(y, labels)
+def reshape(x: Variable, shape: List[int]) -> Variable:
+    op = Reshape(shape)
+    return op(x)
 
 
 def var(*args, **kwargs) -> Variable:

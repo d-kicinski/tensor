@@ -78,6 +78,8 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
+    Tensor(data_t data, std::array<size_type, Dim> shape);
+
     template <typename... Indices>
     auto operator()(size_type first, Indices... rest) -> decltype(auto);
 
@@ -139,6 +141,12 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
         std::advance(t._end, std::distance(_end, _data->end()));
 
         return t;
+    }
+
+    template<int AnyDim>
+    auto reshape(std::array<size_type, AnyDim> shape) -> Tensor<Element, AnyDim>
+    {
+        return Tensor<Element, AnyDim>(_data, shape);
     }
 
     auto static randn(std::vector<int> const &shape) -> Tensor;
@@ -414,6 +422,16 @@ Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
     _data_size = list.size();
     _dimensions[0] = _data_size;
     _data = std::make_shared<vector_t>(list.begin(), list.end());
+    _begin = _data->begin();
+    _end = _data->end();
+}
+
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(data_t data, std::array<size_type, Dim> shape)
+{
+    _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies());
+    _dimensions = shape;
+    _data = data;
     _begin = _data->begin();
     _end = _data->end();
 }

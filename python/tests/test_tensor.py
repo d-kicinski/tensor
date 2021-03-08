@@ -144,3 +144,24 @@ def test_tensor_transpose():
     expected_array = np.array([[1., 1.], [2., 2.], [3., 3.]])
 
     np.testing.assert_equal(tensor_t.numpy, expected_array)
+
+
+def test_tensor_reshape():
+    tensor = ts.Tensor([
+        [[1., 2.], [3., 4.]],
+        [[1., 2.], [3., 4.]],
+        [[1., 2.], [3., 4.]],
+    ])
+    t1 = tensor.reshape([3, 4])
+    expected_t1 = ts.Tensor([
+        [1., 2., 3., 4.],
+        [1., 2., 3., 4.],
+        [1., 2., 3., 4.],
+    ])
+
+    assert t1.shape == expected_t1.shape
+    np.testing.assert_equal(t1.numpy, expected_t1.numpy)
+
+    t2 = tensor.reshape([3, 2, 2])
+    assert t2.shape == tensor.shape
+    np.testing.assert_equal(t2.numpy, tensor.numpy)

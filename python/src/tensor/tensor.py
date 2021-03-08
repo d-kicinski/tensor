@@ -121,7 +121,7 @@ class Tensor:
         self._data_type = _map_ts_to_type(self._data)
 
     @property
-    def shape(self):
+    def shape(self) -> Tuple:
         return self._shape
 
     @property
@@ -173,6 +173,14 @@ class Tensor:
     def __str__(self) -> str:
         return f"Tensor({self.shape})"
 
+    def reshape(self, shape: List[int]) -> Tensor:
+        shape_length = len(shape)
+        if shape_length > 4 or shape_length < 1:
+            raise ValueError(f"Incompatible shape: ${shape}")
+        if shape[0] == -1:
+            shape[0] = self.shape[0]
+        return Tensor(getattr(self._data, f"reshape{shape_length}")(shape))
+
 
 def log(tensor: Tensor) -> Tensor:
     return Tensor(_ts.log(tensor.data))
@@ -199,7 +207,7 @@ def argmax(tensor: Tensor) -> Tensor:
         raise ValueError(f"Incompatible tensor dtype {tensor.dtype}")
 
 
-def flatten(tensor: Tensor, keep_batch: bool) -> Tensor:
+def flatten(tensor: Tensor, keep_batch: bool = True) -> Tensor:
     if keep_batch:
         return Tensor(_ts.flatten_keep_batch(tensor.data))
     else:

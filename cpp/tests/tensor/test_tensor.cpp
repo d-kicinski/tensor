@@ -288,3 +288,27 @@ TEST_CASE("flatten: TensorF -> VectorF")
         REQUIRE(result == expected);
     }
 }
+
+TEST_CASE("reshape")
+{
+    Tensor<int, 3> tensor3 = {
+        {{0, 1}, {2, 3}},
+        {{0, 1}, {2, 3}},
+        {{0, 1}, {2, 3}},
+    };
+    REQUIRE(tensor3.shape() == std::array<int, 3>{3, 2, 2});
+
+    Tensor<int, 2> tensor2 = tensor3.reshape<2>({3, 4});
+    Tensor<int, 2> expected_tensor2 = {
+        {0, 1, 2, 3},
+        {0, 1, 2, 3},
+        {0, 1, 2, 3},
+    };
+    REQUIRE(tensor2.shape() == std::array<int, 2>{3, 4});
+    REQUIRE(tensor2 == expected_tensor2);
+
+    Tensor<int, 1> tensor1 = tensor3.reshape<1>({12});
+    Tensor<int, 1> expected_tensor1 = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+    REQUIRE(tensor1.shape() == std::array<int, 1>{12});
+    REQUIRE(tensor1 == expected_tensor1);
+}

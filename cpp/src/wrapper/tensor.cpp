@@ -38,6 +38,11 @@ auto wrap_tensor4D(pybind11::module & m, char const * class_name)
           return t.shape();
         })
 
+        .def("reshape4",  &ts::Tensor<Element, 4>::template reshape<4>)
+        .def("reshape3",  &ts::Tensor<Element, 4>::template reshape<3>)
+        .def("reshape2",  &ts::Tensor<Element, 4>::template reshape<2>)
+        .def("reshape1",  &ts::Tensor<Element, 4>::template reshape<1>)
+
         .def("data_size", &ts::Tensor<Element, 4>::data_size)
 
         // Bare bones interface
@@ -95,6 +100,11 @@ auto wrap_tensor3D(pybind11::module & m, char const * class_name)
           return t.shape();
         })
 
+        .def("reshape4",  &ts::Tensor<Element, 3>::template reshape<4>)
+        .def("reshape3",  &ts::Tensor<Element, 3>::template reshape<3>)
+        .def("reshape2",  &ts::Tensor<Element, 3>::template reshape<2>)
+        .def("reshape1",  &ts::Tensor<Element, 3>::template reshape<1>)
+
         .def("data_size", &ts::Tensor<Element, 3>::data_size)
 
         // Bare bones interface
@@ -148,6 +158,11 @@ auto wrap_tensor2D(pybind11::module & m, char const * class_name)
           return t.shape();
         })
 
+        .def("reshape4",  &ts::Tensor<Element, 2>::template reshape<4>)
+        .def("reshape3",  &ts::Tensor<Element, 2>::template reshape<3>)
+        .def("reshape2",  &ts::Tensor<Element, 2>::template reshape<2>)
+        .def("reshape1",  &ts::Tensor<Element, 2>::template reshape<1>)
+
         .def("data_size", &ts::Tensor<Element, 2>::data_size)
 
         // Bare bones interface
@@ -198,6 +213,11 @@ auto wrap_tensor1D(pybind11::module & m, char const * class_name)
         .def("shape", [](ts::Tensor<Element, 1> const  &t) -> std::array<int, 1> {
           return t.shape();
         })
+
+        .def("reshape4",  &ts::Tensor<Element, 1>::template reshape<4>)
+        .def("reshape3",  &ts::Tensor<Element, 1>::template reshape<3>)
+        .def("reshape2",  &ts::Tensor<Element, 1>::template reshape<2>)
+        .def("reshape1",  &ts::Tensor<Element, 1>::template reshape<1>)
 
         .def("data_size", &ts::Tensor<Element, 1>::data_size)
 
