@@ -44,6 +44,25 @@ class Linear(Op):
         self._inputs[0].grad = ts.Tensor(d_input)
 
 
+class MaxPool2D(Op):
+    def __init__(self, kernel_size: int, stride: int):
+        super(MaxPool2D, self).__init__()
+        self._layer = _ts.MaxPool2D(kernel_size, stride)
+
+    def forward(self, *inputs: Variable):
+        tensor: Variable
+        tensor = self._check_inputs(*inputs, num=1)
+        if len(self._inputs) == 0:
+            self._inputs.append(tensor)
+        value = self._layer(tensor.value.data)
+        return Variable(ts.Tensor(value), self)
+
+    def backward(self, *grads: ts.Tensor):
+        d_output = self._check_grads(*grads, num=1)
+        d_input = self._layer.backward(d_output.data)
+        self._inputs[0].grad = ts.Tensor(d_input)
+
+
 class ReLU(Op):
     def __init__(self):
         super().__init__()

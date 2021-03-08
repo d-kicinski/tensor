@@ -5,6 +5,7 @@
 #include <tensor/nn/conv2d.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/feed_forward.hpp>
+#include <tensor/nn/max_pool_2d.hpp>
 #include <tensor/nn/optimizers.hpp>
 #include <tensor/nn/softmax.hpp>
 #include <tensor/tensor.hpp>
@@ -349,6 +350,12 @@ auto wrap_nn(pybind11::module & m)
         .def("bias", &ts::Conv2D::bias, py::return_value_policy::reference_internal)
         .def("weight", &ts::Conv2D::weight, py::return_value_policy::reference_internal)
         .def("weights", &ts::Conv2D::weights);
+
+    py::class_<ts::MaxPool2D>(m, "MaxPool2D")
+        .def(py::init(&ts::MaxPool2D::create))
+        .def("__call__", &ts::MaxPool2D::operator())
+        .def("forward", &ts::MaxPool2D::forward)
+        .def("backward", &ts::MaxPool2D::backward);
 
 
     m.def("softmax", &ts::softmax);
