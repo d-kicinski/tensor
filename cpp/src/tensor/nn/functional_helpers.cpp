@@ -21,14 +21,7 @@ auto ts::_get_flatten_tile(Tensor<float, 4> const &images, int size, int row, in
 
 auto ts::_get_flatten_tile(Tensor<float, 3> const &image, int size, int row, int col) -> VectorF
 {
-    MatrixF tile(std::pow(size, 2), image.shape(2));
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            VectorF vec = image(i + row, j + col);
-            std::copy(vec.begin(), vec.end(), tile(j + i * size).begin());
-        }
-    }
-    return tile.flatten();
+    return _get_tile(image, size, row, col).flatten();
 }
 
 auto ts::_add_flatten_tile(Tensor<float, 4> &images, Tensor<float, 2> const &tiles, int size, int row,
@@ -59,6 +52,31 @@ auto ts::_add_flatten_tile(Tensor<float, 3> &image, Tensor<float, 1> const &tile
                 int tile_idx = k + j * c + i * c * size;
                 image(i + row, j + col, k) += tile(tile_idx);
             }
+        }
+    }
+}
+
+template<typename Element>
+auto ts::_get_tile(Tensor<Element, 3> const &image, int size, int row, int col) -> Tensor<Element, 3>
+{
+    Tensor<Element, 3> tile(size, size, image.shape(2));
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            Vector<Element> vec = image(i + row, j + col);
+            std::copy(vec.begin(), vec.end(), tile(i, j).begin());
+        }
+    }
+    return tile;
+}
+
+template <typename Element>
+auto ts::_set_tile(Tensor<Element, 3> &image, Tensor<Element, 3> const &tile, int size, int row,
+                           int col) -> void
+{
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            auto vec = tile(i, j);
+            std::copy(vec.begin(), vec.end(), image(i + row, j + col).begin());
         }
     }
 }

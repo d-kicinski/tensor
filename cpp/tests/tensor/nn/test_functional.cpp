@@ -147,3 +147,48 @@ TEST_CASE("pad")
         REQUIRE(result == expected);
     }
 }
+
+TEST_CASE("max_pool_2d")
+{
+   ts::Tensor<float, 4> input = {{
+        {{0, 0}, {1, 0}, {1, 0}, {0, 0}},
+        {{0, 1}, {0, 0}, {0, 0}, {0, 1}},
+        {{0, 1}, {0, 0}, {0, 0}, {0, 1}},
+        {{0, 0}, {1, 0}, {1, 0}, {0, 0}}
+    }};
+
+    ts::Tensor<float, 4> expected_output = {{
+       {{1, 1}, {1, 1}},
+       {{1, 1}, {1, 1}},
+   }};
+
+    ts::Tensor<bool, 4> expected_mask = {{
+        {{false, false}, {true, false}, {true, false}, {false, false}},
+        {{false, true}, {false, false}, {false, false}, {false, true}},
+        {{false, true}, {false, false}, {false, false}, {false, true}},
+        {{false, false}, {true, false}, {true, false}, {false, false}},
+    }};
+
+    auto [output, mask] = ts::max_pool_2d(input, 2, 2);
+
+    REQUIRE(output.shape() == std::array<int, 4>{1, 2, 2, 2});
+    REQUIRE(output == expected_output);
+    REQUIRE(mask == expected_mask);
+
+    ts::Tensor<float, 4> d_output = {{
+        {{2, 3}, {4, 5}},
+        {{6, 7}, {8, 9}},
+    }};
+
+    ts::Tensor<float, 4> expected_d_input = {{
+        {{0, 0}, {2, 0}, {4, 0}, {0, 0}},
+        {{0, 3}, {0, 0}, {0, 0}, {0, 5}},
+        {{0, 7}, {0, 0}, {0, 0}, {0, 9}},
+        {{0, 0}, {6, 0}, {8, 0}, {0, 0}}
+    }};
+
+    auto d_input = ts::max_pool_2d_backward(d_output, mask, 2, 2);
+    REQUIRE(d_input.shape() == expected_d_input.shape());
+    REQUIRE(d_input == expected_d_input);
+}
+
