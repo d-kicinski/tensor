@@ -76,7 +76,7 @@ def test_variable():
 
 
 def test_sgd():
-    feed_forward = _ts.FeedForward(3, 32, _ts.Activation.NONE, False, 1e-10)
+    feed_forward = _ts.FeedForward(3, 32, _ts.Activation.NONE)
     optimizer = _ts.SGD(10, feed_forward.weights())
     optimizer.step()
     optimizer.step()
