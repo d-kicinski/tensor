@@ -269,6 +269,8 @@ auto wrap_ops(pybind11::module & m)
 
     m.def("argmax_f", &ts::argmax<float>);
     m.def("argmax_i", &ts::argmax<int>);
+
+    m.def("flatten_keep_batch", &ts::flatten_keep_batch<float, 4>);
 }
 
 template<typename Element, int Dim>

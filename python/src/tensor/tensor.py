@@ -197,3 +197,10 @@ def argmax(tensor: Tensor) -> Tensor:
         return Tensor(_ts.argmax_f(tensor.data))
     else:
         raise ValueError(f"Incompatible tensor dtype {tensor.dtype}")
+
+
+def flatten(tensor: Tensor, keep_batch: bool) -> Tensor:
+    if keep_batch:
+        return Tensor(_ts.flatten_keep_batch(tensor.data))
+    else:
+        raise NotImplementedError
