@@ -11,8 +11,7 @@ class FeedForward {
     using Activations = ActivationFactory<float, 2>;
     using VectorRef = std::vector<std::reference_wrapper<GradHolder<float>>>;
 
-    static auto create(int dim_in, int dim_out, Activation activation = Activation::NONE, bool l2 = false,
-                float alpha = 1e-10) -> FeedForward;
+    static auto create(int dim_in, int dim_out, Activation activation = Activation::NONE) -> FeedForward;
 
     auto operator()(MatrixF const &) -> MatrixF;
 
@@ -29,15 +28,12 @@ class FeedForward {
   private:
     FeedForward(Variable<float, 2> weight,
                 Variable<float, 1> bias,
-                Activation activation = Activation::NONE,
-                bool l2 = false, float alpha = 1e-10);
+                Activation activation = Activation::NONE);
 
     MatrixF _x;
     Variable<float, 2> _weight;
     Variable<float, 1> _bias;
     Activations::OptActivationPtr _activation;
-    float _alpha;
-    bool _l2;
 };
 
 } // namespace ts

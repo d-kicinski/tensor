@@ -3,13 +3,10 @@
 
 namespace ts {
 
-FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Activation activation,
-                         bool l2, float alpha)
-    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)),
-      _alpha(alpha), _l2(l2) {}
+FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Activation activation)
+    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)) {}
 
-auto FeedForward::create(int dim_in, int dim_out, Activation activation, bool l2, float alpha)
--> FeedForward
+auto FeedForward::create(int dim_in, int dim_out, Activation activation) -> FeedForward
 {
     auto weight =
         Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::MatrixF::randn({dim_in, dim_out})),
@@ -17,7 +14,7 @@ auto FeedForward::create(int dim_in, int dim_out, Activation activation, bool l2
 
     auto bias = Variable<float, 1>(std::make_unique<ts::VectorF>(ts::VectorF(dim_out)),
                                    std::make_unique<ts::VectorF>(ts::VectorF(dim_out)));
-    return FeedForward(std::move(weight), std::move(bias), activation, l2, alpha);
+    return FeedForward(std::move(weight), std::move(bias), activation);
 }
 
 auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(inputs); }

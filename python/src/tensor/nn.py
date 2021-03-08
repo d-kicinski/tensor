@@ -26,10 +26,9 @@ class Conv2D(Op):
 
 
 class Linear(Op):
-    def __init__(self, dim_in: int, dim_out: int, activation: _ts.Activation = _ts.Activation.NONE,
-                 l2: bool = False, alpha: float = 1e-10):
+    def __init__(self, dim_in: int, dim_out: int, activation: _ts.Activation = _ts.Activation.NONE):
         super().__init__()
-        self._layer = _ts.FeedForward(dim_in, dim_out, activation, l2, alpha)
+        self._layer = _ts.FeedForward(dim_in, dim_out, activation)
 
     def forward(self, *inputs: Variable):
         tensor: Variable
@@ -74,6 +73,7 @@ class ReLU(Op):
 def relu(x: Variable):
     op = ReLU()
     return op(x)
+
 
 def softmax(tensor: ts.Tensor) -> ts.Tensor:
     return ts.Tensor(_ts.softmax(tensor.data))
