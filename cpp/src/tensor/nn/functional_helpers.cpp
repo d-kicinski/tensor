@@ -2,6 +2,12 @@
 
 using namespace ts;
 
+template auto ts::_get_tile(Tensor<float, 3> const &image, int size, int row, int col) -> Tensor<float, 3>;
+template auto ts::_get_tile(Tensor<bool, 3> const &image, int size, int row, int col) -> Tensor<bool, 3>;
+
+template auto ts::_set_tile(Tensor<float, 3> &image, Tensor<float, 3> const &tile, int size, int row, int col) -> void;
+template auto ts::_set_tile(Tensor<bool, 3> &image, Tensor<bool, 3> const &tile, int size, int row, int col) -> void;
+
 auto ts::_get_flatten_tile(Tensor<float, 4> const &images, int size, int row, int col) -> MatrixF
 {
     std::vector<VectorF> tiles;
