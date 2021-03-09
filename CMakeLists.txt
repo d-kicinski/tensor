@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 project(tensor LANGUAGES CXX VERSION 0.2.0)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 # Layout build dir like install dir so it's easier to find binaries and libs (bin/ dir)
 include(GNUInstallDirs)
@@ -11,7 +10,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
 # TODO: in case of error look at this
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_BUILD_TYPE Debug)
+
 # Force default build type to Release
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING

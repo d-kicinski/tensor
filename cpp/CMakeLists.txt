@@ -91,6 +91,7 @@ if (TENSOR_BUILD_TESTS)
     catch_discover_tests(tests)
 
     if (TENSOR_ENABLE_COVERAGE)
+        list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/third-party/Catch2/CMake")
         set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
         find_package(codecov)
         add_coverage(tests)
