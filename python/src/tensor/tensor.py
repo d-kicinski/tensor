@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from numbers import Number
 from typing import Optional, Union, Sequence, List, Tuple, Type, Callable, Final
 
-import tensor.libtensor as _ts
+from . import libtensor as _ts
 import numpy as np
 from numpy.typing import ArrayLike
 

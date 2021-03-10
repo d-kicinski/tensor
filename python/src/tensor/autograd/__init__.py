@@ -1,3 +1,5 @@
-from tensor.autograd.autograd import Variable, Op
-from tensor.autograd.autograd import matmul, add, log, reshape, var, print_graph
-from tensor.autograd import viz
+from .autograd import Variable, Op
+from .autograd import matmul, add, log, reshape, var, print_graph
+from . import viz
+
+__all__ = ["Variable", "Op", "matmul", "add", "log", "reshape", "var", "print_graph", "viz"]

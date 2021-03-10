@@ -1,7 +1,6 @@
-from tensor import tensor as ts
-import tensor.libtensor as _ts
-from tensor.libtensor import Activation
-from tensor.autograd.autograd import Op, Variable
+from . import tensor as ts
+from . import libtensor as _ts
+from .autograd import Op, Variable
 
 
 class Conv2D(Op):

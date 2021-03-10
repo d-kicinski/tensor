@@ -1,6 +1,6 @@
-import tensor.tensor as ts
+import tensor as ts
 import numpy as np
-from tensor.autograd.autograd import var
+from tensor.autograd import var
 from tensor.nn import ReLU
 
 

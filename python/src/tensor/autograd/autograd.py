@@ -4,8 +4,7 @@ from abc import abstractmethod, ABCMeta
 from typing import Optional, List, Iterable, Union, TypeVar
 
 import numpy as np
-from tensor import tensor as ts
-import tensor.libtensor as _ts
+from .. import tensor as ts
 
 T = TypeVar("T")
 IterT = Union[T, Iterable[T]]

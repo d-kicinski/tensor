@@ -1,1 +1,3 @@
-from tensor.fft.fft import dft_naive
+from .fft import dft_naive
+
+__all__ = ["dft_naive"]
