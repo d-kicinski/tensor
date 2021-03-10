@@ -1,11 +1,12 @@
 from . import tensor as ts
 from . import libtensor as _ts
 from .autograd import Op, Variable
+from .libtensor import Activation
 
 
 class Conv2D(Op):
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int,
-                 activation: _ts.Activation = _ts.Activation.NONE, use_bias: bool = True):
+                 activation: Activation = Activation.NONE, use_bias: bool = True):
         super().__init__()
         self._layer = _ts.Conv2D(in_channels, out_channels, kernel_size, stride, activation,
                                  use_bias)
@@ -25,7 +26,7 @@ class Conv2D(Op):
 
 
 class Linear(Op):
-    def __init__(self, dim_in: int, dim_out: int, activation: _ts.Activation = _ts.Activation.NONE):
+    def __init__(self, dim_in: int, dim_out: int, activation: Activation = Activation.NONE):
         super().__init__()
         self._layer = _ts.FeedForward(dim_in, dim_out, activation)
 
