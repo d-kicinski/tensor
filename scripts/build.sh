@@ -1,8 +1,8 @@
 BUILD_DIR=cmake-build
 
 rm -r ${BUILD_DIR}
-cmake -H. -B${BUILD_DIR}
-cd ${BUILD_DIR} && make -j12 && cd ..
+cmake -H. -B${BUILD_DIR} -GNinja
+cd ${BUILD_DIR} && ninja -j12 && cd ..
 if [ -f ${BUILD_DIR}/bin/tests ]; then
   cd ${BUILD_DIR}/bin && ./tests && cd ../..
 fi
