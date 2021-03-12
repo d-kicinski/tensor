@@ -384,6 +384,8 @@ auto wrap_nn(pybind11::module & m)
 
 
     m.def("softmax", &ts::softmax);
+
+    m.def("log_softmax", &ts::log_softmax);
 }
 
 PYBIND11_MODULE(libtensor, m)

@@ -7,4 +7,6 @@ namespace ts {
 
 auto softmax(MatrixF const &logits) -> MatrixF;
 
+auto log_softmax(MatrixF const &logits) -> MatrixF;
+
 }

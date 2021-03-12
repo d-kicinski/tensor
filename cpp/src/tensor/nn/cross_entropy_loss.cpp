@@ -10,15 +10,16 @@ auto ts::CrossEntropyLoss::forward(const ts::MatrixF &logits, ts::Tensor<int, 1>
 {
     _labels = labels;
     _scores = ts::softmax(logits);
-    auto log_probs = -ts::log(ts::get(_scores, labels));
-    float loss = ts::sum(log_probs) / _scores.shape(0);
+
+    VectorF log_probs = ts::log(ts::get(_scores, labels));
+    float loss = -ts::sum(log_probs) / (log_probs.shape(0));
     return loss;
 }
 
 auto ts::CrossEntropyLoss::backward() -> ts::MatrixF
 {
     auto d_scores = ts::apply_if(
-        _scores, ts::to_one_hot(_labels), (Fn<float>)[](float e) { return e - 1; });
+        _scores, ts::to_one_hot(_labels), (Fn<float>)[](float e) { return e - 1.0f; });
     d_scores = ts::apply(
         d_scores, (Fn<float>)[&](float e) { return e / _scores.shape(0); });
     return d_scores;

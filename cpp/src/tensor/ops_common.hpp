@@ -156,4 +156,43 @@ auto flatten_keep_batch(Tensor<Element, Dim> const & tensor) -> Matrix<Element>
     return Matrix<Element>(tensors);
 }
 
+template <typename Element> auto clip_(DataHolder<Element> &data, Element min, Element max) -> void
+{
+    std::transform(data.begin(), data.end(), data.begin(), [min, max](auto &value) {
+        if (value < min)
+            return min;
+        else if (value > max)
+            return max;
+        else
+            return value;
+    });
 }
+
+template <typename Element, int Dim>
+auto clip_max_(Tensor<Element, Dim> &tensor, Element max) -> void
+{
+    std::transform(tensor.begin(), tensor.end(), tensor.begin(),
+                   [max](auto &value) { return value > max ? max : value; });
+}
+
+template <typename Element, int Dim>
+auto clip_min_(Tensor<Element, Dim> &tensor, Element min) -> void
+{
+    std::transform(tensor.begin(), tensor.end(), tensor.begin(),
+                   [min](auto &value) { return value < min ? min : value; });
+}
+
+template <typename Element, int Dim> auto add_(Tensor<Element, Dim> &tensor, Element value) -> void
+{
+    std::transform(tensor.begin(), tensor.end(), tensor.begin(),
+                   [value](Element e) { return e + value; });
+}
+
+template <typename Element, int Dim>
+auto subtract_(Tensor<Element, Dim> const &tensor, Element value) -> void
+{
+    std::transform(tensor.begin(), tensor.end(), tensor.begin(),
+                   [value](Element e) { return e - value; });
+}
+
+} // namespace ts

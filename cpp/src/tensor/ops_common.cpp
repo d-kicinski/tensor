@@ -149,13 +149,14 @@ auto add_(Tensor<Element, 3> const &tensor, Vector<Element> const &vector) -> vo
 
 auto divide(MatrixF const &matrix, VectorF const &vector) -> MatrixF
 {
+    constexpr float epsilon = 1e-10;
     // TODO: divide(matrix, vector, axis=1)?
     MatrixF result(matrix.shape());
     for (int i = 0; i < vector.shape(0); ++i) {
         auto row = matrix(i);
         std::transform(row.begin(), row.end(),
                        result.begin() + (i * row.data_size()),
-                       [&vector, &i](float e) { return e / vector(i); });
+                       [&vector, &i](float e) { return e / vector(i) + epsilon; });
     }
     return result;
 }
@@ -323,7 +324,8 @@ auto apply(Tensor<Element, Dim> const &tensor, Fn<Element> fn) -> Tensor<Element
 template <typename Element, int Dim>
 auto log(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>
 {
-    Fn<float> log = [](Element e){return std::log(e); };
+    constexpr float epsilon = 1e-10;
+    Fn<float> log = [](Element e){return std::log(e + epsilon); };
     return ts::apply(tensor, log);
 }
 
@@ -331,7 +333,8 @@ template <typename Element, int Dim>
 
 auto exp(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>
 {
-    Fn<float> exp = [](Element e){return std::exp(e); };
+    constexpr float epsilon = 1e-10;
+    Fn<float> exp = [](Element e){return std::exp(e) + epsilon; };
     return ts::apply(tensor, exp);
 }
 
