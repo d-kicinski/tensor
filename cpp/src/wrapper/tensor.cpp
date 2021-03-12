@@ -339,8 +339,11 @@ auto wrap_nn(pybind11::module & m)
     wrap_variable<int, 4>(m, "Variable4I");
 
     py::class_<ts::SGD<float>>(m, "SGD")
+        .def(py::init<float>())
         .def(py::init<float, std::vector<std::reference_wrapper<ts::GradHolder<float>>>>())
-        .def("step", &ts::SGD<float>::step);
+        .def("step", &ts::SGD<float>::step)
+        .def("register_params", py::overload_cast<ts::SGD<float>::VectorRef>(&ts::SGD<float>::register_params))
+        .def("register_params", py::overload_cast<ts::SGD<float>::Ref>(&ts::SGD<float>::register_params));
 
     py::class_<ts::CrossEntropyLoss>(m, "CrossEntropyLoss")
         .def(py::init<>())

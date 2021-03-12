@@ -1,3 +1,5 @@
+from typing import List
+
 from . import tensor as ts
 from . import libtensor as _ts
 from .autograd import Op, Variable
@@ -24,6 +26,9 @@ class Conv2D(Op):
         d_input = self._layer.backward(d_output.data)
         self._inputs[0].grad = ts.Tensor(d_input)
 
+    def weights(self) -> List[_ts.GradHolderF]:
+        return self._layer.weights()
+
 
 class Linear(Op):
     def __init__(self, dim_in: int, dim_out: int, activation: Activation = Activation.NONE):
@@ -42,6 +47,9 @@ class Linear(Op):
         d_output = self._check_grads(*grads, num=1)
         d_input = self._layer.backward(d_output.data)
         self._inputs[0].grad = ts.Tensor(d_input)
+
+    def weights(self) -> List[_ts.GradHolderF]:
+        return self._layer.weights()
 
 
 class MaxPool2D(Op):

@@ -25,6 +25,9 @@ class Net:
         x = self.fc2(x)
         return x
 
+    def weights(self) -> List[List[ts.libtensor.GradHolderF]]:
+        return [self.conv1.weights(), self.conv2.weights(), self.fc1.weights(), self.fc2.weights()]
+
 
 def train():
     transform = transforms.Compose([
@@ -36,6 +39,9 @@ def train():
 
     model = Net()
     loss_fn = ts.nn.CrossEntropyLoss()
+    optimizer = ts.libtensor.SGD(0.01)
+    for w in model.weights():
+        optimizer.register_params(w)
 
     for batch_idx, (data, target) in tqdm(enumerate(train_loader)):
         x = ts.autograd.var(np.moveaxis(data.numpy(), 1, -1))
