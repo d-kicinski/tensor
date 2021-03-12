@@ -114,9 +114,10 @@ auto add(Matrix<Element> const &matrix, Vector<Element> const &vector) -> Matrix
 {
     Matrix<Element> result(matrix.shape());
     for (int i = 0; i < matrix.shape(0); ++i) {
-        Vector<Element> row = matrix(i);
-        std::transform(row.begin(), row.end(), vector.begin(),
-                       result.begin() + (i * row.data_size()), std::plus());
+        Vector<Element> input_row = matrix(i);
+        Vector<Element> result_row = result(i);
+        std::transform(input_row.begin(), input_row.end(), vector.begin(),
+                       result_row.begin(), std::plus());
     }
     return result;
 }
