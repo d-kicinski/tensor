@@ -55,7 +55,9 @@ add_library(nn
         src/tensor/nn/variable.cpp
         src/tensor/nn/variable.hpp
         src/tensor/nn/max_pool_2d.cpp
-        src/tensor/nn/max_pool_2d.hpp)
+        src/tensor/nn/max_pool_2d.hpp
+        src/tensor/nn/initialization.hpp
+        )
 add_library(tensor::nn ALIAS nn)
 target_link_libraries(nn tensor)
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
