@@ -144,18 +144,6 @@ template <typename T> auto swap(T &t1, T &t2)
     t2 = std::move(temp);
 }
 
-template <typename Element, int Dim>
-auto flatten_keep_batch(Tensor<Element, Dim> const & tensor) -> Matrix<Element>
-{
-    int batch_size = tensor.shape(0);
-    auto tensors = std::vector<Vector<Element>>();
-    for (int i = 0; i < batch_size; ++i) {
-        auto t = tensor(i);
-        tensors.push_back(t.flatten());
-    }
-    return Matrix<Element>(tensors);
-}
-
 template <typename Element> auto clip_(DataHolder<Element> &data, Element min, Element max) -> void
 {
     std::transform(data.begin(), data.end(), data.begin(), [min, max](auto &value) {

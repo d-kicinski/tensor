@@ -312,20 +312,3 @@ TEST_CASE("swap(MatrixF, MatrixF")
     REQUIRE(b == m1);
 
 }
-
-TEST_CASE("flatten_keep_batch")
-{
-    Tensor<float, 3> input =
-        {{{1, -1}, {2, -2}, {3, -3}},
-         {{4, -4}, {5, -5}, {6, -6}},
-         {{7, -7}, {8, -8}, {9, -9}}};
-
-   Matrix<float> expected_output =
-       {{1, -1, 2, -2, 3, -3},
-        {4, -4, 5, -5, 6, -6},
-        {7, -7, 8, -8, 9, -9}};
-
-   auto output = ts::flatten_keep_batch(input);
-
-   REQUIRE(output == expected_output);
-}
