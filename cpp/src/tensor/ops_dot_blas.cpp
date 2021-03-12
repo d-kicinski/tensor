@@ -1,9 +1,9 @@
 #define OPENBLAS_CONST
-#include "ops_dot.hpp"
+#include "ops_dot_blas.hpp"
 #include "tensor.hpp"
 #include <cblas.h>
 
-namespace ts {
+namespace ts::blas {
 
 
 auto outer_product(VectorF const & x, VectorF const & y) -> MatrixF
@@ -90,11 +90,11 @@ auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>
 {
     int batch_size = A.shape(0);
     std::vector<Tensor<float, 2>> partial;
-    partial.push_back(dot(A(0), B));
+    partial.push_back(blas::dot(A(0), B));
     for (int i = 1; i < batch_size; ++i) {
-        partial.push_back(dot(A(i), B));
+        partial.push_back(blas::dot(A(i), B));
     }
     return Tensor<float, 3>(partial);
 }
 
-} // namespace ts
+} // namespace ts::blas

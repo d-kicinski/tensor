@@ -2,16 +2,18 @@
 #include "tensor_forward.hpp"
 #include <vector>
 
+#ifdef USE_BLAS
+#include "ops_dot_blas.hpp"
 namespace ts {
-
-auto outer_product(VectorF const &, VectorF const &) -> MatrixF;
-
-auto dot(VectorF const &, VectorF const &) -> float;
-
-auto dot(MatrixF const &, VectorF const &) -> VectorF;
-
-auto dot(MatrixF const & A, MatrixF const & B, bool A_T=false, bool B_T=false) -> MatrixF ;
-
-auto dot(Tensor<float, 3> const & A, MatrixF const & B) -> Tensor<float, 3>;
-
+    using namespace blas;
 }
+#else
+#include "ops_dot_naive.hpp"
+namespace ts {
+    using namespace naive;
+}
+#endif
+
+#if BUILD_BENCHMARK
+#include "ops_dot_naive.hpp"
+#endif

@@ -1,9 +1,9 @@
-#include "ops_dot.hpp"
+#include "ops_dot_naive.hpp"
 #include "tensor.hpp"
 
-namespace ts {
+namespace ts::naive {
 
-auto outer_product(VectorF const & x, VectorF const & y) -> MatrixF
+auto outer_product(VectorF const &x, VectorF const &y) -> MatrixF
 {
     MatrixF result(x.data_size(), y.data_size());
     for (int i = 0; i < x.data_size(); ++i) {
@@ -64,11 +64,11 @@ auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>
 {
     int batch_size = A.shape(0);
     std::vector<Tensor<float, 2>> partial;
-    partial.push_back(dot(A(0), B));
+    partial.push_back(naive::dot(A(0), B));
     for (int i = 1; i < batch_size; ++i) {
-        partial.push_back(dot(A(i), B));
+        partial.push_back(naive::dot(A(i), B));
     }
     return Tensor<float, 3>(partial);
 }
 
-} // namespace ts
+} // namespace ts::naive
