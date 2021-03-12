@@ -1,6 +1,7 @@
+from typing import List
+
 import numpy as np
 import torch
-from tqdm import tqdm
 
 import tensor as ts
 from tensor.autograd import Variable
@@ -14,7 +15,7 @@ class Net:
         self.conv2 = ts.nn.Conv2D(32, 64, 3, 1, activation=ts.nn.Activation.RELU)
         self.fc1 = ts.nn.Linear(9216, 128, activation=ts.nn.Activation.RELU)
         self.fc2 = ts.nn.Linear(128, 10)
-        self.max_pool = ts.nn.MaxPool2D(2, 1)
+        self.max_pool = ts.nn.MaxPool2D(2, 2)
 
     def forward(self, x: Variable) -> Variable:
         x = self.conv1(x)
@@ -35,7 +36,7 @@ def train():
         transforms.Normalize((0.1307,), (0.3081,))
     ])
     dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset, batch_size=4)
+    train_loader = torch.utils.data.DataLoader(dataset, batch_size=32)
 
     model = Net()
     loss_fn = ts.nn.CrossEntropyLoss()
@@ -43,13 +44,19 @@ def train():
     for w in model.weights():
         optimizer.register_params(w)
 
-    for batch_idx, (data, target) in tqdm(enumerate(train_loader)):
+    for batch_idx, (data, target) in enumerate(train_loader):
         x = ts.autograd.var(np.moveaxis(data.numpy(), 1, -1))
         y = ts.autograd.var(target.numpy())
 
         output = model.forward(x)
         loss = loss_fn(output, y)
         loss.backward()
+        optimizer.step()
+        if batch_idx % 10 == 0:
+            epoch = 1
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(data), len(train_loader.dataset),
+                       100. * batch_idx / len(train_loader), loss.value[0]))
 
 
 if __name__ == '__main__':
