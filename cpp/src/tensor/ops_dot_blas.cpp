@@ -37,17 +37,25 @@ auto dot(VectorF const &A, VectorF const &X) -> float
     return cblas_sdot(A.data_size(), A_data, 1, X_data, 1);
 }
 
-auto dot(MatrixF const &A, VectorF const &X) -> VectorF
+auto dot(MatrixF const &A, VectorF const &X, bool A_T) -> VectorF
 {
+    CBLAS_TRANSPOSE trans_A = CBLAS_TRANSPOSE::CblasNoTrans;
+    int lda = A.shape(1);
+    int dim_out = A.shape(0);
+    if (A_T) {
+        trans_A = CBLAS_TRANSPOSE::CblasTrans;
+        lda = A.shape(0);
+        dim_out = A.shape(1);
+    }
 
     // A or X could be just view on higher dimensional tensor, if I want to use raw pointer to
     // underlining data I have to take that into account
     auto A_data = A.data()->data() + std::distance(A.data().get()->begin(), A.begin());
     auto X_data = X.data()->data() + std::distance(X.data().get()->begin(), X.begin());
 
-    VectorF Y(A.shape(0));
-    cblas_sgemv(CBLAS_ORDER::CblasRowMajor, CBLAS_TRANSPOSE::CblasNoTrans, A.shape(0), A.shape(1),
-                1.0f, A_data, A.shape(1), X_data, 1, 0.0f, Y.data()->data(), 1);
+    VectorF Y(dim_out);
+    cblas_sgemv(CBLAS_ORDER::CblasRowMajor, trans_A, A.shape(0), A.shape(1),
+                1.0f, A_data, lda, X_data, 1, 0.0f, Y.data()->data(), 1);
 
     return Y;
 }

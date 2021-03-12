@@ -19,7 +19,7 @@ auto dot(VectorF const &a, VectorF const &b) -> float
     return std::inner_product(a.begin(), a.end(), b.begin(), 0.0f);
 }
 
-auto dot(MatrixF const &A, VectorF const &x) -> VectorF
+auto dot(MatrixF const &A, VectorF const &x, bool A_T) -> VectorF
 {
     // C(m) = A(m, k) * x(k)
     VectorF y(A.shape(0));
@@ -28,7 +28,11 @@ auto dot(MatrixF const &A, VectorF const &x) -> VectorF
 
     for (int i = 0; i < m; i++) {
         for (int p = 0; p < k; p++) {
-            float value = A(i, p) * x(p);
+            float value;
+            if (A_T)
+                value = A(p, i) * x(p);
+            else
+                value = A(i, p) * x(p);
             y(i) += value;
         }
     }

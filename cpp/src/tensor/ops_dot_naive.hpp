@@ -8,7 +8,7 @@ auto outer_product(VectorF const &, VectorF const &) -> MatrixF;
 
 auto dot(VectorF const &, VectorF const &) -> float;
 
-auto dot(MatrixF const &, VectorF const &) -> VectorF;
+auto dot(MatrixF const &, VectorF const &, bool A_T = false) -> VectorF;
 
 auto dot(MatrixF const &A, MatrixF const &B, bool A_T = false, bool B_T = false) -> MatrixF;
 
