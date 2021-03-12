@@ -7,6 +7,7 @@ set(SOURCES
         src/tensor/ops.hpp
         src/tensor/ops_common.hpp
         src/tensor/ops_common.cpp
+        src/tensor/statistics.hpp
         )
 
 if (TENSOR_USE_BLAS)

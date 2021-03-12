@@ -77,8 +77,19 @@ def test_variable():
 
 def test_sgd():
     feed_forward = _ts.FeedForward(3, 32, _ts.Activation.NONE)
-    optimizer = _ts.SGD(10, feed_forward.weights())
+    vars = [_ts.Variable1F([2]), _ts.Variable1F([2])]
+    for var in vars:
+        grad = var.grad()
+        grad[0] = 1
+        grad[1] = 1
+
+    optimizer = _ts.SGD(10)
+    optimizer.register_params(vars)
     optimizer.step()
-    optimizer.step()
-    optimizer.step()
+    for var in vars:
+        tensor = np.array(var.tensor())
+        np.testing.assert_array_equal(tensor, np.array([-10, -10]))
+
+
+
 

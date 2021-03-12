@@ -7,7 +7,8 @@ TEST_CASE("SGD")
 {
     auto weight =
         Variable<float, 2>(std::make_unique<Tensor<float, 2>>(Tensor<float, 2>::randn({128, 256})),
-                        std::make_unique<Tensor<float, 2>>(Tensor<float, 2>::randn({128, 256})));
+                        std::make_unique<Tensor<float, 2>>(Tensor<float, 2>::randn({128, 256})),
+                           "Variable");
     std::vector<std::reference_wrapper<GradHolder<float>>> vars;
     vars.emplace_back(std::ref(weight));
 

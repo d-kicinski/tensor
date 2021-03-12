@@ -1,4 +1,5 @@
 #include "feed_forward.hpp"
+#include "initialization.hpp"
 
 
 namespace ts {
@@ -9,11 +10,13 @@ FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Act
 auto FeedForward::create(int dim_in, int dim_out, Activation activation) -> FeedForward
 {
     auto weight =
-        Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::MatrixF::randn({dim_in, dim_out})),
-                           std::make_unique<ts::MatrixF>(ts::MatrixF::randn({dim_in, dim_out})));
+        Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
+                           std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
+                           "FeedForward(weight)");
 
-    auto bias = Variable<float, 1>(std::make_unique<ts::VectorF>(ts::VectorF(dim_out)),
-                                   std::make_unique<ts::VectorF>(ts::VectorF(dim_out)));
+    auto bias = Variable<float, 1>(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+                                   std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+                                   "FeedForward(bias)  ");
     return FeedForward(std::move(weight), std::move(bias), activation);
 }
 

@@ -3,6 +3,7 @@
 namespace ts {
 
 template <typename Element, int Dim> class Tensor;
+template <typename Element> class DataHolder;
 
 // Convenient typedefs
 template<typename Element>

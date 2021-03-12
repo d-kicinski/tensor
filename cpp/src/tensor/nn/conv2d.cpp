@@ -1,5 +1,6 @@
 #include "conv2d.hpp"
 #include "functional.hpp"
+#include "initialization.hpp"
 
 ts::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias,
                    int kernel_size, int stride, Activation activation)
@@ -12,12 +13,15 @@ auto ts::Conv2D::create(int in_channels, int out_channels, int kernel_size, int 
                         Activation activation, bool use_bias) -> Conv2D
 {
     std::vector<int> shape = {kernel_size * kernel_size * in_channels, out_channels};
-    auto weight = Variable<float, 2>(std::make_unique<MatrixF>(ts::MatrixF::randn(shape)),
-                                     std::make_unique<MatrixF>(ts::MatrixF()));
+    Variable<float, 2> weight(std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)),
+                                     std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)),
+                                         "Conv2D(weight)");
     std::optional<Variable<float, 1>> bias = std::nullopt;
     if (use_bias)
-        bias = std::make_optional(Variable<float, 1>(std::make_unique<VectorF>(VectorF(out_channels)),
-                                         std::make_unique<VectorF>(VectorF(out_channels))));
+        bias = std::make_optional(Variable<float, 1>(
+            std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
+            std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
+            "Conv2D(bias)  "));
     return Conv2D(std::move(weight), std::move(bias), kernel_size, stride, activation);
 }
 
