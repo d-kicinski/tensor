@@ -11,6 +11,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 # TODO: in case of error look at this
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+#set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra)
+
 # Force default build type to Release
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING
@@ -24,6 +26,7 @@ option(TENSOR_BUILD_EXAMPLES "" OFF)
 option(TENSOR_BUILD_TESTS "" OFF)
 option(TENSOR_BUILD_SHARED_LIBS "" ON)
 option(TENSOR_BUILD_PYTHON_WRAPPER "" OFF)
+option(TENSOR_BUILD_BENCHMARK "" OFF)
 
 
 message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
@@ -46,6 +49,13 @@ if (TENSOR_BUILD_SHARED_LIBS)
 endif()
 
 add_subdirectory(cpp)
+
+if (TENSOR_USE_BLAS)
+    if(TENSOR_BUILD_BENCHMARK)
+        add_compile_definitions(BUILD_BENCHMARK)
+        add_subdirectory(benchmark)
+    endif()
+endif ()
 
 if (TENSOR_BUILD_EXAMPLES)
     add_subdirectory(examples)

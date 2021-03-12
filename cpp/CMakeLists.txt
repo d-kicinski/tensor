@@ -12,6 +12,9 @@ set(SOURCES
 
 if (TENSOR_USE_BLAS)
     set(SOURCES ${SOURCES}  src/tensor/ops_dot_blas.cpp)
+    if (TENSOR_BUILD_BENCHMARK)
+        set(SOURCES ${SOURCES}  src/tensor/ops_dot_naive.cpp)
+    endif ()
 else ()
     set(SOURCES ${SOURCES}  src/tensor/ops_dot_naive.cpp)
 endif()
