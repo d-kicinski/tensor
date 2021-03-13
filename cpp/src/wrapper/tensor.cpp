@@ -254,7 +254,7 @@ auto wrap_ops(pybind11::module & m)
     // ops_dot.hpp
     m.def("outer_product", &ts::outer_product);
     m.def("dot", py::overload_cast<ts::VectorF const&, ts::VectorF const&>(&ts::dot));
-    m.def("dot", py::overload_cast<ts::MatrixF const&, ts::VectorF const&>(&ts::dot));
+    m.def("dot", py::overload_cast<ts::MatrixF const&, ts::VectorF const&, bool>(&ts::dot));
     m.def("dot",
           py::overload_cast<ts::MatrixF const &, ts::MatrixF const &, bool , bool>(&ts::dot),
           py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
