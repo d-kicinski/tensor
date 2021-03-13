@@ -96,9 +96,9 @@ template auto argmax(Tensor<int, 2> const &) -> Tensor<int, 1>;
 
 
 template <typename Element, int Dim>
-auto add_(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2) -> void
+auto add_(Tensor<Element, Dim> const &x, Tensor<Element, Dim> const &y) -> void
 {
-    std::transform(t1.begin(), t1.end(), t2.begin(), t1.begin(), std::plus<>());
+    std::transform(x.begin(), x.end(), y.begin(), x.begin(), std::plus<>());
 }
 
 template <typename Element, int Dim>

@@ -183,4 +183,16 @@ auto subtract_(Tensor<Element, Dim> const &tensor, Element value) -> void
                    [value](Element e) { return e - value; });
 }
 
+template <typename Element, int Dim>
+auto saxpy_(Tensor<Element, Dim> const &x, Tensor<Element, Dim> const &y) -> void
+{
+#ifdef USE_BLAS
+    auto x_data = x.data()->data() + std::distance(x.data().get()->begin(), x.begin());
+    auto y_data = y.data()->data() + std::distance(y.data().get()->begin(), y.begin());
+    cblas_saxpy(x.data_size(), 1.0f, y_data, 1, x_data, 1);
+#else
+    std::transform(x.begin(), x.end(), y.begin(), x.begin(), std::plus<>());
+#endif
+}
+
 } // namespace ts
