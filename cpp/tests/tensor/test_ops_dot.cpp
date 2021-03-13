@@ -53,6 +53,20 @@ TEST_CASE("dot: MatrixF[3, 3] X VectorF[3]")
     REQUIRE(expected_result == result);
 }
 
+TEST_CASE("dot: MatrixF[3, 3].T X VectorF[3]")
+{
+    MatrixF matrix = {
+        {3, 1, 2},
+        {1, 5, 6},
+        {3, 9, 5}
+    };
+    VectorF vector= { -1, -1, 1 };
+    VectorF result = dot(matrix, vector, true);
+    VectorF expected_result = {-1, 3, -3};
+
+    REQUIRE(expected_result == result);
+}
+
 TEST_CASE("dot: MatrixF[3, 3] X MatrixF[3, 3]")
 {
     MatrixF matrix = {

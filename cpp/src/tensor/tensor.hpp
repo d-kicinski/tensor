@@ -144,9 +144,35 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
     }
 
     template<int AnyDim>
-    auto reshape(std::array<size_type, AnyDim> shape) -> Tensor<Element, AnyDim>
+    auto reshape(std::array<size_type, AnyDim> shape) const -> Tensor<Element, AnyDim>
     {
         return Tensor<Element, AnyDim>(_data, shape);
+    }
+
+    auto at(std::array<int, Dim> indices) const -> Element {
+        size_t offset = 1;
+        size_t index = 0;
+        for (int i = indices.size() - 1; i >= 0 ; --i) {
+            index += indices[i] * offset;
+            offset *= _dimensions[i];
+        }
+        return _begin[index];
+    }
+
+    auto get_subarray(std::vector<size_type> indices) const -> std::pair<iterator, iterator> {
+        size_type offset = _dimensions.back();
+        int index = 0;
+        int start_index = int(indices.size()) - 1;
+        for (int i = start_index; i >= 0 ; --i) {
+            index += indices[i] * offset;
+            offset *= _dimensions[i];
+        }
+        iterator begin = _begin;
+        std::advance(begin, index);
+
+        iterator end = begin;
+        std::advance(end, _dimensions.back());
+        return std::make_pair(begin, end);
     }
 
     auto static randn(std::vector<int> const &shape) -> Tensor;

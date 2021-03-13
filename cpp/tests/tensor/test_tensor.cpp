@@ -312,3 +312,28 @@ TEST_CASE("reshape")
     REQUIRE(tensor1.shape() == std::array<int, 1>{12});
     REQUIRE(tensor1 == expected_tensor1);
 }
+
+TEST_CASE("at")
+{
+    ts::Tensor<float, 3> tensor = {{{0, 1}, {2, 3}, {4, 5}}, {{6, 7}, {8, 9}, {10, 11}}};
+    REQUIRE(tensor.at({0, 0, 0}) == 0);
+    REQUIRE(tensor.at({1, 1, 1}) == 9);
+    REQUIRE(tensor.at({1, 2, 1}) == 11);
+}
+
+TEST_CASE("get_subarray") {
+    ts::Tensor<float, 3> tensor = {{{0, 1}, {2, 3}, {4, 5}}, {{6, 7}, {8, 9}, {10, 11}}};
+    {
+        auto [b, e] = tensor.get_subarray({0, 0});
+
+        REQUIRE(std::equal(b, e, tensor(0, 0).begin()));
+    }
+    {
+        auto [b, e] = tensor.get_subarray({1, 1});
+        REQUIRE(std::equal(b, e, tensor(1, 1).begin()));
+    }
+    {
+        auto [b, e] = tensor.get_subarray({1, 2});
+        REQUIRE(std::equal(b, e, tensor(1, 2).begin()));
+    }
+}

@@ -44,7 +44,6 @@ auto dot(MatrixF const &A, VectorF const &X, bool A_T) -> VectorF
     int dim_out = A.shape(0);
     if (A_T) {
         trans_A = CBLAS_TRANSPOSE::CblasTrans;
-        lda = A.shape(0);
         dim_out = A.shape(1);
     }
 

@@ -68,8 +68,9 @@ auto ts::_get_tile(Tensor<Element, 3> const &image, int size, int row, int col) 
     Tensor<Element, 3> tile(size, size, image.shape(2));
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
-            Vector<Element> vec = image(i + row, j + col);
-            std::copy(vec.begin(), vec.end(), tile(i, j).begin());
+            auto[vec_begin, vec_end] = image.get_subarray({i + row, j + col});
+            auto[tile_begin, tile_end] = tile.get_subarray({i , j});
+            std::copy(vec_begin, vec_end, tile_begin);
         }
     }
     return tile;
