@@ -175,6 +175,10 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
         return std::make_pair(begin, end);
     }
 
+    auto raw() -> float* {
+        return _data.get()->data();
+    }
+
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
   private:
