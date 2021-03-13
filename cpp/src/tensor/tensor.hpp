@@ -149,7 +149,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
         return Tensor<Element, AnyDim>(_data, shape);
     }
 
-    auto at(std::array<int, Dim> indices) const -> Element {
+    auto at(std::array<int, Dim> indices) const -> Element & {
         size_t offset = 1;
         size_t index = 0;
         for (int i = indices.size() - 1; i >= 0 ; --i) {

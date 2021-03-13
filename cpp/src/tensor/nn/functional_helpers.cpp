@@ -56,7 +56,7 @@ auto ts::_add_flatten_tile(Tensor<float, 3> &image, Tensor<float, 1> const &tile
         for (int j = 0; j < size; ++j) {
             for (int k = 0; k < c; ++k) {
                 int tile_idx = k + j * c + i * c * size;
-                image(i + row, j + col, k) += tile(tile_idx);
+                image.at({i + row, j + col, k}) += tile(tile_idx);
             }
         }
     }

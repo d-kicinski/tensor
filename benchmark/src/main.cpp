@@ -60,15 +60,15 @@ auto benchmark_linear() -> void
     auto output = ts::MatrixF();
     {
         auto layer = ts::FeedForward::create(512, 10, ts::Activation::NONE);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 10);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 10);
+        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
+        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
         std::cout << "Linear::forward " << time_fw << " us" << std::endl;
         std::cout << "Linear::backward " << time_bw << " us" << std::endl;
     }
     {
         auto layer = ts::FeedForward::create(512, 10, ts::Activation::RELU);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 10);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 10);
+        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
+        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
         std::cout << "Linear[ReLU]::forward " << time_fw << " us" << std::endl;
         std::cout << "Linear[ReLU]::backward " << time_bw << " us" << std::endl;
     }
@@ -81,16 +81,16 @@ auto benchmark_conv2d() -> void
     {
         auto layer = ts::Conv2D::create(3, 24, 3, 1,
                                         ts::Activation::NONE, false);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 10);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 10);
+        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
+        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
         std::cout << "Conv2D::forward " << time_fw << " us" << std::endl;
         std::cout << "Conv2D::backward " << time_bw << " us" << std::endl;
     }
     {
         auto layer = ts::Conv2D::create(3, 24, 3, 1,
                                         ts::Activation::RELU, false);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 10);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 10);
+        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
+        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
         std::cout << "Conv2D[ReLU]::forward " << time_fw << " us" << std::endl;
         std::cout << "Conv2D[ReLU]::backward " << time_bw << " us" << std::endl;
     }

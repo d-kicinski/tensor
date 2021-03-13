@@ -19,6 +19,7 @@ auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const 
     int dim_out = ts::_calculate_output_dim(images.shape(1), kernel_size, 0, stride, 1);
     ts::Tensor<float, 4> results(batch_size, dim_out, dim_out, kernel.shape(1));
 
+    #pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto image = images(b);
         auto result = results(b);
@@ -26,7 +27,8 @@ auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const 
             for (int j = 0; j < dim_out; ++j) {
                 VectorF tile = _get_flatten_tile(image, kernel_size, i * stride, j * stride);
                 VectorF tile_output = ts::dot(kernel, tile, true);
-                std::copy(tile_output.begin(), tile_output.end(), result(i, j).begin());
+                auto [result_begin, result_end] = result.get_subarray({i, j});
+                std::copy(tile_output.begin(), tile_output.end(), result_begin);
             }
         }
     }
@@ -43,7 +45,8 @@ auto ts::conv_2d(ts::Tensor<float, 3> const &image, ts::Tensor<float, 2> const &
         for (int j = 0; j < dim_out; ++j) {
             ts::VectorF tile = _get_flatten_tile(image, kernel_size, i * stride, j * stride);
             auto tile_output = ts::dot(kernel, tile, true);
-            std::copy(tile_output.begin(), tile_output.end(), result(i, j).begin());
+            auto [result_begin, result_end] = result.get_subarray({i, j});
+            std::copy(tile_output.begin(), tile_output.end(), result_begin);
         }
     }
     return result;
@@ -78,6 +81,8 @@ auto ts::conv_2d_backward(ts::Tensor<float, 4> const &inputs, ts::Tensor<float, 
 
     ts::Tensor<float, 4> d_inputs(batch_size, dim_in, dim_in, channels_in);
     ts::Tensor<float, 2> d_kernel(kernel_size * kernel_size * channels_in, channels_out);
+
+    #pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto d_output = d_outputs(b);
         auto input = inputs(b);
@@ -87,10 +92,11 @@ auto ts::conv_2d_backward(ts::Tensor<float, 4> const &inputs, ts::Tensor<float, 
                 ts::VectorF d_tile = d_output(i, j);
                 ts::VectorF tile = _get_flatten_tile(input, kernel_size, i * stride, j * stride);
 
-                auto d_tile_kernel = ts::outer_product(tile, d_tile);
                 auto d_tile_input = ts::dot(kernel, d_tile);
-
                 _add_flatten_tile(d_input, d_tile_input, kernel_size, i * stride, j * stride);
+
+                auto d_tile_kernel = ts::outer_product(tile, d_tile);
+                #pragma omp critical
                 ts::add_(d_kernel, d_tile_kernel);
             }
         }
@@ -158,6 +164,7 @@ auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int st
     ts::Tensor<float, 4> results(batch_size, dim_out, dim_out, C_in);
     ts::Tensor<bool, 4> masks(inputs.shape());
 
+    #pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto input = inputs(b);
         auto mask = masks(b);
@@ -200,6 +207,7 @@ auto ts::max_pool_2d_backward(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<
     int dim_out = d_outputs.shape(1);
     int batch_size = masks.shape(0);
 
+    #pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto mask = masks(b);
         auto d_output = d_outputs(b);
