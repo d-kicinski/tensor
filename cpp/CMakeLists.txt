@@ -30,12 +30,16 @@ target_include_directories(tensor
         )
 
 if (TENSOR_USE_BLAS)
-    message("Using BLAS for matrix operations.")
     set(BLA_STATIC ON)
     find_package(BLAS REQUIRED)
     target_compile_definitions(tensor PUBLIC USE_BLAS)
     target_link_libraries(tensor ${BLAS_LIBRARIES})
 endif ()
+
+if (TENSOR_USE_OPENMP)
+    find_package(OpenMP REQUIRED)
+    target_link_libraries(tensor OpenMP::OpenMP_CXX)
+endif()
 
 
 add_library(nn
