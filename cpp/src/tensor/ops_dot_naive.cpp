@@ -22,9 +22,10 @@ auto dot(VectorF const &a, VectorF const &b) -> float
 auto dot(MatrixF const &A, VectorF const &x, bool A_T) -> VectorF
 {
     // C(m) = A(m, k) * x(k)
-    VectorF y(A.shape(0));
-    int m = A.shape(0);
-    int k = A.shape(1);
+    int m = A_T ? A.shape(1) : A.shape(0);
+    int k = A_T ? A.shape(0) : A.shape(1);
+
+    VectorF y(m);
 
     for (int i = 0; i < m; i++) {
         for (int p = 0; p < k; p++) {

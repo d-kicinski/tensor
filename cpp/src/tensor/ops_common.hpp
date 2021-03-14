@@ -3,6 +3,10 @@
 #include <cassert>
 #include <functional>
 
+#ifdef USE_BLAS
+#include "cblas.h"
+#endif
+
 namespace ts {
 
 template <typename Element> using Fn = std::function<Element(Element)>;
