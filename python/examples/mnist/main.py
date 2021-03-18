@@ -68,7 +68,7 @@ def train() -> None:
 def eval(model: Net, dataset: MNISTDataset, loss_fn: ts.nn.CrossEntropyLoss) -> None:
     test_loss = 0
     correct = 0
-    for data, target in tqdm(dataset, total=len(dataset) // 32):
+    for data, target in tqdm(dataset):
         x = Variable(data)
         y = Variable(target)
         output = model.forward(x)
@@ -76,11 +76,9 @@ def eval(model: Net, dataset: MNISTDataset, loss_fn: ts.nn.CrossEntropyLoss) -> 
         pred = ts.argmax(output.value)
         correct += np.sum(pred.numpy == y.value.numpy)
 
-    example_num = len(dataset)  # type: ignore
-    test_loss /= example_num
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, example_num,
-        100. * correct / example_num))
+        test_loss / len(dataset), correct, dataset.example_num,
+        100. * correct / dataset.example_num))
 
 
 if __name__ == '__main__':
