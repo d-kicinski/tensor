@@ -5,7 +5,11 @@
 namespace ts {
 
 FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Activation activation)
-    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)) {}
+    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation))
+{
+    register_parameter(_weight.tensor());
+    register_parameter(_bias.tensor());
+}
 
 auto FeedForward::create(int dim_in, int dim_out, Activation activation) -> FeedForward
 {

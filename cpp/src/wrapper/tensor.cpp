@@ -10,6 +10,10 @@
 #include <tensor/nn/softmax.hpp>
 #include <tensor/tensor.hpp>
 
+#ifdef TENSOR_USE_PROTOBUF
+#include <tensor/nn/saver.hpp>
+#endif
+
 namespace py = pybind11;
 
 using size_type = ts::Tensor<float, 2>::size_type;
@@ -18,7 +22,7 @@ using size_type = ts::Tensor<float, 2>::size_type;
 template <typename Element>
 auto wrap_tensor4D(pybind11::module & m, char const * class_name)
 {
-    py::class_<ts::Tensor<Element, 4>>(m, class_name, py::buffer_protocol())
+    py::class_<ts::Tensor<Element, 4>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
         .def(py::init<size_type , size_type, size_type, size_type>())
 
         // Construct from a buffer
@@ -80,7 +84,7 @@ auto wrap_tensor4D(pybind11::module & m, char const * class_name)
 template <typename Element>
 auto wrap_tensor3D(pybind11::module & m, char const * class_name)
 {
-    py::class_<ts::Tensor<Element, 3>>(m, class_name, py::buffer_protocol())
+    py::class_<ts::Tensor<Element, 3>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
         .def(py::init<size_type , size_type, size_type>())
 
             // Construct from a buffer
@@ -138,7 +142,7 @@ auto wrap_tensor3D(pybind11::module & m, char const * class_name)
 template <typename Element>
 auto wrap_tensor2D(pybind11::module & m, char const * class_name)
 {
-    py::class_<ts::Tensor<Element, 2>>(m, class_name, py::buffer_protocol())
+    py::class_<ts::Tensor<Element, 2>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
         .def(py::init<size_type , size_type>())
 
         // Construct from a buffer
@@ -194,7 +198,7 @@ template <typename Element>
 auto wrap_tensor1D(pybind11::module & m, char const * class_name)
 {
 
-    py::class_<ts::Tensor<Element, 1>>(m, class_name, py::buffer_protocol())
+    py::class_<ts::Tensor<Element, 1>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
         .def(py::init<size_type>())
 
         // Construct from a buffer
@@ -321,9 +325,6 @@ auto wrap_variable(pybind11::module & m, char const * class_name)
 
 auto wrap_nn(pybind11::module & m)
 {
-    py::class_<ts::DataHolder<float>>(m, "DataHolder")
-        .def(py::init<>());
-
     wrap_grad_holder<float>(m, "GradHolderF");
     wrap_grad_holder<int>(m, "GradHolderI");
 
@@ -356,23 +357,38 @@ auto wrap_nn(pybind11::module & m)
     wrap_nn_activations<float, 2>(m, "_f2");
     wrap_nn_activations<float, 3>(m, "_f3");
 
-    py::class_<ts::FeedForward>(m, "FeedForward")
+    py::class_<ts::LayerBase<float>>(m, "LayerBase")
+        .def(py::init<>())
+        .def("register_parameter", &ts::LayerBase<float>::register_parameter)
+        .def("register_parameters", &ts::LayerBase<float>::register_parameters)
+        .def("parameters", &ts::LayerBase<float>::parameters);
+
+#ifdef TENSOR_USE_PROTOBUF
+    py::class_<ts::Saver<float>>(m, "Saver")
+        .def(py::init<ts::LayerBase<float> &>())
+        .def("save", &ts::Saver<float>::save)
+        .def("load", &ts::Saver<float>::load);
+#endif
+
+    py::class_<ts::FeedForward, ts::LayerBase<float>>(m, "FeedForward")
         .def(py::init(&ts::FeedForward::create))
         .def("__call__", &ts::FeedForward::operator())
         .def("forward", &ts::FeedForward::forward)
         .def("backward", &ts::FeedForward::backward)
         .def("bias", &ts::FeedForward::bias, py::return_value_policy::reference_internal)
         .def("weight", &ts::FeedForward::weight, py::return_value_policy::reference_internal)
-        .def("weights", &ts::FeedForward::weights);
+        .def("weights", &ts::FeedForward::weights)
+        .def("parameters", &ts::FeedForward::parameters);
 
-    py::class_<ts::Conv2D>(m, "Conv2D")
+    py::class_<ts::Conv2D, ts::LayerBase<float>>(m, "Conv2D")
         .def(py::init(&ts::Conv2D::create))
         .def("__call__", &ts::Conv2D::operator())
         .def("forward", &ts::Conv2D::forward)
         .def("backward", &ts::Conv2D::backward)
         .def("bias", &ts::Conv2D::bias, py::return_value_policy::reference_internal)
         .def("weight", &ts::Conv2D::weight, py::return_value_policy::reference_internal)
-        .def("weights", &ts::Conv2D::weights);
+        .def("weights", &ts::Conv2D::weights)
+        .def("parameters", &ts::Conv2D::parameters);
 
     py::class_<ts::MaxPool2D>(m, "MaxPool2D")
         .def(py::init(&ts::MaxPool2D::create))
@@ -388,6 +404,12 @@ auto wrap_nn(pybind11::module & m)
 
 PYBIND11_MODULE(libtensor, m)
 {
+    py::class_<ts::DataHolder<int>>(m, "DataHolderI")
+        .def(py::init<>());
+
+    py::class_<ts::DataHolder<float>>(m, "DataHolderF")
+        .def(py::init<>());
+
     wrap_tensor4D<int>(m, "Tensor4I");
     wrap_tensor4D<float>(m, "Tensor4F");
     wrap_tensor3D<int>(m, "Tensor3I");

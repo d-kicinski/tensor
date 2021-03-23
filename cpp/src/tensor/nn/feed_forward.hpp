@@ -2,11 +2,12 @@
 
 #include <tensor/tensor.hpp>
 #include "activations.hpp"
+#include "layer_base.hpp"
 #include "variable.hpp"
 
 namespace ts {
 
-class FeedForward {
+class FeedForward : public LayerBase<float> {
   public:
     using Activations = ActivationFactory<float, 2>;
     using VectorRef = std::vector<std::reference_wrapper<GradHolder<float>>>;

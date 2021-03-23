@@ -1,3 +1,13 @@
 .idea/
 cmake-build*
 CMakeFiles
+*.pb.cc
+*.pb.h
+*.ts
+venv
+__pycache__
+bdist_wheel
+build
+dist
+*.egg-info
+*.so

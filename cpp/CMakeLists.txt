@@ -42,7 +42,7 @@ if (TENSOR_USE_OPENMP)
 endif()
 
 
-add_library(nn
+set(NN_SOURCES
         src/tensor/nn/feed_forward.cpp
         src/tensor/nn/cross_entropy_loss.cpp
         src/tensor/nn/regularization.hpp
@@ -65,7 +65,38 @@ add_library(nn
         src/tensor/nn/max_pool_2d.cpp
         src/tensor/nn/max_pool_2d.hpp
         src/tensor/nn/initialization.hpp
+        src/tensor/nn/layer_base.cpp
+        src/tensor/nn/layer_base.hpp
         )
+
+if (TENSOR_USE_PROTOBUF)
+    set(NN_PROTO_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/src/tensor/nn/proto)
+    add_custom_command(
+            OUTPUT
+                ${NN_PROTO_PATH}/array.pb.h
+                ${NN_PROTO_PATH}/array.pb.cc
+            COMMAND
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/protoc array.proto
+                    --proto_path ${NN_PROTO_PATH}
+                    --cpp_out ${NN_PROTO_PATH}
+            DEPENDS
+                protobuf::protoc
+    )
+    add_custom_target(proto
+            DEPENDS ${NN_PROTO_PATH}/array.pb.h ${NN_PROTO_PATH}/array.pb.cc
+    )
+
+    list(APPEND NN_SOURCES
+            src/tensor/nn/saver.cpp
+            src/tensor/nn/saver.hpp
+            ${NN_PROTO_PATH}/array.pb.cc
+            ${NN_PROTO_PATH}/array.pb.h
+            )
+    set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+endif()
+
+
+add_library(nn ${NN_SOURCES})
 add_library(tensor::nn ALIAS nn)
 target_link_libraries(nn tensor)
 set_target_properties(nn PROPERTIES LINKER_LANGUAGE CXX)
@@ -76,9 +107,14 @@ target_include_directories(nn
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         )
 
+if (TENSOR_USE_PROTOBUF)
+    add_dependencies(nn proto)
+    target_link_libraries(nn protobuf::libprotobuf)
+endif ()
+
 # Enable tests only if project is not imported via add_subdirectory()
 if (TENSOR_BUILD_TESTS)
-    add_executable(tests
+    set(NN_TEST_SOURCES
             tests/main_catch2.cpp
             tests/tensor/test_tensor.cpp
             tests/tensor/test_ops_common.cpp
@@ -92,7 +128,14 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/nn/test_functional_helpers.cpp
             tests/tensor/nn/test_activation.cpp
             tests/tensor/nn/test_optimizers.cpp
-            tests/tensor/nn/test_variable.cpp)
+            tests/tensor/nn/test_variable.cpp
+            )
+
+    if (TENSOR_USE_PROTOBUF)
+        set(NN_TEST_SOURCES ${NN_TEST_SOURCES} tests/tensor/nn/test_saver.cpp)
+    endif()
+
+    add_executable(tests ${NN_TEST_SOURCES})
 
     target_link_libraries(tests tensor nn Catch2::Catch2)
 

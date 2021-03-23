@@ -3,10 +3,11 @@
 #include <tensor/tensor.hpp>
 #include "activations.hpp"
 #include "variable.hpp"
+#include "layer_base.hpp"
 
 namespace ts {
 
-class Conv2D {
+class Conv2D : public LayerBase<float> {
   public:
     using Activations = ActivationFactory<float, 4>;
     using VectorRef = std::vector<std::reference_wrapper<GradHolder<float>>>;

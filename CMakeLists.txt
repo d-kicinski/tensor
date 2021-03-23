@@ -30,8 +30,11 @@ option(TENSOR_BUILD_BENCHMARK "" OFF)
 
 option(TENSOR_USE_OPENMP "" OFF)
 
+option(TENSOR_USE_PROTOBUF "" OFF)
+
 message(STATUS "USE_BLAS: ${TENSOR_USE_BLAS}")
 message(STATUS "USE_OPENMP: ${TENSOR_USE_OPENMP}")
+message(STATUS "USE_PROTOBUF: ${TENSOR_USE_PROTOBUF}")
 message(STATUS "ENABLE_COVERAGE: ${TENSOR_ENABLE_COVERAGE}")
 message(STATUS "BUILD_EXAMPLES: ${TENSOR_BUILD_EXAMPLES}")
 message(STATUS "BUILD_TESTS: ${TENSOR_BUILD_TESTS}")
@@ -51,6 +54,13 @@ if (TENSOR_BUILD_SHARED_LIBS)
 endif()
 
 add_subdirectory(cpp)
+
+if (TENSOR_USE_PROTOBUF)
+    option(protobuf_BUILD_TESTS "" OFF)
+    option(protobuf_DISABLE_RTTI "" ON)
+    add_compile_definitions(TENSOR_USE_PROTOBUF)
+    add_subdirectory(third-party/protobuf/cmake)
+endif ()
 
 if (TENSOR_USE_BLAS)
     if(TENSOR_BUILD_BENCHMARK)

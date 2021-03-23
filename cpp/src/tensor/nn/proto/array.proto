@@ -1,0 +1,10 @@
+syntax = "proto3";
+package proto;
+
+message ArrayFloat {
+  repeated float values = 1;
+}
+
+message Model {
+  repeated ArrayFloat variables = 2;
+}
