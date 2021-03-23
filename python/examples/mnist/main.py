@@ -9,14 +9,19 @@ from tensor.autograd import Variable
 
 from dataset import MNISTDataset
 
+MODEL_SAVE_NAME = "mnist_model.ts"
 
-class Net:
+
+class Net(ts.libtensor.LayerBase):
     def __init__(self):
+        super().__init__()
         self.conv1 = ts.nn.Conv2D(1, 32, 3, 1, activation=ts.nn.Activation.RELU)
         self.conv2 = ts.nn.Conv2D(32, 64, 3, 1, activation=ts.nn.Activation.RELU)
         self.fc1 = ts.nn.Linear(9216, 128, activation=ts.nn.Activation.RELU)
         self.fc2 = ts.nn.Linear(128, 10)
         self.max_pool = ts.nn.MaxPool2D(2, 2)
+
+        self._register()
 
     def forward(self, x: Variable) -> Variable:
         x = self.conv1(x)
@@ -30,15 +35,22 @@ class Net:
     def weights(self) -> List[List[ts.libtensor.GradHolderF]]:
         return [self.conv1.weights(), self.conv2.weights(), self.fc1.weights(), self.fc2.weights()]
 
+    def _register(self):
+        self.register_parameters(self.conv1.parameters())
+        self.register_parameters(self.conv2.parameters())
+        self.register_parameters(self.fc1.parameters())
+        self.register_parameters(self.fc2.parameters())
+
 
 def train() -> None:
     normalize = lambda images: (images - 0.1307) / 0.3081
     dataset_train = MNISTDataset("./data", train=True, batch_size=32, transform=normalize)
-    dataset_test = MNISTDataset("./data", train=False, batch_size=32, transform=normalize)
 
     model = Net()
     loss_fn = ts.nn.CrossEntropyLoss()
     optimizer = ts.libtensor.SGD(0.01)
+    saver = ts.libtensor.Saver(model)
+
     for w in model.weights():
         optimizer.register_params(w)
 
@@ -59,27 +71,28 @@ def train() -> None:
     time_end = time.time()
     print(f"Training time: {time_end - time_start}")
 
-    time_start = time.time()
-    eval(model, dataset_test, loss_fn)
-    time_end = time.time()
-    print(f"Evaluation time: {time_end - time_start}")
+    saver.save(MODEL_SAVE_NAME)
 
 
-def eval(model: Net, dataset: MNISTDataset, loss_fn: ts.nn.CrossEntropyLoss) -> None:
-    test_loss = 0
+def eval() -> None:
+    normalize = lambda images: (images - 0.1307) / 0.3081
+    dataset = MNISTDataset("./data", train=False, batch_size=32, transform=normalize)
+    model = Net()
+    saver = ts.libtensor.Saver(model)
+    saver.load(MODEL_SAVE_NAME)
+
     correct = 0
     for data, target in tqdm(dataset):
         x = Variable(data)
         y = Variable(target)
         output = model.forward(x)
-        test_loss += loss_fn(output, y).value[0]
         pred = ts.argmax(output.value)
         correct += np.sum(pred.numpy == y.value.numpy)
 
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss / len(dataset), correct, dataset.example_num,
-        100. * correct / dataset.example_num))
+    print('\nTest set: Accuracy: {}/{} ({:.0f}%)\n'.format(
+        correct, dataset.example_num, 100. * correct / dataset.example_num))
 
 
 if __name__ == '__main__':
     train()
+    eval()

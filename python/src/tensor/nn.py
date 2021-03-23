@@ -29,6 +29,9 @@ class Conv2D(Op):
     def weights(self) -> List[_ts.GradHolderF]:
         return self._layer.weights()
 
+    def parameters(self) -> List[_ts.DataHolderF]:
+        return self._layer.parameters()
+
 
 class Linear(Op):
     def __init__(self, dim_in: int, dim_out: int, activation: Activation = Activation.NONE):
@@ -50,6 +53,9 @@ class Linear(Op):
 
     def weights(self) -> List[_ts.GradHolderF]:
         return self._layer.weights()
+
+    def parameters(self) -> List[_ts.DataHolderF]:
+        return self._layer.parameters()
 
 
 class MaxPool2D(Op):

@@ -53,14 +53,15 @@ if (TENSOR_BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-add_subdirectory(cpp)
-
 if (TENSOR_USE_PROTOBUF)
     option(protobuf_BUILD_TESTS "" OFF)
     option(protobuf_DISABLE_RTTI "" ON)
     add_compile_definitions(TENSOR_USE_PROTOBUF)
     add_subdirectory(third-party/protobuf/cmake)
 endif ()
+
+add_subdirectory(cpp)
+
 
 if (TENSOR_USE_BLAS)
     if(TENSOR_BUILD_BENCHMARK)
