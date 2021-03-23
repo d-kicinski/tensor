@@ -53,6 +53,10 @@ if (TENSOR_BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
+if (TENSOR_USE_BLAS)
+    set(BLA_VENDOR OpenBLAS)
+endif ()
+
 add_subdirectory(cpp)
 
 if (TENSOR_USE_PROTOBUF)
@@ -63,7 +67,6 @@ if (TENSOR_USE_PROTOBUF)
 endif ()
 
 if (TENSOR_USE_BLAS)
-    set(BLA_VENDOR OpenBLAS)
     if(TENSOR_BUILD_BENCHMARK)
         add_compile_definitions(BUILD_BENCHMARK)
         add_subdirectory(benchmark)
