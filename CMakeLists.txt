@@ -20,7 +20,7 @@ if (NOT CMAKE_BUILD_TYPE)
             FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 
-option(TENSOR_USE_BLAS "" ON)
+option(TENSOR_USE_BLAS "" OFF)
 option(TENSOR_ENABLE_COVERAGE "" OFF)
 option(TENSOR_BUILD_EXAMPLES "" OFF)
 option(TENSOR_BUILD_TESTS "" OFF)
@@ -52,10 +52,6 @@ endif()
 if (TENSOR_BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
-
-if (TENSOR_USE_BLAS)
-    set(BLA_VENDOR OpenBLAS)
-endif ()
 
 add_subdirectory(cpp)
 
