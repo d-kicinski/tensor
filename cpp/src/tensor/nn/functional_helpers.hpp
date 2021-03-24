@@ -20,7 +20,7 @@ auto _calculate_output_dim(int dim_in, int kernel_size, int padding, int stride,
     -> int;
 
 template <typename Element>
-auto _get_tile(Tensor<Element, 3> const &image, int size, int row, int col) -> Tensor<Element, 3>;
+auto _get_tile(Tensor<Element, 3> const &image, size_type size, size_type row, size_type col) -> Tensor<Element, 3>;
 
 template <typename Element>
 auto _set_tile(Tensor<Element, 3> &image, Tensor<Element, 3> const &tile, int size, int row,
