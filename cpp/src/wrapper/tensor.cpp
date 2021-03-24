@@ -16,7 +16,7 @@
 
 namespace py = pybind11;
 
-using size_type = ts::Tensor<float, 2>::size_type;
+using size_type = ts::size_type;
 
 
 template <typename Element>
@@ -38,7 +38,7 @@ auto wrap_tensor4D(pybind11::module & m, char const * class_name)
           return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 4> const  &t) -> std::array<int, 4> {
+        .def("shape", [](ts::Tensor<Element, 4> const  &t) -> std::array<size_type , 4> {
           return t.shape();
         })
 
@@ -100,7 +100,7 @@ auto wrap_tensor3D(pybind11::module & m, char const * class_name)
           return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 3> const  &t) -> std::array<int, 3> {
+        .def("shape", [](ts::Tensor<Element, 3> const  &t) -> std::array<size_type, 3> {
           return t.shape();
         })
 
@@ -158,7 +158,7 @@ auto wrap_tensor2D(pybind11::module & m, char const * class_name)
           return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 2> const  &t) -> std::array<int, 2> {
+        .def("shape", [](ts::Tensor<Element, 2> const  &t) -> std::array<size_type, 2> {
           return t.shape();
         })
 
@@ -214,7 +214,7 @@ auto wrap_tensor1D(pybind11::module & m, char const * class_name)
           return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 1> const  &t) -> std::array<int, 1> {
+        .def("shape", [](ts::Tensor<Element, 1> const  &t) -> std::array<size_type, 1> {
           return t.shape();
         })
 
@@ -318,7 +318,7 @@ template <typename Element, int Dim>
 auto wrap_variable(pybind11::module & m, char const * class_name)
 {
    py::class_<ts::Variable<Element, Dim>, ts::GradHolder<Element>>(m, class_name)
-        .def(py::init<std::array<int, Dim>>())
+        .def(py::init<std::array<size_type , Dim>>())
         .def("tensor", &ts::Variable<Element, Dim>::tensor, py::return_value_policy::reference_internal)
         .def("grad", &ts::Variable<Element, Dim>::grad, py::return_value_policy::reference_internal);
 }

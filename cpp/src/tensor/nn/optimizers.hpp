@@ -9,8 +9,10 @@ template <typename Element> class SGD {
   public:
     using Ref = std::reference_wrapper<GradHolder<Element>>;
     using VectorRef = std::vector<Ref>;
-    VectorRef _variables;
+
     float _lr;
+    VectorRef _variables;
+
     explicit SGD(float lr) : _lr(lr) {}
     SGD(float lr, VectorRef variables) : _lr(lr), _variables(std::move(variables)) {}
 

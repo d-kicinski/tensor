@@ -55,7 +55,7 @@ class Variable : public GradHolder<Element>
 
     Variable(): _weight(nullptr), _grad(nullptr) {}
 
-    explicit Variable(std::array<int , Dim> const & shape) {
+    explicit Variable(std::array<size_type, Dim> const & shape) {
         _weight = std::make_unique<Tensor<Element, Dim>>(Tensor<Element, Dim>(shape));
         _grad = std::make_unique<Tensor<Element, Dim>>(Tensor<Element, Dim>(_weight->shape()));
     }
