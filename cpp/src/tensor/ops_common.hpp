@@ -84,11 +84,13 @@ auto concatenate(std::vector<Tensor<Element, 1>>) -> decltype(auto);
 template <typename Element, int axis>
 auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
 {
+    using vec_size_type = typename std::vector<Tensor<Element, 1>>::size_type;
+
     if constexpr (axis == 1) {
-        int vector_size = list[0].shape(0);
+        ts::size_type vector_size = list[0].shape(0);
         Tensor<Element, 2> tensor(vector_size, list.size());
-        for (int i = 0; i < vector_size; ++i) {
-            for (int j = 0; j < list.size(); ++j) {
+        for (size_type i = 0; i < vector_size; ++i) {
+            for (vec_size_type j = 0; j < list.size(); ++j) {
                 tensor(i, j) = list[j][i];
             }
         }
@@ -114,7 +116,7 @@ auto concatenate(std::vector<Tensor<Element, 1>> list) -> decltype(auto)
 template <typename Element>
 auto slice(Tensor<Element, 2> tensor, int from, int to) -> Tensor<Element, 2>
 {
-    std::array<int, 2> shape(tensor.shape());
+    std::array<size_type , 2> shape(tensor.shape());
     shape[0] = to - from;
     int row_size = tensor.shape(1);
 
@@ -129,7 +131,7 @@ auto slice(Tensor<Element, 2> tensor, int from, int to) -> Tensor<Element, 2>
 template <typename Element>
 auto slice(Tensor<Element, 1> tensor, int from, int to) -> Tensor<Element, 1>
 {
-    std::array<int, 1> shape(tensor.shape());
+    std::array<size_type , 1> shape(tensor.shape());
     shape[0] = to - from;
     int row_size = 1;
 

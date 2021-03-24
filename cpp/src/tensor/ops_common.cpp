@@ -113,7 +113,7 @@ template <typename Element>
 auto add(Matrix<Element> const &matrix, Vector<Element> const &vector) -> Matrix<Element>
 {
     Matrix<Element> result(matrix.shape());
-    for (int i = 0; i < matrix.shape(0); ++i) {
+    for (size_type i = 0; i < matrix.shape(0); ++i) {
         Vector<Element> input_row = matrix(i);
         Vector<Element> result_row = result(i);
         std::transform(input_row.begin(), input_row.end(), vector.begin(),
@@ -126,8 +126,8 @@ template <typename Element>
 auto add(Tensor<Element, 3> const &tensor, Vector<Element> const &vector) -> Tensor<Element, 3>
 {
     Tensor<Element, 3> result(tensor.shape());
-    for (int i = 0; i < tensor.shape(0); ++i) {
-        for (int j = 0; j < tensor.shape(1); ++j) {
+    for (size_type i = 0; i < tensor.shape(0); ++i) {
+        for (size_type j = 0; j < tensor.shape(1); ++j) {
             Vector<Element> values = tensor(i, j);
             std::transform(values.begin(), values.end(), vector.begin(),
                            result(i, j).begin(), std::plus());
@@ -139,8 +139,8 @@ auto add(Tensor<Element, 3> const &tensor, Vector<Element> const &vector) -> Ten
 template <typename Element>
 auto add_(Tensor<Element, 3> const &tensor, Vector<Element> const &vector) -> void
 {
-    for (int i = 0; i < tensor.shape(0); ++i) {
-        for (int j = 0; j < tensor.shape(1); ++j) {
+    for (size_type i = 0; i < tensor.shape(0); ++i) {
+        for (size_type j = 0; j < tensor.shape(1); ++j) {
             Vector<Element> values = tensor(i, j);
             std::transform(values.begin(), values.end(), vector.begin(),
                            values.begin(), std::plus());
@@ -153,7 +153,7 @@ auto divide(MatrixF const &matrix, VectorF const &vector) -> MatrixF
     constexpr float epsilon = 1e-10;
     // TODO: divide(matrix, vector, axis=1)?
     MatrixF result(matrix.shape());
-    for (int i = 0; i < vector.shape(0); ++i) {
+    for (size_type i = 0; i < vector.shape(0); ++i) {
         auto row = matrix(i);
         std::transform(row.begin(), row.end(),
                        result.begin() + (i * row.data_size()),
@@ -245,8 +245,8 @@ auto sum(MatrixF const &matrix, int axis) -> VectorF
         // np.sum(matrix, axis=0, keepdims=True);
 
         VectorF result(matrix.shape(1));
-        for (int j = 0; j < matrix.shape(1); ++j) {
-            for (int i = 0; i < matrix.shape(0); ++i) {
+        for (size_type j = 0; j < matrix.shape(1); ++j) {
+            for (size_type i = 0; i < matrix.shape(0); ++i) {
                 result(j) += matrix(i, j);
             }
         }
@@ -255,7 +255,7 @@ auto sum(MatrixF const &matrix, int axis) -> VectorF
         // np.sum(matrix, axis=1, keepdims=True)
 
         VectorF result(matrix.shape(0));
-        for (int i = 0; i < matrix.shape(0); ++i) {
+        for (size_type i = 0; i < matrix.shape(0); ++i) {
            result(i) = ts::sum(matrix(i));
         }
         return result;
@@ -270,8 +270,8 @@ auto sum_v2(MatrixF const &matrix, int axis) -> VectorF
         // np.sum(matrix, axis=0, keepdims=True);
 
         VectorF result(matrix.shape(1));
-        for (int j = 0; j < matrix.shape(1); ++j) {
-            for (int i = 0; i < matrix.shape(0); ++i) {
+        for (size_type j = 0; j < matrix.shape(1); ++j) {
+            for (size_type i = 0; i < matrix.shape(0); ++i) {
                 result(j) += matrix(i, j);
             }
         }
@@ -280,7 +280,7 @@ auto sum_v2(MatrixF const &matrix, int axis) -> VectorF
         // np.sum(matrix, axis=1, keepdims=True)
 
         VectorF result(matrix.shape(0));
-        for (int i = 0; i < matrix.shape(0); ++i) {
+        for (size_type i = 0; i < matrix.shape(0); ++i) {
             result(i) = ts::sum(matrix(i));
         }
         return result;
@@ -299,7 +299,7 @@ auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<bool, 2>
 {
     int max_index = *std::max_element(vector.begin(), vector.end());
     Tensor<bool, 2> one_hot(vector.shape(0), max_index + 1);
-    for (int i = 0; i < one_hot.shape(0); ++i) {
+    for (size_type i = 0; i < one_hot.shape(0); ++i) {
         one_hot(i, vector(i)) = true;
     }
     return one_hot;
@@ -308,7 +308,7 @@ auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<bool, 2>
 auto get(MatrixF const &matrix, Tensor<int, 1> const &indices) -> VectorF
 {
     VectorF result(indices.shape());
-    for (int i = 0; i < matrix.shape(0); ++i) {
+    for (size_type i = 0; i < matrix.shape(0); ++i) {
         result(i) = matrix(i, indices(i));
     }
     return result;
@@ -354,7 +354,7 @@ auto randint(int low, int high, std::vector<int> const &shape) -> Tensor<int, Di
     std::uniform_int_distribution<int> dist(low, high);
 
     // TODO: this is weird :P
-    std::array<int, Dim> _shape;
+    std::array<size_type , Dim> _shape;
     std::copy(shape.begin(), shape.end(), _shape.begin());
     Tensor<int, Dim> tensor(_shape);
     std::generate(tensor.begin(), tensor.end(), [&]() { return dist(mt); });

@@ -11,7 +11,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 # TODO: in case of error look at this
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-#set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra)
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 # Force default build type to Release
 if (NOT CMAKE_BUILD_TYPE)

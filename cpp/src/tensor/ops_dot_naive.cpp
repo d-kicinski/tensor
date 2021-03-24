@@ -6,8 +6,8 @@ namespace ts::naive {
 auto outer_product(VectorF const &x, VectorF const &y) -> MatrixF
 {
     MatrixF result(x.data_size(), y.data_size());
-    for (int i = 0; i < x.data_size(); ++i) {
-        for (int j = 0; j < y.data_size(); ++j) {
+    for (size_type i = 0; i < x.data_size(); ++i) {
+        for (size_type j = 0; j < y.data_size(); ++j) {
             result(i, j) = x(i) * y(j);
         }
     }

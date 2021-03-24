@@ -2,6 +2,8 @@
 
 namespace ts {
 
+using size_type = unsigned long int;
+
 template <typename Element, int Dim> class Tensor;
 template <typename Element> class DataHolder;
 
