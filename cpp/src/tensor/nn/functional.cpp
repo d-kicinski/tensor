@@ -13,7 +13,7 @@ auto ts::pad(ts::MatrixF const &matrix, int pad_row, int pad_col) -> ts::MatrixF
 }
 
 auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel,
-                 int kernel_size, int stride) -> ts::Tensor<float, 4>
+                 int kernel_size, size_type stride) -> ts::Tensor<float, 4>
 {
     int batch_size = images.shape(0);
     int dim_out = ts::_calculate_output_dim(images.shape(1), kernel_size, 0, stride, 1);
@@ -23,8 +23,8 @@ auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const 
     for (int b = 0; b < batch_size; ++b) {
         auto image = images(b);
         auto result = results(b);
-        for (int i = 0; i < dim_out; ++i) {
-            for (int j = 0; j < dim_out; ++j) {
+        for (size_type i = 0; i < dim_out; ++i) {
+            for (size_type j = 0; j < dim_out; ++j) {
                 VectorF tile = _get_flatten_tile(image, kernel_size, i * stride, j * stride);
                 VectorF tile_output = ts::dot(kernel, tile, true);
                 auto [result_begin, result_end] = result.get_subarray({i, j});
@@ -36,13 +36,13 @@ auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const 
 }
 
 auto ts::conv_2d(ts::Tensor<float, 3> const &image, ts::Tensor<float, 2> const &kernel,
-                 int kernel_size, int stride) -> ts::Tensor<float, 3>
+                 int kernel_size, size_type stride) -> ts::Tensor<float, 3>
 {
     int dim_out = ts::_calculate_output_dim(image.shape(0), kernel_size, 0, stride, 1);
     ts::Tensor<float, 3> result(dim_out, dim_out, kernel.shape(1));
 
-    for (int i = 0; i < dim_out; ++i) {
-        for (int j = 0; j < dim_out; ++j) {
+    for (size_type i = 0; i < dim_out; ++i) {
+        for (size_type j = 0; j < dim_out; ++j) {
             ts::VectorF tile = _get_flatten_tile(image, kernel_size, i * stride, j * stride);
             auto tile_output = ts::dot(kernel, tile, true);
             auto [result_begin, result_end] = result.get_subarray({i, j});
@@ -52,7 +52,7 @@ auto ts::conv_2d(ts::Tensor<float, 3> const &image, ts::Tensor<float, 2> const &
     return result;
 }
 
-auto ts::conv_2d(ts::MatrixF const &matrix, ts::MatrixF const &kernel, int stride) -> ts::MatrixF
+auto ts::conv_2d(ts::MatrixF const &matrix, ts::MatrixF const &kernel, size_type stride) -> ts::MatrixF
 {
     assert(kernel.shape(0) == kernel.shape(1));
 
@@ -61,8 +61,8 @@ auto ts::conv_2d(ts::MatrixF const &matrix, ts::MatrixF const &kernel, int strid
     int dim_out = ts::_calculate_output_dim(matrix.shape(0), kernel_size, 0, stride, 1);
     ts::MatrixF result(dim_out, dim_out);
 
-    for (int i = 0; i < dim_out; ++i) {
-        for (int j = 0; j < dim_out; ++j) {
+    for (size_type i = 0; i < dim_out; ++i) {
+        for (size_type j = 0; j < dim_out; ++j) {
             ts::VectorF tile = _get_flatten_tile(matrix, kernel_size, i * stride, j * stride);
             result(i, j) = ts::dot(kernel_flatten, tile);
         }

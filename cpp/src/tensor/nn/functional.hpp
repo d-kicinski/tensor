@@ -4,13 +4,13 @@
 
 namespace ts {
 
-auto conv_2d(Tensor<float, 4> const &image, Tensor<float, 2> const &kernel, int kernel_size,
-             int stride) -> Tensor<float, 4>;
+auto conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel,
+                 int kernel_size, size_type stride) -> ts::Tensor<float, 4>;
 
 auto conv_2d(Tensor<float, 3> const &image, Tensor<float, 2> const &kernel, int kernel_size,
-             int stride) -> Tensor<float, 3>;
+             size_type stride) -> Tensor<float, 3>;
 
-auto conv_2d(MatrixF const &matrix, MatrixF const &kernel, int stride) -> MatrixF;
+auto conv_2d(MatrixF const &matrix, MatrixF const &kernel, size_type stride) -> MatrixF;
 
 auto conv_2d_backward(Tensor<float, 4> const &input, Tensor<float, 2> const &kernel,
                       Tensor<float, 4> const &d_output, int kernel_size, int stride)
