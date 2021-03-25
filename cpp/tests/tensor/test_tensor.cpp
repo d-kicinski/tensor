@@ -7,14 +7,14 @@ using namespace ts;
 TEST_CASE("simple initialization")
 {
     Tensor<float, 3> tensor(2, 2, 1);
-    REQUIRE(tensor.shape() == std::array{2, 2, 1});
+    REQUIRE(tensor.shape() == std::array<size_type, 3>{2, 2, 1});
     REQUIRE(tensor.data_size() == 4);
 }
 
 TEST_CASE("simple initializer_list")
 {
     Tensor<int, 1> array = {0, 1, 2, 3};
-    REQUIRE(array.shape() == std::array{4});
+    REQUIRE(array.shape() == std::array<size_type, 1>{4});
     REQUIRE(array.data_size() == 4);
     REQUIRE(*array.data() == std::vector{0, 1, 2, 3});
 }
@@ -23,7 +23,7 @@ TEST_CASE("nested initializer_list")
 {
     Tensor<int, 2> array = {{0, 1},
                             {2, 3}};
-    REQUIRE(array.shape() == std::array{2, 2});
+    REQUIRE(array.shape() == std::array<size_type, 2>{2, 2});
     REQUIRE(array.data_size() == 4);
     REQUIRE(*array.data() == std::vector{0, 1, 2, 3});
 }
@@ -43,13 +43,13 @@ TEST_CASE("indexing multidimensional array")
 TEST_CASE("shape: simple case")
 {
     Tensor<int, 2> matrix(2, 3);
-    REQUIRE(matrix.shape() == std::array{2, 3});
+    REQUIRE(matrix.shape() == std::array<size_type, 2>{2, 3});
 }
 
 TEST_CASE("shape: scalar")
 {
     Tensor<int, 1> matrix = {1};
-    REQUIRE(matrix.shape() == std::array{1});
+    REQUIRE(matrix.shape() == std::array<size_type, 1>{1});
 }
 
 TEST_CASE("shape(index)")
@@ -63,12 +63,12 @@ TEST_CASE("bracket operator")
 {
     Tensor<float, 2> matrix ={{1, 2, 3},
                               {4, 5, 6}};
-    REQUIRE(matrix.shape() == std::array{2, 3});
+    REQUIRE(matrix.shape() == std::array<size_type, 2>{2, 3});
     REQUIRE(*matrix.data() == std::vector<float>{1, 2, 3, 4, 5, 6});
 
     {
         Tensor<float, 1> array = matrix[0];
-        REQUIRE(array.shape() == std::array{3});
+        REQUIRE(array.shape() == std::array<size_type, 1>{3});
         std::vector<float> expected = {1, 2, 3};
         REQUIRE(std::equal(array.begin(), array.end(), expected.begin()));
         REQUIRE(array[0] == 1);
@@ -77,7 +77,7 @@ TEST_CASE("bracket operator")
     }
     {
         Tensor<float, 1> array = matrix[1];
-        REQUIRE(array.shape() == std::array{3});
+        REQUIRE(array.shape() == std::array<size_type, 1>{3});
         std::vector<float> expected = {4, 5, 6};
         REQUIRE(std::equal(array.begin(), array.end(), expected.begin()));
         REQUIRE(array[0] == 4);
@@ -192,7 +192,7 @@ TEST_CASE("operator<(Tensor, scalar)")
 TEST_CASE("rand(shape)")
 {
     auto matrix = Tensor<float, 2>::randn({2, 2});
-    REQUIRE(matrix.shape() == std::array{2, 2});
+    REQUIRE(matrix.shape() == std::array<size_type, 2>{2, 2});
     REQUIRE(matrix.data_size() == 4);
 }
 
@@ -296,7 +296,7 @@ TEST_CASE("reshape")
         {{0, 1}, {2, 3}},
         {{0, 1}, {2, 3}},
     };
-    REQUIRE(tensor3.shape() == std::array<int, 3>{3, 2, 2});
+    REQUIRE(tensor3.shape() == std::array<size_type, 3>{3, 2, 2});
 
     Tensor<int, 2> tensor2 = tensor3.reshape<2>({3, 4});
     Tensor<int, 2> expected_tensor2 = {
@@ -304,12 +304,12 @@ TEST_CASE("reshape")
         {0, 1, 2, 3},
         {0, 1, 2, 3},
     };
-    REQUIRE(tensor2.shape() == std::array<int, 2>{3, 4});
+    REQUIRE(tensor2.shape() == std::array<size_type, 2>{3, 4});
     REQUIRE(tensor2 == expected_tensor2);
 
     Tensor<int, 1> tensor1 = tensor3.reshape<1>({12});
     Tensor<int, 1> expected_tensor1 = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
-    REQUIRE(tensor1.shape() == std::array<int, 1>{12});
+    REQUIRE(tensor1.shape() == std::array<size_type, 1>{12});
     REQUIRE(tensor1 == expected_tensor1);
 }
 

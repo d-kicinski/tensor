@@ -225,7 +225,7 @@ TEST_CASE("from_vector")
    VectorF vector = ts::from_vector(std_v);
 
    REQUIRE(std::equal(std_v.begin(), std_v.end(), vector.begin()));
-   REQUIRE(vector.shape() == std::array{5});
+   REQUIRE(vector.shape() == std::array<size_type, 1>{5});
 }
 
 TEST_CASE("concatenate vectors with axis = 1")

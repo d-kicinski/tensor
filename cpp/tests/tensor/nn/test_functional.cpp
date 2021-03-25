@@ -86,7 +86,7 @@ TEST_CASE("conv_2d_gradient")
         {{3, -3}, {4, -4}}
     };
 
-    assert((kernel.shape() == std::array<int, 2>{8, 2}));
+    assert((kernel.shape() == std::array<ts::size_type, 2>{8, 2}));
 
     int kernel_size = 2;
     int stride = 1;
@@ -171,7 +171,7 @@ TEST_CASE("max_pool_2d")
 
     auto [output, mask] = ts::max_pool_2d(input, 2, 2);
 
-    REQUIRE(output.shape() == std::array<int, 4>{1, 2, 2, 2});
+    REQUIRE(output.shape() == std::array<ts::size_type, 4>{1, 2, 2, 2});
     REQUIRE(output == expected_output);
     REQUIRE(mask == expected_mask);
 
