@@ -2,9 +2,10 @@
 
 #include <utility>
 
-ts::DatasetIterator::DatasetIterator(ts::Tensor<float, 2> inputs,
-                                     ts::Tensor<int, 1> labels, int batch_size, int index)
-    : _inputs(std::move(inputs)), _labels(std::move(labels)), _batch_size(batch_size), _index(index) { }
+ts::DatasetIterator::DatasetIterator(ts::Tensor<float, 2> inputs, ts::Tensor<int, 1> labels, int batch_size, int index)
+    : _inputs(std::move(inputs)), _labels(std::move(labels)), _batch_size(batch_size), _index(index)
+{
+}
 
 auto ts::DatasetIterator::operator++() -> ts::DatasetIterator &
 {
@@ -48,7 +49,4 @@ auto ts::operator==(const ts::DatasetIterator &lhs, const ts::DatasetIterator &r
     return lhs._index >= rhs._inputs.shape(0);
 }
 
-auto ts::operator!=(const ts::DatasetIterator &lhs, const ts::DatasetIterator &rhs) -> bool
-{
-    return !(lhs == rhs);
-}
+auto ts::operator!=(const ts::DatasetIterator &lhs, const ts::DatasetIterator &rhs) -> bool { return !(lhs == rhs); }

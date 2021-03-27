@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 
-#include "tensor/tensor.hpp"
 #include "tensor/nn/dataset_iterator.hpp"
+#include "tensor/tensor.hpp"
 
 namespace ts {
 
@@ -28,7 +28,6 @@ class PlanarDataset {
     auto end() -> DatasetIterator;
 
     explicit PlanarDataset(std::string const &path, bool header_line = false, int batch_size = 16);
-
 };
 
 } // namespace ts

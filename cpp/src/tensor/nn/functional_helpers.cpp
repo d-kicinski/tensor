@@ -2,8 +2,10 @@
 
 using namespace ts;
 
-template auto ts::_get_tile(Tensor<float, 3> const &image, size_type size, size_type row, size_type col) -> Tensor<float, 3>;
-template auto ts::_get_tile(Tensor<bool, 3> const &image, size_type size, size_type row, size_type col) -> Tensor<bool, 3>;
+template auto ts::_get_tile(Tensor<float, 3> const &image, size_type size, size_type row, size_type col)
+    -> Tensor<float, 3>;
+template auto ts::_get_tile(Tensor<bool, 3> const &image, size_type size, size_type row, size_type col)
+    -> Tensor<bool, 3>;
 
 template auto ts::_set_tile(Tensor<float, 3> &image, Tensor<float, 3> const &tile, int size, int row, int col) -> void;
 template auto ts::_set_tile(Tensor<bool, 3> &image, Tensor<bool, 3> const &tile, int size, int row, int col) -> void;
@@ -22,7 +24,7 @@ auto ts::_get_flatten_tile(Tensor<float, 4> const &images, int size, int row, in
         }
         tiles.push_back(std::move(tile.flatten()));
     }
-    return MatrixF(tiles);  // (B, k*k*C_in)
+    return MatrixF(tiles); // (B, k*k*C_in)
 }
 
 auto ts::_get_flatten_tile(Tensor<float, 3> const &image, int size, int row, int col) -> VectorF
@@ -30,8 +32,7 @@ auto ts::_get_flatten_tile(Tensor<float, 3> const &image, int size, int row, int
     return _get_tile(image, size, row, col).flatten();
 }
 
-auto ts::_add_flatten_tile(Tensor<float, 4> &images, Tensor<float, 2> const &tiles, int size, int row,
-                           int col) -> void
+auto ts::_add_flatten_tile(Tensor<float, 4> &images, Tensor<float, 2> const &tiles, int size, int row, int col) -> void
 {
     for (size_type b = 0; b < images.shape(0); ++b) {
         auto image = images(b);
@@ -48,8 +49,7 @@ auto ts::_add_flatten_tile(Tensor<float, 4> &images, Tensor<float, 2> const &til
     }
 }
 
-auto ts::_add_flatten_tile(Tensor<float, 3> &image, Tensor<float, 1> const &tile, int size, int row,
-                       int col) -> void
+auto ts::_add_flatten_tile(Tensor<float, 3> &image, Tensor<float, 1> const &tile, int size, int row, int col) -> void
 {
     int c = image.shape(2);
     for (int i = 0; i < size; ++i) {
@@ -62,14 +62,14 @@ auto ts::_add_flatten_tile(Tensor<float, 3> &image, Tensor<float, 1> const &tile
     }
 }
 
-template<typename Element>
+template <typename Element>
 auto ts::_get_tile(Tensor<Element, 3> const &image, size_type size, size_type row, size_type col) -> Tensor<Element, 3>
 {
     Tensor<Element, 3> tile(size, size, image.shape(2));
     for (size_type i = 0; i < size; ++i) {
         for (size_type j = 0; j < size; ++j) {
-            auto[vec_begin, vec_end] = image.get_subarray({i + row, j + col});
-            auto[tile_begin, tile_end] = tile.get_subarray({i , j});
+            auto [vec_begin, vec_end] = image.get_subarray({i + row, j + col});
+            auto [tile_begin, tile_end] = tile.get_subarray({i, j});
             std::copy(vec_begin, vec_end, tile_begin);
         }
     }
@@ -77,8 +77,7 @@ auto ts::_get_tile(Tensor<Element, 3> const &image, size_type size, size_type ro
 }
 
 template <typename Element>
-auto ts::_set_tile(Tensor<Element, 3> &image, Tensor<Element, 3> const &tile, int size, int row,
-                           int col) -> void
+auto ts::_set_tile(Tensor<Element, 3> &image, Tensor<Element, 3> const &tile, int size, int row, int col) -> void
 {
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
@@ -99,8 +98,7 @@ auto ts::_get_flatten_tile(MatrixF const &image, int size, int row, int col) -> 
     return tile;
 }
 
-auto ts::_calculate_output_dim(int dim_in, int kernel_size, int padding, int stride, int dilatation)
-    -> int
+auto ts::_calculate_output_dim(int dim_in, int kernel_size, int padding, int stride, int dilatation) -> int
 {
     return (dim_in + 2 * padding - dilatation * (kernel_size - 1) - 1) / stride + 1;
 }

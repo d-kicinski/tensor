@@ -14,19 +14,17 @@
 
 namespace ts {
 
-template <typename Element>
-class DataHolder {
+template <typename Element> class DataHolder {
   public:
     using vector_t = std::vector<Element>;
     using data_t = std::shared_ptr<vector_t>;
     using iterator = typename vector_t::iterator;
     data_t _vector;
 
-
-    DataHolder() : _vector(nullptr) {};
+    DataHolder() : _vector(nullptr){};
 
     virtual auto get() const -> data_t { return _vector; }
-    virtual auto begin() const -> iterator {return _vector->begin(); }
+    virtual auto begin() const -> iterator { return _vector->begin(); }
     virtual auto end() const -> iterator { return _vector->end(); }
 };
 
@@ -38,7 +36,7 @@ class DataHolder {
 
 template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
-    template<typename AnyElement, int AnyDim> friend class Tensor;
+    template <typename AnyElement, int AnyDim> friend class Tensor;
 
   public:
     using vector_t = typename DataHolder<Element>::vector_t;
@@ -71,19 +69,17 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     Tensor(Tensor const &tensor, bool deep_copy);
 
-    Tensor(Tensor const &tensor) : Tensor(tensor, false) {};
+    Tensor(Tensor const &tensor) : Tensor(tensor, false){};
 
-    Tensor(Tensor && tensor) noexcept ;
+    Tensor(Tensor &&tensor) noexcept;
 
     Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
     Tensor(data_t data, std::array<size_type, Dim> shape);
 
-    template <typename... Indices>
-    auto operator()(size_type first, Indices... rest) -> decltype(auto);
+    template <typename... Indices> auto operator()(size_type first, Indices... rest) -> decltype(auto);
 
-    template <typename... Indices>
-    auto operator()(size_type first, Indices... rest) const -> decltype(auto);
+    template <typename... Indices> auto operator()(size_type first, Indices... rest) const -> decltype(auto);
 
     auto operator[](size_type i) const -> decltype(auto);
 
@@ -93,7 +89,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     auto operator=(Tensor const &tensor) -> Tensor &;
 
-    auto operator=(Tensor &&tensor)  noexcept -> Tensor &;
+    auto operator=(Tensor &&tensor) noexcept -> Tensor &;
 
     auto operator=(std::initializer_list<Element> list) -> Tensor &;
 
@@ -111,27 +107,11 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     auto operator-() -> Tensor &;
 
-    template <typename T>
-    auto cast() -> Tensor<T, Dim>
+    template <typename T> auto cast() -> Tensor<T, Dim>
     {
-       auto t = Tensor<T, Dim>();
-       t._data = std::make_shared<std::vector<T>>(std::vector<T>(begin(), end()));
-       t._dimensions = _dimensions;
-       t._data_size = _data_size;
-       t._begin = t.data()->begin();
-       t._end = t.data()->end();
-
-       std::advance(t._begin, std::distance(_data->begin(), _begin));
-       std::advance(t._end, std::distance(_end, _data->end()));
-
-       return t;
-    }
-
-    auto flatten() const -> Vector<Element>
-    {
-        auto t = Vector<Element>(_data_size);
-        t._data = _data;
-        t._dimensions = std::array<size_type , 1>{_data_size};
+        auto t = Tensor<T, Dim>();
+        t._data = std::make_shared<std::vector<T>>(std::vector<T>(begin(), end()));
+        t._dimensions = _dimensions;
         t._data_size = _data_size;
         t._begin = t.data()->begin();
         t._end = t.data()->end();
@@ -142,27 +122,43 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
         return t;
     }
 
-    template<int AnyDim>
-    auto reshape(std::array<size_type, AnyDim> shape) const -> Tensor<Element, AnyDim>
+    auto flatten() const -> Vector<Element>
+    {
+        auto t = Vector<Element>(_data_size);
+        t._data = _data;
+        t._dimensions = std::array<size_type, 1>{_data_size};
+        t._data_size = _data_size;
+        t._begin = t.data()->begin();
+        t._end = t.data()->end();
+
+        std::advance(t._begin, std::distance(_data->begin(), _begin));
+        std::advance(t._end, std::distance(_end, _data->end()));
+
+        return t;
+    }
+
+    template <int AnyDim> auto reshape(std::array<size_type, AnyDim> shape) const -> Tensor<Element, AnyDim>
     {
         return Tensor<Element, AnyDim>(_data, shape);
     }
 
-    auto at(std::array<int, Dim> indices) const -> Element & {
+    auto at(std::array<int, Dim> indices) const -> Element &
+    {
         size_t offset = 1;
         size_t index = 0;
-        for (int i = indices.size() - 1; i >= 0 ; --i) {
+        for (int i = indices.size() - 1; i >= 0; --i) {
             index += indices[i] * offset;
             offset *= _dimensions[i];
         }
         return _begin[index];
     }
 
-    auto get_subarray(std::vector<size_type> indices) const -> std::pair<iterator, iterator> {
+    auto get_subarray(std::vector<size_type> indices) const -> std::pair<iterator, iterator>
+    {
         size_type offset = _dimensions.back();
         int index = 0;
         int start_index = int(indices.size()) - 1;
-        for (int i = start_index; i >= 0 ; --i) {
+        for (int i = start_index; i >= 0; --i) {
             index += indices[i] * offset;
             offset *= _dimensions[i];
         }
@@ -174,9 +170,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
         return std::make_pair(begin, end);
     }
 
-    auto raw() -> float* {
-        return _data.get()->data();
-    }
+    auto raw() -> float * { return _data.get()->data(); }
 
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
@@ -190,8 +184,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
     template <typename... Sizes> auto set_sizes(int pos, size_type first, Sizes... rest) -> void;
 
     template <typename... Indices>
-    auto get_index(int pos, size_type prev_index, size_type first, Indices... rest) const
-        -> size_type;
+    auto get_index(int pos, size_type prev_index, size_type first, Indices... rest) const -> size_type;
 };
 
 template <typename Element, int Dim> Tensor<Element, Dim>::Tensor()
@@ -213,18 +206,16 @@ Tensor<Element, Dim>::Tensor(size_type first, Sizes... rest)
 template <typename Element, int Dim>
 Tensor<Element, Dim>::Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index)
 {
-    auto shape_cpy(tensor.shape());  // TODO: why without this tests fail?
+    auto shape_cpy(tensor.shape()); // TODO: why without this tests fail?
     std::copy(shape_cpy.begin() + 1, shape_cpy.end(), _dimensions.begin());
 
     _data_size = tensor.data_size() / tensor.shape(0);
     _data = tensor.data();
-    _begin = tensor.begin() + (int) index * _data_size;
+    _begin = tensor.begin() + (int)index * _data_size;
     _end = _begin + _data_size;
-
 }
 
-template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(const std::array<size_type, Dim> &shape)
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(const std::array<size_type, Dim> &shape)
 {
     std::copy(shape.begin(), shape.end(), _dimensions.begin());
     _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies<>());
@@ -250,8 +241,7 @@ auto Tensor<Element, Dim>::operator()(size_type first, Indices... rest) -> declt
 
 template <typename Element, int Dim>
 template <typename... Indices>
-auto Tensor<Element, Dim>::operator()(size_type first, Indices... rest) const
-    -> decltype(auto)
+auto Tensor<Element, Dim>::operator()(size_type first, Indices... rest) const -> decltype(auto)
 {
     if constexpr (sizeof...(Indices) == Dim - 1) {
         return _begin[get_index(0, 0, first, rest...)];
@@ -273,8 +263,7 @@ auto Tensor<Element, Dim>::operator==(const Tensor<Element, Dim> &other) const -
     return std::equal(other.begin(), other.end(), _begin);
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator[](size_type i) const -> decltype(auto)
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator[](size_type i) const -> decltype(auto)
 {
     if constexpr (Dim == 1) {
         return _begin[i];
@@ -283,14 +272,12 @@ auto Tensor<Element, Dim>::operator[](size_type i) const -> decltype(auto)
     }
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator!=(const Tensor<Element, Dim> &other) -> bool
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator!=(const Tensor<Element, Dim> &other) -> bool
 {
     return !(*this == other);
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator=(Tensor const &tensor) -> Tensor &
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator=(Tensor const &tensor) -> Tensor &
 {
     if (this == &tensor)
         return *this;
@@ -304,8 +291,7 @@ auto Tensor<Element, Dim>::operator=(Tensor const &tensor) -> Tensor &
     return *this;
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::randn(const std::vector<int> &shape) -> Tensor
+template <typename Element, int Dim> auto Tensor<Element, Dim>::randn(const std::vector<int> &shape) -> Tensor
 {
     std::random_device rd;
     std::mt19937 mt(rd());
@@ -319,38 +305,32 @@ auto Tensor<Element, Dim>::randn(const std::vector<int> &shape) -> Tensor
     return tensor;
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator<(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator<(const Element &value) -> Tensor<bool, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e < value; });
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator<=(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator<=(const Element &value) -> Tensor<bool, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e <= value; });
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator>(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator>(const Element &value) -> Tensor<bool, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e > value; });
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator>=(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator>=(const Element &value) -> Tensor<bool, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e >= value; });
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator==(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator==(const Element &value) -> Tensor<bool, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e == value; });
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator+=(Tensor const &tensor) -> Tensor &
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator+=(Tensor const &tensor) -> Tensor &
 {
     std::transform(_begin, _end, tensor.begin(), _begin, std::plus());
     return *this;
@@ -373,8 +353,7 @@ auto Tensor<Element, Dim>::set_sizes(int pos, size_type first, Sizes... rest) ->
 
 template <typename Element, int Dim>
 template <typename... Indices>
-auto Tensor<Element, Dim>::get_index(int pos, size_type prev_index, size_type first,
-                                     Indices... rest) const -> size_type
+auto Tensor<Element, Dim>::get_index(int pos, size_type prev_index, size_type first, Indices... rest) const -> size_type
 {
     size_type index = (prev_index * _dimensions[pos]) + first;
     if constexpr (sizeof...(rest) > 0) {
@@ -384,8 +363,7 @@ auto Tensor<Element, Dim>::get_index(int pos, size_type prev_index, size_type fi
     }
 }
 
-template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list)
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(std::initializer_list<Tensor<Element, Dim - 1>> list)
 {
     if (list.size() == 0) {
         _data_size = 0;
@@ -412,8 +390,7 @@ Tensor<Element, Dim>::Tensor(std::initializer_list<Tensor<Element, Dim - 1>> lis
     _end = data_end;
 }
 
-template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(std::vector<Tensor<Element, Dim - 1>> list)
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(std::vector<Tensor<Element, Dim - 1>> list)
 {
     if (list.size() == 0) {
         _data_size = 0;
@@ -440,8 +417,7 @@ Tensor<Element, Dim>::Tensor(std::vector<Tensor<Element, Dim - 1>> list)
     _end = data_end;
 }
 
-template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
 {
     if (list.size() == 0) {
         _data_size = 0;
@@ -455,8 +431,7 @@ Tensor<Element, Dim>::Tensor(std::initializer_list<Element> list)
     _end = _data->end();
 }
 
-template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(data_t data, std::array<size_type, Dim> shape)
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(data_t data, std::array<size_type, Dim> shape)
 {
     _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies());
     _dimensions = shape;
@@ -465,20 +440,15 @@ Tensor<Element, Dim>::Tensor(data_t data, std::array<size_type, Dim> shape)
     _end = _data->end();
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator-() -> Tensor &
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator-() -> Tensor &
 {
-    std::transform(_begin, _end, _begin, [](Element const &e) { return -e;});
+    std::transform(_begin, _end, _begin, [](Element const &e) { return -e; });
     return *this;
 }
 
-template <typename Element, int Dim> auto Tensor<Element, Dim>::clone() const -> Tensor
-{
-    return Tensor(*this, true);
-}
+template <typename Element, int Dim> auto Tensor<Element, Dim>::clone() const -> Tensor { return Tensor(*this, true); }
 
-template <typename Element, int Dim>
-Tensor<Element, Dim>::Tensor(const Tensor &tensor, bool deep_copy)
+template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(const Tensor &tensor, bool deep_copy)
 {
     _data_size = tensor.data_size();
     _dimensions = tensor.shape();
@@ -491,18 +461,15 @@ Tensor<Element, Dim>::Tensor(const Tensor &tensor, bool deep_copy)
     _end = _data->end();
 }
 
-template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(Tensor &&tensor)
- noexcept :   _data_size(tensor._data_size),
-              _dimensions(std::move(tensor._dimensions)),
-              _data(std::move(tensor._data)),
-              _begin(std::move(tensor._begin)),
-              _end(std::move(tensor._end))
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(Tensor &&tensor) noexcept
+    : _data_size(tensor._data_size), _dimensions(std::move(tensor._dimensions)), _data(std::move(tensor._data)),
+      _begin(std::move(tensor._begin)), _end(std::move(tensor._end))
 {
     tensor._data_size = 0;
 }
 
-template <typename Element, int Dim>
-auto Tensor<Element, Dim>::operator=(Tensor &&tensor) noexcept -> Tensor &
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator=(Tensor &&tensor) noexcept -> Tensor &
 {
     if (&tensor == this)
         return *this;

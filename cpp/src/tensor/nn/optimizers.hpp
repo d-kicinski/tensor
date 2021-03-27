@@ -29,9 +29,8 @@ template <typename Element> class SGD {
             ts::clip_(var.get().grad(), -5.0f, 5.0f);
             // print_stats<Element>(var.get().tensor(), var.get().name() + "[tensor]");
             // print_stats(var.get().grad(), var.get().name() + "[grad]  ");
-            std::transform(var.get().tensor().begin(), var.get().tensor().end(),
-                           var.get().grad().begin(), var.get().tensor().begin(),
-                           [&](Element &w, Element &d_w) { return w - (_lr * d_w); });
+            std::transform(var.get().tensor().begin(), var.get().tensor().end(), var.get().grad().begin(),
+                           var.get().tensor().begin(), [&](Element &w, Element &d_w) { return w - (_lr * d_w); });
         }
     }
 };

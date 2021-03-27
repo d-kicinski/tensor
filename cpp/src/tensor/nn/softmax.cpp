@@ -28,6 +28,6 @@ auto ts::log_softmax(MatrixF const &logits) -> MatrixF
     auto sum_exp_logits = sum(exp_logits, 1);
     auto log_sum_exp_logits = log(sum_exp_logits);
     auto neg_log_sum_exp_logits = -log_sum_exp_logits;
-    MatrixF result =  add(logits_clone, neg_log_sum_exp_logits);
+    MatrixF result = add(logits_clone, neg_log_sum_exp_logits);
     return result;
 }

@@ -1,4 +1,4 @@
 #pragma once
 
-#include "tensor.hpp"
 #include "ops.hpp"
+#include "tensor.hpp"

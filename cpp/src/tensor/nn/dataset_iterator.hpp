@@ -17,8 +17,7 @@ class DatasetIterator {
 
     typedef std::forward_iterator_tag iterator_category;
 
-    DatasetIterator(ts::Tensor<float, 2> inputs, ts::Tensor<int, 1> labels,
-                    int batch_size, int index = 0);
+    DatasetIterator(ts::Tensor<float, 2> inputs, ts::Tensor<int, 1> labels, int batch_size, int index = 0);
 
     auto operator++() -> DatasetIterator &;
 
@@ -45,4 +44,4 @@ auto operator==(DatasetIterator const &lhs, DatasetIterator const &rhs) -> bool;
 
 auto operator!=(DatasetIterator const &lhs, DatasetIterator const &rhs) -> bool;
 
-}
+} // namespace ts

@@ -1,13 +1,12 @@
 #pragma once
 
-#include <tensor/tensor.hpp>
 #include "variable.hpp"
+#include <tensor/tensor.hpp>
 
 namespace ts {
 
 class MaxPool2D {
   public:
-
     static auto create(int kernel_size, int stride) -> MaxPool2D;
 
     MaxPool2D(int kernel_size, int stride);

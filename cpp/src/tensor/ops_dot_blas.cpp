@@ -5,8 +5,7 @@
 
 namespace ts::blas {
 
-
-auto outer_product(VectorF const & x, VectorF const & y) -> MatrixF
+auto outer_product(VectorF const &x, VectorF const &y) -> MatrixF
 {
     // x or y could be just view on higher dimensional tensor, if I want to use raw pointer to
     // underlining data I have to take that into account
@@ -14,16 +13,8 @@ auto outer_product(VectorF const & x, VectorF const & y) -> MatrixF
     auto y_data = y.data()->data() + std::distance(y.data().get()->begin(), y.begin());
 
     MatrixF result(x.data_size(), y.data_size());
-    cblas_sger(CBLAS_ORDER::CblasRowMajor,
-               x.data_size(),
-               y.data_size(),
-               1.0,
-               x_data,
-               1,
-               y_data,
-               1,
-               result.data()->data(),
-               y.data_size());
+    cblas_sger(CBLAS_ORDER::CblasRowMajor, x.data_size(), y.data_size(), 1.0, x_data, 1, y_data, 1,
+               result.data()->data(), y.data_size());
 
     return result;
 }
@@ -53,8 +44,8 @@ auto dot(MatrixF const &A, VectorF const &X, bool A_T) -> VectorF
     auto X_data = X.data()->data() + std::distance(X.data().get()->begin(), X.begin());
 
     VectorF Y(dim_out);
-    cblas_sgemv(CBLAS_ORDER::CblasRowMajor, trans_A, A.shape(0), A.shape(1),
-                1.0f, A_data, lda, X_data, 1, 0.0f, Y.data()->data(), 1);
+    cblas_sgemv(CBLAS_ORDER::CblasRowMajor, trans_A, A.shape(0), A.shape(1), 1.0f, A_data, lda, X_data, 1, 0.0f,
+                Y.data()->data(), 1);
 
     return Y;
 }
@@ -87,8 +78,7 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
     auto B_data = B.data()->data() + std::distance(B.data().get()->begin(), B.begin());
 
     MatrixF C(m, n);
-    cblas_sgemm(CBLAS_ORDER::CblasRowMajor, trans_A, trans_B, m, n, k,
-                1.0f, A_data, lda, B_data, ldb, 0.0f,
+    cblas_sgemm(CBLAS_ORDER::CblasRowMajor, trans_A, trans_B, m, n, k, 1.0f, A_data, lda, B_data, ldb, 0.0f,
                 C.data()->data(), C.shape(1));
     return C;
 }

@@ -8,9 +8,9 @@ namespace ts {
 class CrossEntropyLoss {
 
   public:
-    auto operator()(MatrixF const & probs, Tensor<int, 1> const &labels) -> float;
+    auto operator()(MatrixF const &probs, Tensor<int, 1> const &labels) -> float;
 
-    auto forward(MatrixF const & probs, Tensor<int, 1> const &labels) -> float;
+    auto forward(MatrixF const &probs, Tensor<int, 1> const &labels) -> float;
 
     auto backward() -> MatrixF;
 
@@ -19,5 +19,4 @@ class CrossEntropyLoss {
     MatrixF _scores;
 };
 
-}
-
+} // namespace ts

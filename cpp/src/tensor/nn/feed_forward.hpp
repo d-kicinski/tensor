@@ -1,9 +1,9 @@
 #pragma once
 
-#include <tensor/tensor.hpp>
 #include "activations.hpp"
 #include "layer_base.hpp"
 #include "variable.hpp"
+#include <tensor/tensor.hpp>
 
 namespace ts {
 
@@ -27,9 +27,7 @@ class FeedForward : public LayerBase<float> {
     auto weights() -> VectorRef;
 
   private:
-    FeedForward(Variable<float, 2> weight,
-                Variable<float, 1> bias,
-                Activation activation = Activation::NONE);
+    FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Activation activation = Activation::NONE);
 
     MatrixF _x;
     Variable<float, 2> _weight;

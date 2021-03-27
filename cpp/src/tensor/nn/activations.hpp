@@ -6,20 +6,11 @@ namespace ts {
 
 template <typename Element, int Dim> class ActivationBase {
   public:
-    auto operator()(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim>
-    {
-        return forward(input);
-    }
+    auto operator()(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim> { return forward(input); }
 
-    virtual auto backward(Tensor<Element, Dim> const &d_output) -> Tensor<Element, Dim>
-    {
-        return d_output;
-    }
+    virtual auto backward(Tensor<Element, Dim> const &d_output) -> Tensor<Element, Dim> { return d_output; }
 
-    virtual auto forward(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim>
-    {
-        return input;
-    }
+    virtual auto forward(Tensor<Element, Dim> const &input) -> Tensor<Element, Dim> { return input; }
 };
 
 template <typename Element, int Dim> class ReLU : public ActivationBase<Element, Dim> {
@@ -39,12 +30,7 @@ template <typename Element, int Dim> class ReLU : public ActivationBase<Element,
     Tensor<Element, Dim> _input;
 };
 
-
-enum class Activation {
-    RELU,
-    NONE
-};
-
+enum class Activation { RELU, NONE };
 
 template <typename Element, int Dim> class ActivationFactory {
   public:

@@ -12,14 +12,14 @@ auto ts::pad(ts::MatrixF const &matrix, int pad_row, int pad_col) -> ts::MatrixF
     return matrix_padded;
 }
 
-auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel,
-                 int kernel_size, size_type stride) -> ts::Tensor<float, 4>
+auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel, int kernel_size,
+                 size_type stride) -> ts::Tensor<float, 4>
 {
     int batch_size = images.shape(0);
     int dim_out = ts::_calculate_output_dim(images.shape(1), kernel_size, 0, stride, 1);
     ts::Tensor<float, 4> results(batch_size, dim_out, dim_out, kernel.shape(1));
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto image = images(b);
         auto result = results(b);
@@ -35,8 +35,8 @@ auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const 
     return results;
 }
 
-auto ts::conv_2d(ts::Tensor<float, 3> const &image, ts::Tensor<float, 2> const &kernel,
-                 int kernel_size, size_type stride) -> ts::Tensor<float, 3>
+auto ts::conv_2d(ts::Tensor<float, 3> const &image, ts::Tensor<float, 2> const &kernel, int kernel_size,
+                 size_type stride) -> ts::Tensor<float, 3>
 {
     int dim_out = ts::_calculate_output_dim(image.shape(0), kernel_size, 0, stride, 1);
     ts::Tensor<float, 3> result(dim_out, dim_out, kernel.shape(1));
@@ -82,7 +82,7 @@ auto ts::conv_2d_backward(ts::Tensor<float, 4> const &inputs, ts::Tensor<float, 
     ts::Tensor<float, 4> d_inputs(batch_size, dim_in, dim_in, channels_in);
     ts::Tensor<float, 2> d_kernel(kernel_size * kernel_size * channels_in, channels_out);
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto d_output = d_outputs(b);
         auto input = inputs(b);
@@ -96,7 +96,7 @@ auto ts::conv_2d_backward(ts::Tensor<float, 4> const &inputs, ts::Tensor<float, 
                 _add_flatten_tile(d_input, d_tile_input, kernel_size, i * stride, j * stride);
 
                 auto d_tile_kernel = ts::outer_product(tile, d_tile);
-                #pragma omp critical
+#pragma omp critical
                 ts::add_(d_kernel, d_tile_kernel);
             }
         }
@@ -164,7 +164,7 @@ auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int st
     ts::Tensor<float, 4> results(batch_size, dim_out, dim_out, C_in);
     ts::Tensor<bool, 4> masks(inputs.shape());
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto input = inputs(b);
         auto mask = masks(b);
@@ -173,8 +173,8 @@ auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int st
             for (int j = 0; j < dim_out; ++j) {
                 auto tile = _get_tile(input, kernel_size, i * stride, j * stride);
                 auto [max_values, indices] = find_max(tile);
-                for (auto & idx : indices) {
-                    mask[i*stride + idx[0]][j*stride + idx[1]][idx[2]] = true;
+                for (auto &idx : indices) {
+                    mask[i * stride + idx[0]][j * stride + idx[1]][idx[2]] = true;
                 }
 
                 // TODO copy seems unnecessary
@@ -186,8 +186,8 @@ auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int st
     return std::make_pair(results, masks);
 }
 
-auto put_vector_to_tile(ts::Tensor<float, 3> &d_input_tile, ts::VectorF const &vector,
-                        ts::Tensor<bool, 3> const &mask) -> void
+auto put_vector_to_tile(ts::Tensor<float, 3> &d_input_tile, ts::VectorF const &vector, ts::Tensor<bool, 3> const &mask)
+    -> void
 {
     for (int i = 0; i < d_input_tile.shape(0); ++i) {
         for (int j = 0; j < d_input_tile.shape(1); ++j) {
@@ -200,14 +200,14 @@ auto put_vector_to_tile(ts::Tensor<float, 3> &d_input_tile, ts::VectorF const &v
     }
 }
 
-auto ts::max_pool_2d_backward(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<bool, 4> const &masks,
-                          int kernel_size, int stride) -> ts::Tensor<float, 4>
+auto ts::max_pool_2d_backward(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<bool, 4> const &masks, int kernel_size,
+                              int stride) -> ts::Tensor<float, 4>
 {
     auto d_inputs = ts::Tensor<float, 4>(masks.shape());
     int dim_out = d_outputs.shape(1);
     int batch_size = masks.shape(0);
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
         auto mask = masks(b);
         auto d_output = d_outputs(b);

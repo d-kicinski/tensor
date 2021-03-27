@@ -1,7 +1,6 @@
 #include "planar_dataset.hpp"
 
-ts::PlanarDataset::PlanarDataset(const std::string &path, bool header_line, int batch_size)
-    : _batch_size(batch_size)
+ts::PlanarDataset::PlanarDataset(const std::string &path, bool header_line, int batch_size) : _batch_size(batch_size)
 {
     if (std::ifstream input = std::ifstream(path)) {
         if (header_line) {
@@ -39,10 +38,7 @@ auto ts::PlanarDataset::labels() -> ts::Tensor<int, 1> { return _labels; }
 
 auto ts::PlanarDataset::size() -> int { return _inputs.shape(0); }
 
-auto ts::PlanarDataset::begin() -> ts::DatasetIterator
-{
-    return DatasetIterator(_inputs, _labels, _batch_size, 0);
-}
+auto ts::PlanarDataset::begin() -> ts::DatasetIterator { return DatasetIterator(_inputs, _labels, _batch_size, 0); }
 
 auto ts::PlanarDataset::end() -> ts::DatasetIterator
 {

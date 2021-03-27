@@ -30,22 +30,20 @@ template <typename Element> class IteratorClass {
 
     auto operator->() -> Element * { return &_element[_index]; }
 
-    friend auto operator==(IteratorClass const & lhs, IteratorClass const & rhs) -> bool {
+    friend auto operator==(IteratorClass const &lhs, IteratorClass const &rhs) -> bool
+    {
         // comparing addresses because I can't assume Element will have operator== implemented
         return &(lhs._element[lhs._index]) == &(rhs._element[rhs._index]);
     }
 
-    friend auto operator!=(IteratorClass const & lhs, IteratorClass const & rhs) -> bool {
+    friend auto operator!=(IteratorClass const &lhs, IteratorClass const &rhs) -> bool
+    {
         return &(lhs._element[lhs._index]) != &(rhs._element[rhs._index]);
     }
 
-    static auto begin(Element * element, std::size_t length) -> IteratorClass {
-        return IteratorClass(element, 0);
-    }
+    static auto begin(Element *element, std::size_t length) -> IteratorClass { return IteratorClass(element, 0); }
 
-    static auto end(Element * element, std::size_t length) -> IteratorClass {
-        return IteratorClass(element, length);
-    }
+    static auto end(Element *element, std::size_t length) -> IteratorClass { return IteratorClass(element, length); }
 };
 
-}
+} // namespace ts

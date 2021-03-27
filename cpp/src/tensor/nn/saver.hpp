@@ -2,18 +2,17 @@
 
 #include <fstream>
 
-#include "proto/array.pb.h"
 #include "layer_base.hpp"
+#include "proto/array.pb.h"
 
 namespace ts {
-template <typename T>
-class Saver {
+template <typename T> class Saver {
   public:
-    LayerBase<T> & _model_base;
+    LayerBase<T> &_model_base;
     proto::Model _proto_model;
     explicit Saver(LayerBase<T> &model) : _model_base(model), _proto_model() {}
 
-    auto save(std::string const & output_path) -> void
+    auto save(std::string const &output_path) -> void
     {
         _proto_model.clear_variables();
         for (auto const &param : _model_base.parameters()) {
@@ -23,12 +22,11 @@ class Saver {
             }
         }
 
-        std::fstream output(output_path.c_str(),
-                            std::ios::out | std::ios::trunc | std::ios::binary);
+        std::fstream output(output_path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
         _proto_model.SerializePartialToOstream(&output);
     }
 
-    auto load(std::string const & input_path) -> void
+    auto load(std::string const &input_path) -> void
     {
         std::fstream input(input_path.c_str(), std::ios::in | std::ios::binary);
         if (!_proto_model.ParseFromIstream(&input)) {

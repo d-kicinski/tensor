@@ -11,13 +11,13 @@ set(SOURCES
         )
 
 if (TENSOR_USE_BLAS)
-    set(SOURCES ${SOURCES}  src/tensor/ops_dot_blas.cpp)
+    set(SOURCES ${SOURCES} src/tensor/ops_dot_blas.cpp)
     if (TENSOR_BUILD_BENCHMARK)
-        set(SOURCES ${SOURCES}  src/tensor/ops_dot_naive.cpp)
+        set(SOURCES ${SOURCES} src/tensor/ops_dot_naive.cpp)
     endif ()
 else ()
-    set(SOURCES ${SOURCES}  src/tensor/ops_dot_naive.cpp)
-endif()
+    set(SOURCES ${SOURCES} src/tensor/ops_dot_naive.cpp)
+endif ()
 
 add_library(tensor ${SOURCES})
 add_library(tensor::tensor ALIAS tensor)
@@ -39,7 +39,7 @@ endif ()
 if (TENSOR_USE_OPENMP)
     find_package(OpenMP REQUIRED)
     target_link_libraries(tensor OpenMP::OpenMP_CXX)
-endif()
+endif ()
 
 
 set(NN_SOURCES
@@ -70,21 +70,21 @@ set(NN_SOURCES
         )
 
 if (TENSOR_USE_PROTOBUF)
-    set(NN_PROTO_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/src/tensor/nn/proto)
+    set(NN_PROTO_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/tensor/nn/proto)
     add_custom_command(
             OUTPUT
-                ${NN_PROTO_PATH}/array.pb.h
-                ${NN_PROTO_PATH}/array.pb.cc
+            ${NN_PROTO_PATH}/array.pb.h
+            ${NN_PROTO_PATH}/array.pb.cc
             COMMAND
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/protoc array.proto
-                    --proto_path ${NN_PROTO_PATH}
-                    --cpp_out ${NN_PROTO_PATH}
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/protoc array.proto
+            --proto_path ${NN_PROTO_PATH}
+            --cpp_out ${NN_PROTO_PATH}
             DEPENDS
-                protobuf::protoc
+            protobuf::protoc
     )
     add_custom_target(proto
             DEPENDS ${NN_PROTO_PATH}/array.pb.h ${NN_PROTO_PATH}/array.pb.cc
-    )
+            )
 
     list(APPEND NN_SOURCES
             src/tensor/nn/saver.cpp
@@ -93,7 +93,7 @@ if (TENSOR_USE_PROTOBUF)
             ${NN_PROTO_PATH}/array.pb.h
             )
     set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-endif()
+endif ()
 
 
 add_library(nn ${NN_SOURCES})
@@ -133,7 +133,7 @@ if (TENSOR_BUILD_TESTS)
 
     if (TENSOR_USE_PROTOBUF)
         set(NN_TEST_SOURCES ${NN_TEST_SOURCES} tests/tensor/nn/test_saver.cpp)
-    endif()
+    endif ()
 
     add_executable(tests ${NN_TEST_SOURCES})
 
@@ -173,4 +173,4 @@ if (TENSOR_BUILD_PYTHON_WRAPPER)
             tensor
             nn
             )
-endif()
+endif ()

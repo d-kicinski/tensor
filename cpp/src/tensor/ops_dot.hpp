@@ -5,12 +5,12 @@
 #ifdef USE_BLAS
 #include "ops_dot_blas.hpp"
 namespace ts {
-    using namespace blas;
+using namespace blas;
 }
 #else
 #include "ops_dot_naive.hpp"
 namespace ts {
-    using namespace naive;
+using namespace naive;
 }
 #endif
 

@@ -18,96 +18,82 @@ namespace py = pybind11;
 
 using size_type = ts::size_type;
 
-
-template <typename Element>
-auto wrap_tensor4D(pybind11::module & m, char const * class_name)
+template <typename Element> auto wrap_tensor4D(pybind11::module &m, char const *class_name)
 {
     py::class_<ts::Tensor<Element, 4>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
-        .def(py::init<size_type , size_type, size_type, size_type>())
+        .def(py::init<size_type, size_type, size_type, size_type>())
 
         // Construct from a buffer
         .def(py::init([](py::buffer const b) {
-          py::buffer_info info = b.request();
-          if (info.format != py::format_descriptor<Element>::format() || info.ndim != 4)
-              throw std::runtime_error("Incompatible buffer format!");
+            py::buffer_info info = b.request();
+            if (info.format != py::format_descriptor<Element>::format() || info.ndim != 4)
+                throw std::runtime_error("Incompatible buffer format!");
 
-          auto v = new ts::Tensor<Element, 4>(info.shape[0], info.shape[1], info.shape[2], info.shape[3]);
-          memcpy(v->data()->data(),
-                 info.ptr,
-                 sizeof(Element) * (size_t)(v->shape(0) * v->shape(1) * v->shape(2) * v->shape(3)));
-          return v;
+            auto v = new ts::Tensor<Element, 4>(info.shape[0], info.shape[1], info.shape[2], info.shape[3]);
+            memcpy(v->data()->data(), info.ptr,
+                   sizeof(Element) * (size_t)(v->shape(0) * v->shape(1) * v->shape(2) * v->shape(3)));
+            return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 4> const  &t) -> std::array<size_type , 4> {
-          return t.shape();
-        })
+        .def("shape", [](ts::Tensor<Element, 4> const &t) -> std::array<size_type, 4> { return t.shape(); })
 
-        .def("reshape4",  &ts::Tensor<Element, 4>::template reshape<4>)
-        .def("reshape3",  &ts::Tensor<Element, 4>::template reshape<3>)
-        .def("reshape2",  &ts::Tensor<Element, 4>::template reshape<2>)
-        .def("reshape1",  &ts::Tensor<Element, 4>::template reshape<1>)
+        .def("reshape4", &ts::Tensor<Element, 4>::template reshape<4>)
+        .def("reshape3", &ts::Tensor<Element, 4>::template reshape<3>)
+        .def("reshape2", &ts::Tensor<Element, 4>::template reshape<2>)
+        .def("reshape1", &ts::Tensor<Element, 4>::template reshape<1>)
 
         .def("data_size", &ts::Tensor<Element, 4>::data_size)
 
         // Bare bones interface
         .def("__getitem__",
-             [](ts::Tensor<Element, 4> const &t,
-                std::tuple<py::ssize_t, py::ssize_t, py::ssize_t, py::size_t> i) {
-               auto [dim_0, dim_1, dim_2, dim_3] = i;
-               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2) || dim_3 >= t.shape(3))
-                   throw py::index_error();
-               return t(dim_0, dim_1, dim_2, dim_3);
+             [](ts::Tensor<Element, 4> const &t, std::tuple<py::ssize_t, py::ssize_t, py::ssize_t, py::size_t> i) {
+                 auto [dim_0, dim_1, dim_2, dim_3] = i;
+                 if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2) || dim_3 >= t.shape(3))
+                     throw py::index_error();
+                 return t(dim_0, dim_1, dim_2, dim_3);
              })
 
         .def("__setitem__",
-             [](ts::Tensor<Element, 4> &t,
-                std::tuple<py::ssize_t, py::ssize_t, py::ssize_t, py::size_t> i, Element v) {
-               auto [dim_0, dim_1, dim_2, dim_3] = i;
-               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2) || dim_3 >= t.shape(3))
-                   throw py::index_error();
-               t(dim_0, dim_1, dim_2, dim_3) = v;
+             [](ts::Tensor<Element, 4> &t, std::tuple<py::ssize_t, py::ssize_t, py::ssize_t, py::size_t> i, Element v) {
+                 auto [dim_0, dim_1, dim_2, dim_3] = i;
+                 if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2) || dim_3 >= t.shape(3))
+                     throw py::index_error();
+                 t(dim_0, dim_1, dim_2, dim_3) = v;
              })
 
         // Provide buffer access
         .def_buffer([](ts::Tensor<Element, 4> &t) -> py::buffer_info {
-          return py::buffer_info(
-              t.data()->data(),                                                                 // Pointer to buffer
-              {t.shape(0), t.shape(1), t.shape(2), t.shape(3)},                                 // Buffer dimensions
-              {sizeof(Element) * size_t(t.shape(1)) * size_t(t.shape(2)) * size_t(t.shape(3)),  // Strides (in bytes) for each index
-               sizeof(Element) * size_t(t.shape(2)) * size_t(t.shape(3)),
-               sizeof(Element) * size_t(t.shape(3)),
-               sizeof(Element)});
+            return py::buffer_info(t.data()->data(),                                 // Pointer to buffer
+                                   {t.shape(0), t.shape(1), t.shape(2), t.shape(3)}, // Buffer dimensions
+                                   {sizeof(Element) * size_t(t.shape(1)) * size_t(t.shape(2)) *
+                                        size_t(t.shape(3)), // Strides (in bytes) for each index
+                                    sizeof(Element) * size_t(t.shape(2)) * size_t(t.shape(3)),
+                                    sizeof(Element) * size_t(t.shape(3)), sizeof(Element)});
         });
 }
 
-
-template <typename Element>
-auto wrap_tensor3D(pybind11::module & m, char const * class_name)
+template <typename Element> auto wrap_tensor3D(pybind11::module &m, char const *class_name)
 {
     py::class_<ts::Tensor<Element, 3>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
-        .def(py::init<size_type , size_type, size_type>())
+        .def(py::init<size_type, size_type, size_type>())
 
-            // Construct from a buffer
+        // Construct from a buffer
         .def(py::init([](py::buffer const b) {
-          py::buffer_info info = b.request();
-          if (info.format != py::format_descriptor<Element>::format() || info.ndim != 3)
-              throw std::runtime_error("Incompatible buffer format!");
+            py::buffer_info info = b.request();
+            if (info.format != py::format_descriptor<Element>::format() || info.ndim != 3)
+                throw std::runtime_error("Incompatible buffer format!");
 
-          auto v = new ts::Tensor<Element, 3>(info.shape[0], info.shape[1], info.shape[2]);
-          memcpy(v->data()->data(),
-                 info.ptr,
-                 sizeof(Element) * (size_t)(v->shape(0) * v->shape(1) * v->shape(2)));
-          return v;
+            auto v = new ts::Tensor<Element, 3>(info.shape[0], info.shape[1], info.shape[2]);
+            memcpy(v->data()->data(), info.ptr, sizeof(Element) * (size_t)(v->shape(0) * v->shape(1) * v->shape(2)));
+            return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 3> const  &t) -> std::array<size_type, 3> {
-          return t.shape();
-        })
+        .def("shape", [](ts::Tensor<Element, 3> const &t) -> std::array<size_type, 3> { return t.shape(); })
 
-        .def("reshape4",  &ts::Tensor<Element, 3>::template reshape<4>)
-        .def("reshape3",  &ts::Tensor<Element, 3>::template reshape<3>)
-        .def("reshape2",  &ts::Tensor<Element, 3>::template reshape<2>)
-        .def("reshape1",  &ts::Tensor<Element, 3>::template reshape<1>)
+        .def("reshape4", &ts::Tensor<Element, 3>::template reshape<4>)
+        .def("reshape3", &ts::Tensor<Element, 3>::template reshape<3>)
+        .def("reshape2", &ts::Tensor<Element, 3>::template reshape<2>)
+        .def("reshape1", &ts::Tensor<Element, 3>::template reshape<1>)
 
         .def("data_size", &ts::Tensor<Element, 3>::data_size)
 
@@ -115,87 +101,79 @@ auto wrap_tensor3D(pybind11::module & m, char const * class_name)
         .def("__getitem__",
              [](ts::Tensor<Element, 3> const &t, std::tuple<py::ssize_t, py::ssize_t, py::ssize_t> i) {
                  auto [dim_0, dim_1, dim_2] = i;
-               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2))
-                   throw py::index_error();
-               return t(dim_0, dim_1, dim_2);
+                 if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2))
+                     throw py::index_error();
+                 return t(dim_0, dim_1, dim_2);
              })
 
         .def("__setitem__",
              [](ts::Tensor<Element, 3> &t, std::tuple<py::ssize_t, py::ssize_t, py::ssize_t> i, Element v) {
-               auto [dim_0, dim_1, dim_2] = i;
-               if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2))
-                   throw py::index_error();
-               t(dim_0, dim_1, dim_2) = v;
+                 auto [dim_0, dim_1, dim_2] = i;
+                 if (dim_0 >= t.shape(0) || dim_1 >= t.shape(1) || dim_2 >= t.shape(2))
+                     throw py::index_error();
+                 t(dim_0, dim_1, dim_2) = v;
              })
 
         // Provide buffer access
         .def_buffer([](ts::Tensor<Element, 3> &t) -> py::buffer_info {
-          return py::buffer_info(
-              t.data()->data(),                          // Pointer to buffer
-              {t.shape(0), t.shape(1), t.shape(2)},      // Buffer dimensions
-              {sizeof(Element) * size_t(t.shape(1)) * size_t(t.shape(2)),     // Strides (in bytes) for each index
-               sizeof(Element) * size_t(t.shape(2)),
-               sizeof(Element)});
+            return py::buffer_info(
+                t.data()->data(),                                           // Pointer to buffer
+                {t.shape(0), t.shape(1), t.shape(2)},                       // Buffer dimensions
+                {sizeof(Element) * size_t(t.shape(1)) * size_t(t.shape(2)), // Strides (in bytes) for each index
+                 sizeof(Element) * size_t(t.shape(2)), sizeof(Element)});
         });
 }
 
-template <typename Element>
-auto wrap_tensor2D(pybind11::module & m, char const * class_name)
+template <typename Element> auto wrap_tensor2D(pybind11::module &m, char const *class_name)
 {
     py::class_<ts::Tensor<Element, 2>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
-        .def(py::init<size_type , size_type>())
+        .def(py::init<size_type, size_type>())
 
         // Construct from a buffer
         .def(py::init([](py::buffer const b) {
-          py::buffer_info info = b.request();
-          if (info.format != py::format_descriptor<Element>::format() || info.ndim != 2)
-              throw std::runtime_error("Incompatible buffer format!");
+            py::buffer_info info = b.request();
+            if (info.format != py::format_descriptor<Element>::format() || info.ndim != 2)
+                throw std::runtime_error("Incompatible buffer format!");
 
-          auto v = new ts::Tensor<Element, 2>(info.shape[0], info.shape[1]);
-          memcpy(v->data()->data(),
-                 info.ptr,
-                 sizeof(Element) * (size_t)(v->shape(0) * v->shape(1)));
-          return v;
+            auto v = new ts::Tensor<Element, 2>(info.shape[0], info.shape[1]);
+            memcpy(v->data()->data(), info.ptr, sizeof(Element) * (size_t)(v->shape(0) * v->shape(1)));
+            return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 2> const  &t) -> std::array<size_type, 2> {
-          return t.shape();
-        })
+        .def("shape", [](ts::Tensor<Element, 2> const &t) -> std::array<size_type, 2> { return t.shape(); })
 
-        .def("reshape4",  &ts::Tensor<Element, 2>::template reshape<4>)
-        .def("reshape3",  &ts::Tensor<Element, 2>::template reshape<3>)
-        .def("reshape2",  &ts::Tensor<Element, 2>::template reshape<2>)
-        .def("reshape1",  &ts::Tensor<Element, 2>::template reshape<1>)
+        .def("reshape4", &ts::Tensor<Element, 2>::template reshape<4>)
+        .def("reshape3", &ts::Tensor<Element, 2>::template reshape<3>)
+        .def("reshape2", &ts::Tensor<Element, 2>::template reshape<2>)
+        .def("reshape1", &ts::Tensor<Element, 2>::template reshape<1>)
 
         .def("data_size", &ts::Tensor<Element, 2>::data_size)
 
         // Bare bones interface
         .def("__getitem__",
              [](ts::Tensor<Element, 2> const &t, std::pair<py::ssize_t, py::ssize_t> i) {
-               if (i.first >= t.shape(0) || i.second >= t.shape(1))
-                   throw py::index_error();
-               return t(i.first, i.second);
+                 if (i.first >= t.shape(0) || i.second >= t.shape(1))
+                     throw py::index_error();
+                 return t(i.first, i.second);
              })
 
         .def("__setitem__",
              [](ts::Tensor<Element, 2> &t, std::pair<py::ssize_t, py::ssize_t> i, Element v) {
-               if (i.first >= t.shape(0) || i.second >= t.shape(1))
-                   throw py::index_error();
-               t(i.first, i.second) = v;
+                 if (i.first >= t.shape(0) || i.second >= t.shape(1))
+                     throw py::index_error();
+                 t(i.first, i.second) = v;
              })
 
         // Provide buffer access
         .def_buffer([](ts::Tensor<Element, 2> &t) -> py::buffer_info {
-          return py::buffer_info(
-              t.data()->data(),                          /* Pointer to buffer */
-              {t.shape(0), t.shape(1)},              /* Buffer dimensions */
-              {sizeof(Element) * size_t(t.shape(1)), /* Strides (in bytes) for each index */
-               sizeof(Element)});
+            return py::buffer_info(t.data()->data(),                      /* Pointer to buffer */
+                                   {t.shape(0), t.shape(1)},              /* Buffer dimensions */
+                                   {sizeof(Element) * size_t(t.shape(1)), /* Strides (in bytes) for each index */
+                                    sizeof(Element)});
         });
 }
 
-template <typename Element>
-auto wrap_tensor1D(pybind11::module & m, char const * class_name)
+template <typename Element> auto wrap_tensor1D(pybind11::module &m, char const *class_name)
 {
 
     py::class_<ts::Tensor<Element, 1>, ts::DataHolder<Element>>(m, class_name, py::buffer_protocol())
@@ -203,66 +181,55 @@ auto wrap_tensor1D(pybind11::module & m, char const * class_name)
 
         // Construct from a buffer
         .def(py::init([](py::buffer const b) {
-          py::buffer_info info = b.request();
-          if (info.format != py::format_descriptor<Element>::format() || info.ndim != 1)
-              throw std::runtime_error("Incompatible buffer format!");
+            py::buffer_info info = b.request();
+            if (info.format != py::format_descriptor<Element>::format() || info.ndim != 1)
+                throw std::runtime_error("Incompatible buffer format!");
 
-          auto v = new ts::Tensor<Element, 1>(info.shape[0]);
-          memcpy(v->data()->data(),
-                 info.ptr,
-                 sizeof(Element) * (size_t)(v->shape(0)));
-          return v;
+            auto v = new ts::Tensor<Element, 1>(info.shape[0]);
+            memcpy(v->data()->data(), info.ptr, sizeof(Element) * (size_t)(v->shape(0)));
+            return v;
         }))
 
-        .def("shape", [](ts::Tensor<Element, 1> const  &t) -> std::array<size_type, 1> {
-          return t.shape();
-        })
+        .def("shape", [](ts::Tensor<Element, 1> const &t) -> std::array<size_type, 1> { return t.shape(); })
 
-        .def("reshape4",  &ts::Tensor<Element, 1>::template reshape<4>)
-        .def("reshape3",  &ts::Tensor<Element, 1>::template reshape<3>)
-        .def("reshape2",  &ts::Tensor<Element, 1>::template reshape<2>)
-        .def("reshape1",  &ts::Tensor<Element, 1>::template reshape<1>)
+        .def("reshape4", &ts::Tensor<Element, 1>::template reshape<4>)
+        .def("reshape3", &ts::Tensor<Element, 1>::template reshape<3>)
+        .def("reshape2", &ts::Tensor<Element, 1>::template reshape<2>)
+        .def("reshape1", &ts::Tensor<Element, 1>::template reshape<1>)
 
         .def("data_size", &ts::Tensor<Element, 1>::data_size)
 
         // Bare bones interface
         .def("__getitem__",
              [](ts::Tensor<Element, 1> const &t, py::ssize_t i) {
-               if (i >= t.shape(0))
-                   throw py::index_error();
-               return t(i);
+                 if (i >= t.shape(0))
+                     throw py::index_error();
+                 return t(i);
              })
 
         .def("__setitem__",
              [](ts::Tensor<Element, 1> &t, py::ssize_t i, int v) {
-               if (i >= t.shape(0))
-                   throw py::index_error();
-               t(i) = v;
+                 if (i >= t.shape(0))
+                     throw py::index_error();
+                 t(i) = v;
              })
 
         // Provide buffer access
-        .def_buffer([](ts::Tensor<Element, 1> & t) -> py::buffer_info {
-          return py::buffer_info(
-                t.data()->data(),
-                sizeof(Element),
-                py::format_descriptor<Element>::format(),
-                1,
-                {t.shape(0)},
-                {sizeof(Element)}
-          );
+        .def_buffer([](ts::Tensor<Element, 1> &t) -> py::buffer_info {
+            return py::buffer_info(t.data()->data(), sizeof(Element), py::format_descriptor<Element>::format(), 1,
+                                   {t.shape(0)}, {sizeof(Element)});
         });
 }
 
-auto wrap_ops(pybind11::module & m)
+auto wrap_ops(pybind11::module &m)
 {
     // ops_dot.hpp
     m.def("outer_product", &ts::outer_product);
-    m.def("dot", py::overload_cast<ts::VectorF const&, ts::VectorF const&>(&ts::dot));
-    m.def("dot", py::overload_cast<ts::MatrixF const&, ts::VectorF const&, bool>(&ts::dot));
-    m.def("dot",
-          py::overload_cast<ts::MatrixF const &, ts::MatrixF const &, bool , bool>(&ts::dot),
-          py::arg("A"), py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
-    m.def("dot", py::overload_cast<ts::Tensor<float, 3> const&, ts::MatrixF const&>(&ts::dot));
+    m.def("dot", py::overload_cast<ts::VectorF const &, ts::VectorF const &>(&ts::dot));
+    m.def("dot", py::overload_cast<ts::MatrixF const &, ts::VectorF const &, bool>(&ts::dot));
+    m.def("dot", py::overload_cast<ts::MatrixF const &, ts::MatrixF const &, bool, bool>(&ts::dot), py::arg("A"),
+          py::arg("B"), py::arg("A_T") = false, py::arg("B_T") = false);
+    m.def("dot", py::overload_cast<ts::Tensor<float, 3> const &, ts::MatrixF const &>(&ts::dot));
 
     // ops_common.hpp
     m.def("add_matrixf_matrixf", &ts::add<float, 2>);
@@ -272,8 +239,10 @@ auto wrap_ops(pybind11::module & m)
     m.def("add_matrixf_vectorf", &ts::add<float>);
     m.def("add_matrixi_vectori", &ts::add<int>);
 
-    m.def("multiply_vectorf_vectorf", py::overload_cast<ts::VectorF const &, ts::VectorF const&>(&ts::multiply<float, 1>));
-    m.def("multiply_matrixf_matrixf", py::overload_cast<ts::MatrixF const &, ts::MatrixF const&>(&ts::multiply<float, 2>));
+    m.def("multiply_vectorf_vectorf",
+          py::overload_cast<ts::VectorF const &, ts::VectorF const &>(&ts::multiply<float, 1>));
+    m.def("multiply_matrixf_matrixf",
+          py::overload_cast<ts::MatrixF const &, ts::MatrixF const &>(&ts::multiply<float, 2>));
     m.def("multiply_vectorf_f", py::overload_cast<ts::VectorF const &, float>(&ts::multiply<float, 1>));
     m.def("multiply_matrixf_f", py::overload_cast<ts::MatrixF const &, float>(&ts::multiply<float, 2>));
 
@@ -287,16 +256,14 @@ auto wrap_ops(pybind11::module & m)
 
     m.def("sum", py::overload_cast<ts::MatrixF const &, int>(&ts::sum_v2));
 
-    m.def("get", [](ts::MatrixF const & m, ts::MatrixF const & i) {
-      return ts::MatrixF({ts::get(m, i[0].cast<int>())});
-    });
+    m.def("get",
+          [](ts::MatrixF const &m, ts::MatrixF const &i) { return ts::MatrixF({ts::get(m, i[0].cast<int>())}); });
 
     m.def("argmax_f", &ts::argmax<float>);
     m.def("argmax_i", &ts::argmax<int>);
 }
 
-template<typename Element, int Dim>
-auto wrap_nn_activations(pybind11::module & m, std::string postfix)
+template <typename Element, int Dim> auto wrap_nn_activations(pybind11::module &m, std::string postfix)
 {
     py::class_<ts::ReLU<Element, Dim>>(m, ("ReLU" + postfix).c_str())
         .def(py::init<>())
@@ -305,8 +272,7 @@ auto wrap_nn_activations(pybind11::module & m, std::string postfix)
         .def("backward", &ts::ReLU<Element, Dim>::backward);
 }
 
-template <typename Element>
-auto wrap_grad_holder(pybind11:: module &m, char const * class_name)
+template <typename Element> auto wrap_grad_holder(pybind11::module &m, char const *class_name)
 {
     py::class_<ts::GradHolder<Element>>(m, class_name)
         .def(py::init<>())
@@ -314,16 +280,15 @@ auto wrap_grad_holder(pybind11:: module &m, char const * class_name)
         .def("grad", &ts::GradHolder<Element>::grad, py::return_value_policy::reference_internal);
 }
 
-template <typename Element, int Dim>
-auto wrap_variable(pybind11::module & m, char const * class_name)
+template <typename Element, int Dim> auto wrap_variable(pybind11::module &m, char const *class_name)
 {
-   py::class_<ts::Variable<Element, Dim>, ts::GradHolder<Element>>(m, class_name)
-        .def(py::init<std::array<size_type , Dim>>())
+    py::class_<ts::Variable<Element, Dim>, ts::GradHolder<Element>>(m, class_name)
+        .def(py::init<std::array<size_type, Dim>>())
         .def("tensor", &ts::Variable<Element, Dim>::tensor, py::return_value_policy::reference_internal)
         .def("grad", &ts::Variable<Element, Dim>::grad, py::return_value_policy::reference_internal);
 }
 
-auto wrap_nn(pybind11::module & m)
+auto wrap_nn(pybind11::module &m)
 {
     wrap_grad_holder<float>(m, "GradHolderF");
     wrap_grad_holder<int>(m, "GradHolderI");
@@ -350,9 +315,7 @@ auto wrap_nn(pybind11::module & m)
         .def("forward", &ts::CrossEntropyLoss::forward)
         .def("backward", &ts::CrossEntropyLoss::backward);
 
-    py::enum_<ts::Activation>(m, "Activation")
-        .value("RELU", ts::Activation::RELU)
-        .value("NONE", ts::Activation::NONE);
+    py::enum_<ts::Activation>(m, "Activation").value("RELU", ts::Activation::RELU).value("NONE", ts::Activation::NONE);
 
     wrap_nn_activations<float, 2>(m, "_f2");
     wrap_nn_activations<float, 3>(m, "_f3");
@@ -396,7 +359,6 @@ auto wrap_nn(pybind11::module & m)
         .def("forward", &ts::MaxPool2D::forward)
         .def("backward", &ts::MaxPool2D::backward);
 
-
     m.def("softmax", &ts::softmax);
 
     m.def("log_softmax", &ts::log_softmax);
@@ -404,11 +366,9 @@ auto wrap_nn(pybind11::module & m)
 
 PYBIND11_MODULE(libtensor, m)
 {
-    py::class_<ts::DataHolder<int>>(m, "DataHolderI")
-        .def(py::init<>());
+    py::class_<ts::DataHolder<int>>(m, "DataHolderI").def(py::init<>());
 
-    py::class_<ts::DataHolder<float>>(m, "DataHolderF")
-        .def(py::init<>());
+    py::class_<ts::DataHolder<float>>(m, "DataHolderF").def(py::init<>());
 
     wrap_tensor4D<int>(m, "Tensor4I");
     wrap_tensor4D<float>(m, "Tensor4F");

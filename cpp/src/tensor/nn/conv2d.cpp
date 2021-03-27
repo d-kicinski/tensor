@@ -2,10 +2,10 @@
 #include "functional.hpp"
 #include "initialization.hpp"
 
-ts::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias,
-                   int kernel_size, int stride, Activation activation)
-    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)),
-      _stride(stride), _kernel_size(kernel_size)
+ts::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size, int stride,
+                   Activation activation)
+    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)), _stride(stride),
+      _kernel_size(kernel_size)
 {
     register_parameter(_weight.tensor());
     if (_bias) {
@@ -13,26 +13,21 @@ ts::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> 
     }
 }
 
-auto ts::Conv2D::create(int in_channels, int out_channels, int kernel_size, int stride,
-                        Activation activation, bool use_bias) -> Conv2D
+auto ts::Conv2D::create(int in_channels, int out_channels, int kernel_size, int stride, Activation activation,
+                        bool use_bias) -> Conv2D
 {
     std::vector<int> shape = {kernel_size * kernel_size * in_channels, out_channels};
     Variable<float, 2> weight(std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)),
-                                     std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)),
-                                         "Conv2D(weight)");
+                              std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)), "Conv2D(weight)");
     std::optional<Variable<float, 1>> bias = std::nullopt;
     if (use_bias)
-        bias = std::make_optional(Variable<float, 1>(
-            std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
-            std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
-            "Conv2D(bias)  "));
+        bias = std::make_optional(Variable<float, 1>(std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
+                                                     std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
+                                                     "Conv2D(bias)  "));
     return Conv2D(std::move(weight), std::move(bias), kernel_size, stride, activation);
 }
 
-auto ts::Conv2D::operator()(const ts::Tensor<float, 4> &input) -> Tensor<float, 4>
-{
-    return forward(input);
-}
+auto ts::Conv2D::operator()(const ts::Tensor<float, 4> &input) -> Tensor<float, 4> { return forward(input); }
 
 auto ts::Conv2D::forward(const ts::Tensor<float, 4> &input) -> ts::Tensor<float, 4>
 {
@@ -55,8 +50,7 @@ auto ts::Conv2D::backward(const ts::Tensor<float, 4> &d_output) -> ts::Tensor<fl
     if (_activation) {
         d_output_ = _activation.value()->backward(d_output_);
     }
-    auto [d_input, d_weight] =
-        ts::conv_2d_backward(_input, _weight.tensor(), d_output_, _kernel_size, _stride);
+    auto [d_input, d_weight] = ts::conv_2d_backward(_input, _weight.tensor(), d_output_, _kernel_size, _stride);
     _weight.grad() = std::move(d_weight);
 
     if (_bias.has_value()) {
