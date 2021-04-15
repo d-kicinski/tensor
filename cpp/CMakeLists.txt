@@ -67,6 +67,8 @@ set(NN_SOURCES
         src/tensor/nn/initialization.hpp
         src/tensor/nn/layer_base.cpp
         src/tensor/nn/layer_base.hpp
+        src/tensor/nn/im2col.cpp
+        src/tensor/nn/im2col.hpp
         )
 
 if (TENSOR_USE_PROTOBUF)
@@ -129,6 +131,7 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/nn/test_activation.cpp
             tests/tensor/nn/test_optimizers.cpp
             tests/tensor/nn/test_variable.cpp
+            tests/tensor/nn/test_im2col.cpp
             )
 
     if (TENSOR_USE_PROTOBUF)
