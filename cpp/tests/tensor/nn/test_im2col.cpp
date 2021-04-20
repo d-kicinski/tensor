@@ -6,12 +6,11 @@
 
 using namespace ts;
 
-
 auto compute_output_shape(std::array<int, 3> const &input_shape, int kernel_size, int stride,
-                          int pad, int dilatation) -> std::array<int, 3>
+                          int pad, int dilatation) -> std::array<ts::size_type, 3>
 {
     // col_buffer_shape: c_in * k * k, out_1, out_2
-    std::array<int, 3> output_shape{input_shape[0] * kernel_size * kernel_size};
+    std::array<size_type , 3> output_shape{static_cast<size_type>(input_shape[0] * kernel_size * kernel_size)};
 
     int const num_spatial_axes_ = 2;
 
