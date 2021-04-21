@@ -14,7 +14,7 @@ inline bool is_a_ge_zero_and_a_lt_b(int a, int b)
 }
 
 template <typename Dtype>
-void im2col_cpu(const Dtype *data_im, const int channels, const int height, const int width,
+void im2col(const Dtype *data_im, const int channels, const int height, const int width,
                 const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
                 const int stride_h, const int stride_w, const int dilation_h, const int dilation_w,
                 Dtype *data_col)
@@ -50,7 +50,7 @@ void im2col_cpu(const Dtype *data_im, const int channels, const int height, cons
 }
 
 // Explicit instantiation
-template void im2col_cpu<float>(const float *data_im, const int channels, const int height,
+template void im2col<float>(const float *data_im, const int channels, const int height,
                                 const int width, const int kernel_h, const int kernel_w,
                                 const int pad_h, const int pad_w, const int stride_h,
                                 const int stride_w, const int dilation_h, const int dilation_w,
@@ -58,7 +58,7 @@ template void im2col_cpu<float>(const float *data_im, const int channels, const 
 
 
 template <typename Dtype>
-void col2im_cpu(const Dtype *data_col, const int channels, const int height, const int width,
+void col2im(const Dtype *data_col, const int channels, const int height, const int width,
                 const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
                 const int stride_h, const int stride_w, const int dilation_h, const int dilation_w,
                 Dtype *data_im)
@@ -92,7 +92,7 @@ void col2im_cpu(const Dtype *data_col, const int channels, const int height, con
 }
 
 // Explicit instantiation
-template void col2im_cpu<float>(const float *data_col, const int channels, const int height,
+template void col2im<float>(const float *data_col, const int channels, const int height,
                                 const int width, const int kernel_h, const int kernel_w,
                                 const int pad_h, const int pad_w, const int stride_h,
                                 const int stride_w, const int dilation_h, const int dilation_w,
