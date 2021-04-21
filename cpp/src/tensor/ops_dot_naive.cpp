@@ -45,9 +45,19 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
     // C(m, n) = A(m, k) * B(k, n)
     int m = A_T ? A.shape(1) : A.shape(0);
     int n = B_T ? B.shape(0) : B.shape(1);
-    int k = A_T ? A.shape(0) : A.shape(1);
 
     MatrixF C(m, n);
+    dot(A, B, C, A_T, B_T);
+    return C;
+}
+
+
+auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> void
+{
+    // C(m, n) = A(m, k) * B(k, n)
+    int m = A_T ? A.shape(1) : A.shape(0);
+    int n = B_T ? B.shape(0) : B.shape(1);
+    int k = A_T ? A.shape(0) : A.shape(1);
 
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
@@ -62,7 +72,6 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
             }
         }
     }
-    return C;
 }
 
 auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>

@@ -31,8 +31,8 @@ auto dot(VectorF const &A, VectorF const &X) -> float
 auto dot(MatrixF const &A, VectorF const &X, bool A_T) -> VectorF
 {
     CBLAS_TRANSPOSE trans_A = CBLAS_TRANSPOSE::CblasNoTrans;
-    int lda = A.shape(1);
-    int dim_out = A.shape(0);
+    size_type lda = A.shape(1);
+    size_type dim_out = A.shape(0);
     if (A_T) {
         trans_A = CBLAS_TRANSPOSE::CblasTrans;
         dim_out = A.shape(1);
@@ -52,11 +52,21 @@ auto dot(MatrixF const &A, VectorF const &X, bool A_T) -> VectorF
 
 auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
 {
-    int m = A.shape(0);
-    int n = B.shape(1);
-    int k = A.shape(1);
-    int lda = k;
-    int ldb = n;
+    size_type m = A.shape(0);
+    size_type n = B.shape(1);
+
+    MatrixF C(m, n);
+    dot(A, B , C, A_T, B_T);
+    return C;
+}
+
+auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> void
+{
+    size_type m = A.shape(0);
+    size_type n = B.shape(1);
+    size_type k = A.shape(1);
+    size_type lda = k;
+    size_type ldb = n;
     CBLAS_TRANSPOSE trans_A = CBLAS_TRANSPOSE::CblasNoTrans;
     CBLAS_TRANSPOSE trans_B = CBLAS_TRANSPOSE::CblasNoTrans;
 
@@ -77,15 +87,16 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
     auto A_data = A.data()->data() + std::distance(A.data().get()->begin(), A.begin());
     auto B_data = B.data()->data() + std::distance(B.data().get()->begin(), B.begin());
 
-    MatrixF C(m, n);
+    if (C.shape() != std::array<ts::size_type, 2>{m, n}) {
+        return;
+    }
     cblas_sgemm(CBLAS_ORDER::CblasRowMajor, trans_A, trans_B, m, n, k, 1.0f, A_data, lda, B_data, ldb, 0.0f,
                 C.data()->data(), C.shape(1));
-    return C;
 }
 
 auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>
 {
-    int batch_size = A.shape(0);
+    size_type batch_size = A.shape(0);
     std::vector<Tensor<float, 2>> partial;
     partial.push_back(blas::dot(A(0), B));
     for (int i = 1; i < batch_size; ++i) {
