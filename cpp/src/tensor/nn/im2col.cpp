@@ -8,16 +8,12 @@
 // therefore its value is always lower than 0x800... where casting
 // negative value of a parameter converts it to value higher than 0x800...
 // The casting allows to use one condition instead of two.
-inline bool is_a_ge_zero_and_a_lt_b(int a, int b)
-{
-    return static_cast<unsigned>(a) < static_cast<unsigned>(b);
-}
+inline bool is_a_ge_zero_and_a_lt_b(int a, int b) { return static_cast<unsigned>(a) < static_cast<unsigned>(b); }
 
 template <typename Dtype>
-void im2col(const Dtype *data_im, const int channels, const int height, const int width,
-                const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
-                const int stride_h, const int stride_w, const int dilation_h, const int dilation_w,
-                Dtype *data_col)
+void ts::im2col::im2col(const Dtype *data_im, const int channels, const int height, const int width, const int kernel_h,
+                        const int kernel_w, const int pad_h, const int pad_w, const int stride_h, const int stride_w,
+                        const int dilation_h, const int dilation_w, Dtype *data_col)
 {
     const int output_h = (height + 2 * pad_h - (dilation_h * (kernel_h - 1) + 1)) / stride_h + 1;
     const int output_w = (width + 2 * pad_w - (dilation_w * (kernel_w - 1) + 1)) / stride_w + 1;
@@ -50,20 +46,17 @@ void im2col(const Dtype *data_im, const int channels, const int height, const in
 }
 
 // Explicit instantiation
-template void im2col<float>(const float *data_im, const int channels, const int height,
-                                const int width, const int kernel_h, const int kernel_w,
-                                const int pad_h, const int pad_w, const int stride_h,
-                                const int stride_w, const int dilation_h, const int dilation_w,
-                                float *data_col);
-
+template void ts::im2col::im2col<float>(const float *data_im, const int channels, const int height, const int width,
+                                        const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
+                                        const int stride_h, const int stride_w, const int dilation_h,
+                                        const int dilation_w, float *data_col);
 
 template <typename Dtype>
-void col2im(const Dtype *data_col, const int channels, const int height, const int width,
-                const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
-                const int stride_h, const int stride_w, const int dilation_h, const int dilation_w,
-                Dtype *data_im)
+void ts::im2col::col2im(const Dtype *data_col, const int channels, const int height, const int width,
+                        const int kernel_h, const int kernel_w, const int pad_h, const int pad_w, const int stride_h,
+                        const int stride_w, const int dilation_h, const int dilation_w, Dtype *data_im)
 {
-//    caffe_set(height * width * channels, Dtype(0), data_im);
+    //    caffe_set(height * width * channels, Dtype(0), data_im);
     const int output_h = (height + 2 * pad_h - (dilation_h * (kernel_h - 1) + 1)) / stride_h + 1;
     const int output_w = (width + 2 * pad_w - (dilation_w * (kernel_w - 1) + 1)) / stride_w + 1;
     const int channel_size = height * width;
@@ -90,10 +83,25 @@ void col2im(const Dtype *data_col, const int channels, const int height, const i
         }
     }
 }
+auto ts::im2col::im2col_buffer_shape(const std::array<size_type, 3> &input_shape, int kernel_size, int stride, int pad,
+                                     int dilatation) -> std::array<ts::size_type, 2>
+{
+    // col_buffer_shape: c_in * k * k, out_1 * out_2
+    std::array<size_type, 2> output_shape{static_cast<size_type>(input_shape[0] * kernel_size * kernel_size), 1};
+
+    int const num_spatial_axes_ = 2;
+
+    for (int i = 0; i < num_spatial_axes_; ++i) {
+        size_type const input_dim = input_shape[i + 1];
+        int const kernel_extent = dilatation * (kernel_size - 1) + 1;
+        size_type const output_dim = (input_dim + 2 * pad - kernel_extent) / stride + 1;
+        output_shape[1] *= output_dim;
+    }
+    return output_shape;
+}
 
 // Explicit instantiation
-template void col2im<float>(const float *data_col, const int channels, const int height,
-                                const int width, const int kernel_h, const int kernel_w,
-                                const int pad_h, const int pad_w, const int stride_h,
-                                const int stride_w, const int dilation_h, const int dilation_w,
-                                float *data_im);
+template void ts::im2col::col2im<float>(const float *data_col, const int channels, const int height, const int width,
+                                        const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
+                                        const int stride_h, const int stride_w, const int dilation_h,
+                                        const int dilation_w, float *data_im);
