@@ -1,7 +1,7 @@
 #include "catch2/catch.hpp"
-#include <tensor/tensor.hpp>
 #include <tensor/nn/functional.hpp>
-
+#include <tensor/nn/im2col.hpp>
+#include <tensor/tensor.hpp>
 
 TEST_CASE("conv_2d(Tensor<float, 3>, ...")
 {
@@ -29,6 +29,41 @@ TEST_CASE("conv_2d(Tensor<float, 3>, ...")
     };
 
     auto output = ts::conv_2d(input, kernel, 2, 1);
+
+    REQUIRE(output == expected_output);
+}
+
+TEST_CASE("conv_2d_im2col(Tensor<float, 3>, ...")
+{
+    // shape: (C_int, H, W)
+    ts::Tensor<float, 4> input =
+        {{
+            {{1, 2, 3},
+             {4, 5, 6},
+             {7, 8, 9}},
+            {{-1, -2, -3},
+             {-4, -5, -6},
+             {-7, -8, -9}},
+        }};
+
+    // shape: (c_out, k*k*C_in, )
+    ts::Tensor<float, 2> kernel = {
+        {2, 2, 2, 2, -2, -2, -2, -2},
+        {1, 1, 1, 1, -1, -1, -1, -1}
+    };
+
+    ts::Tensor<float, 4> expected_output = {{
+        {{48, 64},
+         {96, 112}},
+        {{24, 32},
+         {48, 56}}
+    }};
+
+    auto const im2col_buffer_shape = ts::im2col::im2col_buffer_shape({2, 3, 3},
+                                                                 2, 1, 0, 1);
+    auto _im2col_buffer = ts::Tensor<float, 2>(im2col_buffer_shape);
+
+    auto output = ts::conv_2d_im2col(input, kernel, _im2col_buffer, 2, 1, 0, 1);
 
     REQUIRE(output == expected_output);
 }
