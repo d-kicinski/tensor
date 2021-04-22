@@ -49,8 +49,6 @@ set(NN_SOURCES
         src/tensor/nn/softmax.hpp
         src/tensor/nn/planar_dataset.cpp
         src/tensor/nn/dataset_iterator.cpp
-        src/tensor/nn/conv2d.cpp
-        src/tensor/nn/conv2d.hpp
         src/tensor/nn/functional.hpp
         src/tensor/nn/functional.cpp
         src/tensor/nn/functional_helpers.hpp
@@ -69,6 +67,11 @@ set(NN_SOURCES
         src/tensor/nn/layer_base.hpp
         src/tensor/nn/im2col.cpp
         src/tensor/nn/im2col.hpp
+        src/tensor/nn/conv2d.hpp
+        src/tensor/nn/conv2d_naive.cpp
+        src/tensor/nn/conv2d_naive.hpp
+        src/tensor/nn/conv2d_im2col.cpp
+        src/tensor/nn/conv2d_im2col.hpp
         )
 
 if (TENSOR_USE_PROTOBUF)

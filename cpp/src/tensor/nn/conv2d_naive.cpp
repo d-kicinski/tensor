@@ -1,8 +1,9 @@
-#include "conv2d.hpp"
+#include "conv2d_naive.hpp"
 #include "functional.hpp"
 #include "initialization.hpp"
 
-ts::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size, int stride,
+
+ts::naive::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size, int stride,
                    Activation activation)
     : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)), _stride(stride),
       _kernel_size(kernel_size)
@@ -13,7 +14,7 @@ ts::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> 
     }
 }
 
-auto ts::Conv2D::create(int in_channels, int out_channels, int kernel_size, int stride, Activation activation,
+auto ts::naive::Conv2D::create(int in_channels, int out_channels, int kernel_size, int stride, Activation activation,
                         bool use_bias) -> Conv2D
 {
     std::vector<int> shape = {kernel_size * kernel_size * in_channels, out_channels};
@@ -27,9 +28,9 @@ auto ts::Conv2D::create(int in_channels, int out_channels, int kernel_size, int 
     return Conv2D(std::move(weight), std::move(bias), kernel_size, stride, activation);
 }
 
-auto ts::Conv2D::operator()(const ts::Tensor<float, 4> &input) -> Tensor<float, 4> { return forward(input); }
+auto ts::naive::Conv2D::operator()(const ts::Tensor<float, 4> &input) -> Tensor<float, 4> { return forward(input); }
 
-auto ts::Conv2D::forward(const ts::Tensor<float, 4> &input) -> ts::Tensor<float, 4>
+auto ts::naive::Conv2D::forward(const ts::Tensor<float, 4> &input) -> ts::Tensor<float, 4>
 {
     _input = input;
     auto output = ts::conv_2d(input, _weight.tensor(), _kernel_size, _stride);
@@ -44,7 +45,7 @@ auto ts::Conv2D::forward(const ts::Tensor<float, 4> &input) -> ts::Tensor<float,
     return output;
 }
 
-auto ts::Conv2D::backward(const ts::Tensor<float, 4> &d_output) -> ts::Tensor<float, 4>
+auto ts::naive::Conv2D::backward(const ts::Tensor<float, 4> &d_output) -> ts::Tensor<float, 4>
 {
     auto d_output_(d_output); // cheap, not a deep copy
     if (_activation) {
@@ -65,9 +66,9 @@ auto ts::Conv2D::backward(const ts::Tensor<float, 4> &d_output) -> ts::Tensor<fl
     return std::move(d_input);
 }
 
-auto ts::Conv2D::weight() -> ts::Variable<float, 2> & { return _weight; }
+auto ts::naive::Conv2D::weight() -> ts::Variable<float, 2> & { return _weight; }
 
-auto ts::Conv2D::bias() -> std::optional<std::reference_wrapper<ts::Variable<float, 1>>>
+auto ts::naive::Conv2D::bias() -> std::optional<std::reference_wrapper<ts::Variable<float, 1>>>
 {
     if (_bias.has_value()) {
         return std::make_optional(std::ref(_bias.value()));
@@ -76,7 +77,7 @@ auto ts::Conv2D::bias() -> std::optional<std::reference_wrapper<ts::Variable<flo
     }
 }
 
-auto ts::Conv2D::weights() -> VectorRef
+auto ts::naive::Conv2D::weights() -> VectorRef
 {
     std::vector<std::reference_wrapper<ts::GradHolder<float>>> vars;
     vars.emplace_back(std::ref(weight()));
