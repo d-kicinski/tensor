@@ -227,3 +227,32 @@ TEST_CASE("max_pool_2d")
     REQUIRE(d_input == expected_d_input);
 }
 
+TEST_CASE("chw2hwc/hwc2chw") {
+
+    ts::Tensor<float, 4> tensor_chw =
+        {{
+             {{0, 1, 1, 0},
+              {0, 0, 0, 0},
+              {0, 0, 0 , 0},
+              {0, 1, 1, 0}},
+             {{0, 0, 0 , 0},
+              {1, 0 , 0, 1},
+              {1, 0, 0, 1},
+              {0, 0 , 0, 0}}
+         }};
+
+    ts::Tensor<float, 4> tensor_hwc = {{
+                                      {{0, 0}, {1, 0}, {1, 0}, {0, 0}},
+                                      {{0, 1}, {0, 0}, {0, 0}, {0, 1}},
+                                      {{0, 1}, {0, 0}, {0, 0}, {0, 1}},
+                                      {{0, 0}, {1, 0}, {1, 0}, {0, 0}}
+                                  }};
+
+    auto tensor_hwc_probably = ts::chw2hwc(tensor_chw);
+    REQUIRE(tensor_hwc_probably.shape() == std::array<ts::size_type, 4>{1, 4, 4, 2});
+    REQUIRE(tensor_hwc_probably == tensor_hwc);
+
+    auto tensor_chw_probably = ts::hwc2chw(tensor_hwc);
+    REQUIRE(tensor_chw_probably.shape() == std::array<ts::size_type, 4>{1, 2, 4, 4});
+    REQUIRE(tensor_chw_probably == tensor_chw);
+}
