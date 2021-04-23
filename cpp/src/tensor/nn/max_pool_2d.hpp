@@ -7,9 +7,9 @@ namespace ts {
 
 class MaxPool2D {
   public:
-    static auto create(int kernel_size, int stride) -> MaxPool2D;
+    static auto create(int kernel_size, int stride, int pad) -> MaxPool2D;
 
-    MaxPool2D(int kernel_size, int stride);
+    MaxPool2D(int kernel_size, int stride, int pad);
 
     auto operator()(Tensor<float, 4> const &) -> Tensor<float, 4>;
 
@@ -18,9 +18,11 @@ class MaxPool2D {
     auto backward(Tensor<float, 4> const &) -> Tensor<float, 4>;
 
   private:
-    Tensor<bool, 4> _mask;
+    Tensor<int, 4> _mask;
+    int _dim_in{};
     int _kernel_size;
     int _stride;
+    int _pad;
 };
 
 } // namespace ts

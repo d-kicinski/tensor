@@ -228,7 +228,7 @@ auto find_max(ts::Tensor<float, 3> const &input) -> std::pair<ts::VectorF, std::
     return std::make_pair(max_values, indices);
 }
 
-auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int stride)
+auto ts::max_pool_2d_hwc(ts::Tensor<float, 4> const &inputs, int kernel_size, int stride)
     -> std::pair<ts::Tensor<float, 4>, ts::Tensor<bool, 4>>
 {
     int dim_out = ts::_calculate_output_dim(inputs.shape(1), kernel_size, 0, stride, 1);
@@ -260,6 +260,63 @@ auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int st
     return std::make_pair(results, masks);
 }
 
+auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int stride, int pad)
+    -> std::pair<ts::Tensor<float, 4>, ts::Tensor<int, 4>>
+{
+    int batch_size = inputs.shape(0);
+    int C_in = inputs.shape(1);
+    int dim_out = ts::_calculate_output_dim(inputs.shape(2), kernel_size, pad, stride, 1);
+
+    int dim_out_h = dim_out;
+    int dim_out_w = dim_out;
+    int pad_h = pad;
+    int pad_w = pad;
+    int stride_h = stride;
+    int stride_w = stride;
+    int kernel_h = kernel_size;
+    int kernel_w = kernel_size;
+
+    int height = inputs.shape(2);
+    int width = inputs.shape(3);
+
+    ts::Tensor<float, 4> results(batch_size, C_in, dim_out_h, dim_out_w);
+    ts::fill_(results, -std::numeric_limits<float>::infinity());
+    ts::Tensor<int, 4> masks(batch_size, C_in, dim_out_h, dim_out_w);
+
+#pragma omp parallel for
+    for (int b = 0; b < batch_size; ++b) {
+        auto input = inputs(b);
+        auto mask = masks(b);
+        auto result = results(b);
+        for (int c = 0; c < C_in; ++c) {
+            for (int i = 0; i < dim_out_h; ++i) {
+                for (int j = 0; j < dim_out_w; ++j) {
+
+                    // get two corners of current tile
+                    int h_start = i * stride_h - pad_h;
+                    int w_start = j * stride_w - pad_w;
+                    int h_end = std::min(h_start + kernel_h, height);
+                    int w_end = std::min(w_start + kernel_w, width);
+                    h_start = std::max(h_start, 0);
+                    w_start = std::max(w_start, 0);
+
+                    // iterate over a current tile
+                    for (int h = h_start; h < h_end; ++h) {
+                        for (int w = w_start; w < w_end; ++w) {
+                            const int index = h * width + w;
+                            if (input.at({c, h, w}) > result.at({c, i, j})) {
+                                result.at({c, i, j}) = input.at({c, h, w});
+                                mask.at({c, i, j}) = input.index({c, h, w});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return std::make_pair(results, masks);
+}
+
 auto put_vector_to_tile(ts::Tensor<float, 3> &d_input_tile, ts::VectorF const &vector, ts::Tensor<bool, 3> const &mask)
     -> void
 {
@@ -274,8 +331,35 @@ auto put_vector_to_tile(ts::Tensor<float, 3> &d_input_tile, ts::VectorF const &v
     }
 }
 
-auto ts::max_pool_2d_backward(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<bool, 4> const &masks, int kernel_size,
-                              int stride) -> ts::Tensor<float, 4>
+auto ts::max_pool_2d_backward(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<int, 4> const &masks, int dim_in,
+                              int kernel_size, int stride) -> ts::Tensor<float, 4>
+{
+    int batch_size = masks.shape(0);
+    int C_in = d_outputs.shape(1);
+    int dim_out_h = d_outputs.shape(2);
+    int dim_out_w = d_outputs.shape(3);
+
+    auto d_inputs = ts::Tensor<float, 4>(batch_size, C_in, dim_in, dim_in);
+
+#pragma omp parallel for
+    for (int b = 0; b < batch_size; ++b) {
+        auto mask = masks(b);
+        auto d_output = d_outputs(b);
+        auto d_input = d_inputs(b);
+
+        for (int c = 0; c < C_in; ++c) {
+            for (int i = 0; i < dim_out_h; ++i) {
+                for (int j = 0; j < dim_out_w; ++j) {
+                    d_input.at(mask.at({c, i, j})) += d_output.at({c, i, j});
+                }
+            }
+        }
+    }
+    return d_inputs;
+}
+
+auto ts::max_pool_2d_backward_hwc(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<bool, 4> const &masks,
+                                  int kernel_size, int stride) -> ts::Tensor<float, 4>
 {
     auto d_inputs = ts::Tensor<float, 4>(masks.shape());
     int dim_out = d_outputs.shape(1);
