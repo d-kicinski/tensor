@@ -15,7 +15,7 @@ TEST_CASE("conv2d_naive(..., use_bias = false")
     size_type dim_in = 64;
     size_type dim_out = _calculate_output_dim(dim_in, kernel_size, 0, 1, 1);
 
-    auto layer = Conv2D::create(channel_in, channel_out, kernel_size, 1, Activation::NONE, false);
+    auto layer = naive::Conv2D::create(channel_in, channel_out, kernel_size, 1, Activation::NONE, false);
     Tensor<float, 4> input(batch_size, dim_in, dim_in, channel_in);
 
     auto output = layer(input);
