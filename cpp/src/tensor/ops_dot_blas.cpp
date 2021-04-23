@@ -54,6 +54,12 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
 {
     size_type m = A.shape(0);
     size_type n = B.shape(1);
+    if (A_T) {
+        m = A.shape(1);
+    }
+    if (B_T) {
+        n = B.shape(0);
+    }
 
     MatrixF C(m, n);
     dot(A, B , C, A_T, B_T);
@@ -82,16 +88,17 @@ auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> 
         ldb = k;
     }
 
-    // A or B could be just view on higher dimensional tensor, if I want to use raw pointer to
+    // A, B or C could be just view on higher dimensional tensor, if I want to use raw pointer to
     // underlining data I have to take that into account
     auto A_data = A.data()->data() + std::distance(A.data().get()->begin(), A.begin());
     auto B_data = B.data()->data() + std::distance(B.data().get()->begin(), B.begin());
+    auto C_data = C.data()->data() + std::distance(C.data().get()->begin(), C.begin());
 
     if (C.shape() != std::array<ts::size_type, 2>{m, n}) {
         return;
     }
     cblas_sgemm(CBLAS_ORDER::CblasRowMajor, trans_A, trans_B, m, n, k, 1.0f, A_data, lda, B_data, ldb, 0.0f,
-                C.data()->data(), C.shape(1));
+                C_data, C.shape(1));
 }
 
 auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>
