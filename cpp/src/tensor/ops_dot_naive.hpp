@@ -12,7 +12,7 @@ auto dot(MatrixF const &, VectorF const &, bool A_T = false) -> VectorF;
 
 auto dot(MatrixF const &A, MatrixF const &B, bool A_T = false, bool B_T = false) -> MatrixF;
 
-auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> void;
+auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T = false, bool B_T = false, float beta = 0.0f) -> void;
 
 auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>;
 

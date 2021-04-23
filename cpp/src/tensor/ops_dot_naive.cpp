@@ -52,24 +52,26 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
 }
 
 
-auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> void
+auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T, float beta) -> void
 {
-    // C(m, n) = A(m, k) * B(k, n)
+    // C(m, n) = A(m, k) * B(k, n) + beta * C(m, n)
     int m = A_T ? A.shape(1) : A.shape(0);
     int n = B_T ? B.shape(0) : B.shape(1);
     int k = A_T ? A.shape(0) : A.shape(1);
 
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
+            float acc = 0;
             for (int p = 0; p < k; p++) {
                 if (A_T) {
-                    C(i, j) += A(p, i) * B(p, j);
+                    acc += A(p, i) * B(p, j);
                 } else if (B_T) {
-                    C(i, j) += A(i, p) * B(j, p);
+                    acc += A(i, p) * B(j, p);
                 } else {
-                    C(i, j) += A(i, p) * B(p, j);
+                    acc += A(i, p) * B(p, j);
                 }
             }
+            C(i, j) = acc + beta * C(i, j);
         }
     }
 }

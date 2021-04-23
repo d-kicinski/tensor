@@ -62,11 +62,11 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
     }
 
     MatrixF C(m, n);
-    dot(A, B , C, A_T, B_T);
+    dot(A, B, C, A_T, B_T);
     return C;
 }
 
-auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> void
+auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T, float beta) -> void
 {
     size_type m = A.shape(0);
     size_type n = B.shape(1);
@@ -97,8 +97,8 @@ auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> 
     if (C.shape() != std::array<ts::size_type, 2>{m, n}) {
         return;
     }
-    cblas_sgemm(CBLAS_ORDER::CblasRowMajor, trans_A, trans_B, m, n, k, 1.0f, A_data, lda, B_data, ldb, 0.0f,
-                C_data, C.shape(1));
+    cblas_sgemm(CBLAS_ORDER::CblasRowMajor, trans_A, trans_B, m, n, k, 1.0f, A_data, lda, B_data, ldb, beta, C_data,
+                C.shape(1));
 }
 
 auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>
