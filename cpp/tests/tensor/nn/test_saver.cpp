@@ -7,7 +7,7 @@ class Model : public ts::LayerBase<float> {
   public:
     Model()
         : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)),
-          _layer2(ts::Conv2D::create(3, 64, 3, 1, ts::Activation::NONE)),
+          _layer2(ts::Conv2D::create(3, 64, 3, 1, 0, 1, ts::Activation::NONE)),
           _number()
     {
         _number.set_weight(std::make_unique<ts::VectorF>(ts::VectorF{1337}));
