@@ -1,8 +1,8 @@
 #pragma once
 
-namespace {
+namespace ts {
 
-template <typename Element> auto print_stats(DataHolder<Element> &v, std::string tag) -> void
+template <typename Element> auto print_stats(DataHolder<Element> const &v, std::string tag) -> void
 {
     std::cerr << tag << ":"
               << " min = " << *std::min_element(v.begin(), v.end())
