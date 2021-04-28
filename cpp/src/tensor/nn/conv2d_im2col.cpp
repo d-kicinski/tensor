@@ -28,9 +28,9 @@ auto ts::im2col::Conv2D::create(int in_channels, int out_channels, int kernel_si
     return Conv2D(std::move(weight), std::move(bias), kernel_size, stride, pad, dilatation, activation);
 }
 
-auto ts::im2col::Conv2D::operator()(const ts::Tensor<float, 4> &input) -> Tensor<float, 4> { return forward(input); }
+auto ts::im2col::Conv2D::operator()(ts::Tensor<float, 4> const &input) -> Tensor<float, 4> { return forward(input); }
 
-auto ts::im2col::Conv2D::forward(const ts::Tensor<float, 4> &input) -> ts::Tensor<float, 4>
+auto ts::im2col::Conv2D::forward(ts::Tensor<float, 4> const &input) -> ts::Tensor<float, 4>
 {
     _input = input;
 
@@ -51,7 +51,7 @@ auto ts::im2col::Conv2D::forward(const ts::Tensor<float, 4> &input) -> ts::Tenso
     return output;
 }
 
-auto ts::im2col::Conv2D::backward(const ts::Tensor<float, 4> &d_output) -> ts::Tensor<float, 4>
+auto ts::im2col::Conv2D::backward(ts::Tensor<float, 4> const &d_output) -> ts::Tensor<float, 4>
 {
     auto d_output_(d_output); // cheap, not a deep copy
     if (_activation) {
