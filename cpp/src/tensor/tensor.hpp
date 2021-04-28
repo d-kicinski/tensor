@@ -144,6 +144,22 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
         return Tensor<Element, AnyDim>(_data, shape, begin(), end());
     }
 
+    auto index(std::array<int, Dim> indices) const -> size_type
+    {
+        size_type offset = 1;
+        size_type index = 0;
+        for (int i = indices.size() - 1; i >= 0; --i) {
+            index += indices[i] * offset;
+            offset *= _dimensions[i];
+        }
+        return index;
+    }
+
+    auto at(size_type index) const -> Element &
+    {
+        return _begin[index];
+    }
+
     auto at(std::array<int, Dim> indices) const -> Element &
     {
         size_t offset = 1;
