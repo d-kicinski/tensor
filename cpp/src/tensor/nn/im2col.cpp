@@ -1,88 +1,103 @@
-#include <vector>
+#include <tensor/tensor.hpp>
 
 #include "im2col.hpp"
 
-// Function uses casting from int to unsigned to compare if value of
-// parameter a is greater or equal to zero and lower than value of
-// parameter b. The b parameter is of type signed and is always positive,
-// therefore its value is always lower than 0x800... where casting
-// negative value of a parameter converts it to value higher than 0x800...
-// The casting allows to use one condition instead of two.
-inline bool is_a_ge_zero_and_a_lt_b(int a, int b) { return static_cast<unsigned>(a) < static_cast<unsigned>(b); }
-
-template <typename Dtype>
-void ts::im2col::im2col(const Dtype *data_im, const int channels, const int height, const int width, const int kernel_h,
-                        const int kernel_w, const int pad_h, const int pad_w, const int stride_h, const int stride_w,
-                        const int dilation_h, const int dilation_w, Dtype *data_col)
+inline bool is_a_ge_zero_and_a_lt_b(long a, long b)
 {
-    const int output_h = (height + 2 * pad_h - (dilation_h * (kernel_h - 1) + 1)) / stride_h + 1;
-    const int output_w = (width + 2 * pad_w - (dilation_w * (kernel_w - 1) + 1)) / stride_w + 1;
-    const int channel_size = height * width;
-    for (int channel = channels; channel--; data_im += channel_size) {
-        for (int kernel_row = 0; kernel_row < kernel_h; kernel_row++) {
-            for (int kernel_col = 0; kernel_col < kernel_w; kernel_col++) {
-                int input_row = -pad_h + kernel_row * dilation_h;
-                for (int output_rows = output_h; output_rows; output_rows--) {
-                    if (!is_a_ge_zero_and_a_lt_b(input_row, height)) {
-                        for (int output_cols = output_w; output_cols; output_cols--) {
+    bool value = false;
+    if (a >= 0 && a < b)
+        value = true;
+    return value;
+}
+
+void ts::im2col::im2col(ts::Tensor<float, 3> &image, int kernel, int pad, int stride, int dilation,
+                        ts::Tensor<float, 2> &buffer)
+{
+    ts::size_type const channels = image.shape(0);
+    ts::size_type const height = image.shape(1);
+    ts::size_type const width = image.shape(2);
+
+    ts::size_type const dim_out = (height + 2 * pad - (dilation * (kernel - 1) + 1)) / stride + 1;
+    ts::size_type const channel_size = height * width;
+
+    float *data_col = buffer.raw_data_mutable();
+
+    for (int c = 0; c < channels; ++c) {
+        auto data = image(c);
+
+        for (int kernel_row = 0; kernel_row < kernel; kernel_row++) {
+            for (int kernel_col = 0; kernel_col < kernel; kernel_col++) {
+
+                int input_row = -pad + kernel_row * dilation; // start row of tile
+
+                for (int output_rows = (int)dim_out; output_rows; output_rows--) {
+
+                    if (!is_a_ge_zero_and_a_lt_b(input_row, (int) height)) {
+                        // this sets padding in output array
+                        for (int output_cols = (int)dim_out; output_cols; output_cols--) {
                             *(data_col++) = 0;
                         }
                     } else {
-                        int input_col = -pad_w + kernel_col * dilation_w;
-                        for (int output_col = output_w; output_col; output_col--) {
-                            if (is_a_ge_zero_and_a_lt_b(input_col, width)) {
-                                *(data_col++) = data_im[input_row * width + input_col];
+                        int input_col = -pad + kernel_col * dilation; // start column of tile
+
+                        for (int output_col = (int)dim_out; output_col; output_col--) {
+                            if (is_a_ge_zero_and_a_lt_b(input_col, (int)width)) {
+                                *(data_col++) = data.at({input_row, input_col});
                             } else {
+                                // this also sets padding
                                 *(data_col++) = 0;
                             }
-                            input_col += stride_w;
+                            input_col += stride;
                         }
                     }
-                    input_row += stride_h;
+                    input_row += stride;
                 }
             }
         }
     }
 }
 
-// Explicit instantiation
-template void ts::im2col::im2col<float>(const float *data_im, const int channels, const int height, const int width,
-                                        const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
-                                        const int stride_h, const int stride_w, const int dilation_h,
-                                        const int dilation_w, float *data_col);
 
-template <typename Dtype>
-void ts::im2col::col2im(const Dtype *data_col, const int channels, const int height, const int width,
-                        const int kernel_h, const int kernel_w, const int pad_h, const int pad_w, const int stride_h,
-                        const int stride_w, const int dilation_h, const int dilation_w, Dtype *data_im)
+void ts::im2col::col2im(ts::Tensor<float, 2> &buffer, int kernel, int pad, int stride, int dilation,
+                        ts::Tensor<float, 3> &image)
 {
-    //    caffe_set(height * width * channels, Dtype(0), data_im);
-    const int output_h = (height + 2 * pad_h - (dilation_h * (kernel_h - 1) + 1)) / stride_h + 1;
-    const int output_w = (width + 2 * pad_w - (dilation_w * (kernel_w - 1) + 1)) / stride_w + 1;
-    const int channel_size = height * width;
-    for (int channel = channels; channel--; data_im += channel_size) {
-        for (int kernel_row = 0; kernel_row < kernel_h; kernel_row++) {
-            for (int kernel_col = 0; kernel_col < kernel_w; kernel_col++) {
-                int input_row = -pad_h + kernel_row * dilation_h;
-                for (int output_rows = output_h; output_rows; output_rows--) {
-                    if (!is_a_ge_zero_and_a_lt_b(input_row, height)) {
-                        data_col += output_w;
+    ts::size_type const channels = image.shape(0);
+    ts::size_type const height = image.shape(1);
+    ts::size_type const width = image.shape(2);
+
+    ts::fill_(image, float(0));
+
+    ts::size_type const dim_out = (height + 2 * pad - (dilation * (kernel - 1) + 1)) / stride + 1;
+    ts::size_type const channel_size = height * width;
+
+    float *data_col = buffer.raw_data_mutable();
+
+    for (int c = 0; c < channels; ++c) {
+        auto data = image(c);
+
+        for (int kernel_row = 0; kernel_row < kernel; kernel_row++) {
+            for (int kernel_col = 0; kernel_col < kernel; kernel_col++) {
+                int input_row = -pad + kernel_row * dilation;
+                for (int output_rows = (int)dim_out; output_rows; output_rows--) {
+                    if (!is_a_ge_zero_and_a_lt_b(input_row, (int)height)) {
+                        data_col += dim_out;
                     } else {
-                        int input_col = -pad_w + kernel_col * dilation_w;
-                        for (int output_col = output_w; output_col; output_col--) {
-                            if (is_a_ge_zero_and_a_lt_b(input_col, width)) {
-                                data_im[input_row * width + input_col] += *data_col;
+                        int input_col = -pad + kernel_col * dilation;
+                        for (int output_col = (int)dim_out; output_col; output_col--) {
+                            if (is_a_ge_zero_and_a_lt_b(input_col, (int)width)) {
+                                data.at({input_row,  input_col}) += *data_col;
                             }
                             data_col++;
-                            input_col += stride_w;
+                            input_col += stride;
                         }
                     }
-                    input_row += stride_h;
+                    input_row += stride;
                 }
             }
         }
     }
 }
+
 auto ts::im2col::im2col_buffer_shape(const std::array<size_type, 3> &input_shape, int kernel_size, int stride, int pad,
                                      int dilatation) -> std::array<ts::size_type, 2>
 {
@@ -99,9 +114,3 @@ auto ts::im2col::im2col_buffer_shape(const std::array<size_type, 3> &input_shape
     }
     return output_shape;
 }
-
-// Explicit instantiation
-template void ts::im2col::col2im<float>(const float *data_col, const int channels, const int height, const int width,
-                                        const int kernel_h, const int kernel_w, const int pad_h, const int pad_w,
-                                        const int stride_h, const int stride_w, const int dilation_h,
-                                        const int dilation_w, float *data_im);
