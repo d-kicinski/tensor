@@ -43,8 +43,7 @@ class Net(ts.libtensor.LayerBase):
 
 
 def train() -> None:
-    normalize = lambda images: (images - 0.1307) / 0.3081
-    dataset_train = MNISTDataset("./data", train=True, batch_size=32, transform=normalize)
+    dataset_train = MNISTDataset("./data", train=True, batch_size=32, transform=None)
 
     model = Net()
     loss_fn = ts.nn.CrossEntropyLoss()
