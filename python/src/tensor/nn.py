@@ -8,10 +8,11 @@ from .libtensor import Activation
 
 class Conv2D(Op):
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int,
-                 activation: Activation = Activation.NONE, use_bias: bool = True):
+                 pad: int, dilatation: int, activation: Activation = Activation.NONE,
+                 use_bias: bool = True):
         super().__init__()
-        self._layer = _ts.Conv2D(in_channels, out_channels, kernel_size, stride, activation,
-                                 use_bias)
+        self._layer = _ts.Conv2D(in_channels, out_channels, kernel_size, stride, pad,
+                                 dilatation, activation, use_bias)
 
     def forward(self, *inputs: Variable):
         tensor: Variable
@@ -59,9 +60,9 @@ class Linear(Op):
 
 
 class MaxPool2D(Op):
-    def __init__(self, kernel_size: int, stride: int):
+    def __init__(self, kernel_size: int, stride: int, pad: int):
         super(MaxPool2D, self).__init__()
-        self._layer = _ts.MaxPool2D(kernel_size, stride)
+        self._layer = _ts.MaxPool2D(kernel_size, stride, pad)
 
     def forward(self, *inputs: Variable):
         tensor: Variable

@@ -15,7 +15,7 @@ class MNISTDataset:
         loader = MNIST(root, return_type="numpy")
         data, target = loader.load_training() if train else loader.load_testing()
 
-        self._data = data.reshape(-1, 28, 28, 1).astype(np.float32)
+        self._data = data.reshape(-1, 1, 28, 28).astype(np.float32)
         self._target = target.astype(np.int32)
         self._transform = transform
         self._n: int = 0
