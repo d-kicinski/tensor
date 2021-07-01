@@ -4,8 +4,9 @@
 #include <iostream>
 #include <string>
 
-#include "tensor/nn/dataset_iterator.hpp"
-#include "tensor/tensor.hpp"
+#include <tensor/tensor_forward.hpp>
+
+#include "dataset_iterator.hpp"
 
 namespace ts {
 

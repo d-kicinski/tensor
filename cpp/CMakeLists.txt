@@ -46,8 +46,6 @@ set(NN_SOURCES
         src/tensor/nn/cross_entropy_loss.cpp
         src/tensor/nn/regularization.hpp
         src/tensor/nn/softmax.hpp
-        src/tensor/nn/planar_dataset.cpp
-        src/tensor/nn/dataset_iterator.cpp
         src/tensor/nn/image_utils.hpp
         src/tensor/nn/image_utils.cpp
         src/tensor/nn/conv_2d_helpers.hpp
@@ -64,6 +62,9 @@ set(NN_SOURCES
         src/tensor/nn/im2col.hpp
         src/tensor/nn/conv_2d.cpp
         src/tensor/nn/max_pool_2d.cpp
+
+        src/tensor/nn/data/dataset_iterator.cpp
+        src/tensor/nn/data/planar_dataset.cpp
 
         src/tensor/nn/layer/feed_forward.cpp
         src/tensor/nn/layer/max_pool_2d.cpp
@@ -124,7 +125,6 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/test_ops_dot.cpp
             tests/tensor/nn/test_cross_entropy_loss.cpp
             tests/tensor/nn/test_softmax.cpp
-            tests/tensor/nn/test_planar_dataset.cpp
             tests/tensor/nn/test_image_utils.cpp
             tests/tensor/nn/test_conv_2d_helpers.cpp
             tests/tensor/nn/test_activation.cpp
@@ -133,7 +133,7 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/nn/test_im2col.cpp
             tests/tensor/nn/test_max_pool_2d.cpp
             tests/tensor/nn/test_conv_2d.cpp
-
+            tests/tensor/nn/data/test_planar_dataset.cpp
             tests/tensor/nn/layer/test_feed_forward.cpp
             tests/tensor/nn/layer/test_conv_2d.cpp
             )

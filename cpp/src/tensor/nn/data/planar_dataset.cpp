@@ -1,3 +1,5 @@
+#include <tensor/tensor.hpp>
+
 #include "planar_dataset.hpp"
 
 ts::PlanarDataset::PlanarDataset(const std::string &path, bool header_line, int batch_size) : _batch_size(batch_size)

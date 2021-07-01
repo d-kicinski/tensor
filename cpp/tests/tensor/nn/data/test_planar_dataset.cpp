@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include <tensor/nn/planar_dataset.hpp>
+#include <tensor/nn/data/planar_dataset.hpp>
 
 constexpr auto DATASET_PATH = "resources/example_planar_data.tsv";
 
