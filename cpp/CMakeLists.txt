@@ -66,8 +66,8 @@ set(NN_SOURCES
         src/tensor/nn/layer/feed_forward.cpp
         src/tensor/nn/layer/max_pool_2d.cpp
         src/tensor/nn/layer/layer_base.cpp
-        src/tensor/nn/layer/conv2d_naive.cpp
-        src/tensor/nn/layer/conv2d_im2col.cpp
+        src/tensor/nn/layer/conv_2d_naive.cpp
+        src/tensor/nn/layer/conv_2d_im2col.cpp
         )
 
 if (TENSOR_USE_PROTOBUF)
