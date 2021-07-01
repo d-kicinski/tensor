@@ -1,10 +1,9 @@
 #include "conv2d_naive.hpp"
-#include "functional.hpp"
-#include "initialization.hpp"
+#include "tensor/nn/functional.hpp"
+#include "tensor/nn/initialization.hpp"
 
-
-ts::naive::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size, int stride,
-                   Activation activation)
+ts::naive::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size,
+                          int stride, Activation activation)
     : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)), _stride(stride),
       _kernel_size(kernel_size)
 {
@@ -15,7 +14,7 @@ ts::naive::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<floa
 }
 
 auto ts::naive::Conv2D::create(int in_channels, int out_channels, int kernel_size, int stride, Activation activation,
-                        bool use_bias) -> Conv2D
+                               bool use_bias) -> Conv2D
 {
     std::vector<int> shape = {kernel_size * kernel_size * in_channels, out_channels};
     Variable<float, 2> weight(std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)),

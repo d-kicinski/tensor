@@ -1,9 +1,15 @@
 #include "max_pool_2d.hpp"
-#include "functional.hpp"
+#include "tensor/nn/functional.hpp"
 
-ts::MaxPool2D::MaxPool2D(int kernel_size, int stride, int pad) : _dim_in(-1), _kernel_size(kernel_size), _stride(stride), _pad(pad) {}
+ts::MaxPool2D::MaxPool2D(int kernel_size, int stride, int pad)
+    : _dim_in(-1), _kernel_size(kernel_size), _stride(stride), _pad(pad)
+{
+}
 
-auto ts::MaxPool2D::create(int kernel_size, int stride, int pad) -> MaxPool2D { return MaxPool2D(kernel_size, stride, pad); }
+auto ts::MaxPool2D::create(int kernel_size, int stride, int pad) -> MaxPool2D
+{
+    return MaxPool2D(kernel_size, stride, pad);
+}
 
 auto ts::MaxPool2D::operator()(Tensor<float, 4> const &input) -> Tensor<float, 4> { return forward(input); }
 

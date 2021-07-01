@@ -1,5 +1,5 @@
 #include "feed_forward.hpp"
-#include "initialization.hpp"
+#include "tensor/nn/initialization.hpp"
 
 namespace ts {
 

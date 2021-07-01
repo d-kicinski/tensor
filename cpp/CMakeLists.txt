@@ -43,7 +43,6 @@ endif ()
 
 
 set(NN_SOURCES
-        src/tensor/nn/feed_forward.cpp
         src/tensor/nn/cross_entropy_loss.cpp
         src/tensor/nn/regularization.hpp
         src/tensor/nn/softmax.hpp
@@ -60,18 +59,15 @@ set(NN_SOURCES
         src/tensor/nn/optimizers.hpp
         src/tensor/nn/variable.cpp
         src/tensor/nn/variable.hpp
-        src/tensor/nn/max_pool_2d.cpp
-        src/tensor/nn/max_pool_2d.hpp
         src/tensor/nn/initialization.hpp
-        src/tensor/nn/layer_base.cpp
-        src/tensor/nn/layer_base.hpp
         src/tensor/nn/im2col.cpp
         src/tensor/nn/im2col.hpp
-        src/tensor/nn/conv2d.hpp
-        src/tensor/nn/conv2d_naive.cpp
-        src/tensor/nn/conv2d_naive.hpp
-        src/tensor/nn/conv2d_im2col.cpp
-        src/tensor/nn/conv2d_im2col.hpp
+
+        src/tensor/nn/layer/feed_forward.cpp
+        src/tensor/nn/layer/max_pool_2d.cpp
+        src/tensor/nn/layer/layer_base.cpp
+        src/tensor/nn/layer/conv2d_naive.cpp
+        src/tensor/nn/layer/conv2d_im2col.cpp
         )
 
 if (TENSOR_USE_PROTOBUF)

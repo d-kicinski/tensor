@@ -1,7 +1,8 @@
 #pragma once
 
-#include "variable.hpp"
 #include <tensor/tensor.hpp>
+
+#include "tensor/nn/variable.hpp"
 
 namespace ts {
 

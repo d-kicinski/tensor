@@ -1,9 +1,10 @@
 #pragma once
 
-#include "activations.hpp"
-#include "layer_base.hpp"
-#include "variable.hpp"
 #include <tensor/tensor.hpp>
+
+#include "layer_base.hpp"
+#include "tensor/nn/activations.hpp"
+#include "tensor/nn/variable.hpp"
 
 namespace ts {
 
