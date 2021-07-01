@@ -2,9 +2,10 @@
 #include <pybind11/stl.h>
 
 #include <tensor/nn/activations.hpp>
-#include <tensor/nn/conv2d.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
-#include <tensor/nn/feed_forward.hpp>
+#include <tensor/nn/layer/conv_2d.hpp>
+#include <tensor/nn/layer/feed_forward.hpp>
+#include <tensor/nn/layer/max_pool_2d.hpp>
 #include <tensor/nn/max_pool_2d.hpp>
 #include <tensor/nn/optimizers.hpp>
 #include <tensor/nn/softmax.hpp>
