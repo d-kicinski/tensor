@@ -1,18 +1,18 @@
 
 #include <tensor/nn/activations.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
-#include <tensor/nn/feed_forward.hpp>
+#include <tensor/nn/data/planar_dataset.hpp>
+#include <tensor/nn/layer/feed_forward.hpp>
 #include <tensor/nn/optimizers.hpp>
-#include <tensor/nn/planar_dataset.hpp>
 
 class Model {
 
   public:
     using VectorRef = std::vector<std::reference_wrapper<ts::GradHolder<float>>>;
 
-    Model()
-    : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)),
-      _layer2(ts::FeedForward::create(100, 3)) {}
+    Model() : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)), _layer2(ts::FeedForward::create(100, 3))
+    {
+    }
 
     auto predict(ts::MatrixF const &inputs) -> ts::VectorI { return ts::argmax(_forward(inputs)); }
 
@@ -22,9 +22,7 @@ class Model {
         return _loss(logits, labels);
     }
 
-    auto backward() -> void {
-        _layer1.backward(_layer2.backward(_loss.backward()));
-    }
+    auto backward() -> void { _layer1.backward(_layer2.backward(_loss.backward())); }
 
     auto weights() -> VectorRef
     {
@@ -45,10 +43,7 @@ class Model {
     ts::FeedForward _layer2;
     ts::CrossEntropyLoss _loss;
 
-    auto _forward(ts::MatrixF const &inputs) -> ts::MatrixF
-    {
-        return _layer2(_layer1(inputs));
-    }
+    auto _forward(ts::MatrixF const &inputs) -> ts::MatrixF { return _layer2(_layer1(inputs)); }
 };
 
 auto train(Model &model, ts::SGD<float> &optimizer, ts::PlanarDataset &dataset) -> float
@@ -62,15 +57,14 @@ auto train(Model &model, ts::SGD<float> &optimizer, ts::PlanarDataset &dataset) 
             model.backward();
             optimizer.step();
             if (epoch_i % 10 == 0)
-                std::cout << "epoch: " << epoch_i << "/" << epoch_num << " loss: " << loss
-                          << std::endl;
+                std::cout << "epoch: " << epoch_i << "/" << epoch_num << " loss: " << loss << std::endl;
         }
     }
     std::cout << "epoch: " << epoch_num << "/" << epoch_num << " loss: " << loss << std::endl;
     return loss;
 }
 
-auto label(Model &model, ts::PlanarDataset &dataset) ->ts::VectorI
+auto label(Model &model, ts::PlanarDataset &dataset) -> ts::VectorI
 {
     std::vector<ts::Tensor<int, 1>> labels;
 
