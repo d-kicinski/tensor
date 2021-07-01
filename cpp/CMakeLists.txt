@@ -48,10 +48,10 @@ set(NN_SOURCES
         src/tensor/nn/softmax.hpp
         src/tensor/nn/planar_dataset.cpp
         src/tensor/nn/dataset_iterator.cpp
-        src/tensor/nn/functional.hpp
-        src/tensor/nn/functional.cpp
-        src/tensor/nn/functional_helpers.hpp
-        src/tensor/nn/functional_helpers.cpp
+        src/tensor/nn/image_utils.hpp
+        src/tensor/nn/image_utils.cpp
+        src/tensor/nn/conv_2d_helpers.hpp
+        src/tensor/nn/conv_2d_helpers.cpp
         src/tensor/nn/softmax.cpp
         src/tensor/nn/activations.cpp
         src/tensor/nn/activations.hpp
@@ -62,6 +62,8 @@ set(NN_SOURCES
         src/tensor/nn/initialization.hpp
         src/tensor/nn/im2col.cpp
         src/tensor/nn/im2col.hpp
+        src/tensor/nn/conv_2d.cpp
+        src/tensor/nn/max_pool_2d.cpp
 
         src/tensor/nn/layer/feed_forward.cpp
         src/tensor/nn/layer/max_pool_2d.cpp
@@ -120,21 +122,24 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/test_tensor.cpp
             tests/tensor/test_ops_common.cpp
             tests/tensor/test_ops_dot.cpp
-            tests/tensor/nn/test_feed_forward.cpp
             tests/tensor/nn/test_cross_entropy_loss.cpp
             tests/tensor/nn/test_softmax.cpp
-            tests/tensor/nn/test_conv2d.cpp
             tests/tensor/nn/test_planar_dataset.cpp
-            tests/tensor/nn/test_functional.cpp
-            tests/tensor/nn/test_functional_helpers.cpp
+            tests/tensor/nn/test_image_utils.cpp
+            tests/tensor/nn/test_conv_2d_helpers.cpp
             tests/tensor/nn/test_activation.cpp
             tests/tensor/nn/test_optimizers.cpp
             tests/tensor/nn/test_variable.cpp
             tests/tensor/nn/test_im2col.cpp
+            tests/tensor/nn/test_max_pool_2d.cpp
+            tests/tensor/nn/test_conv_2d.cpp
+
+            tests/tensor/nn/layer/test_feed_forward.cpp
+            tests/tensor/nn/layer/test_conv_2d.cpp
             )
 
     if (TENSOR_USE_PROTOBUF)
-        set(NN_TEST_SOURCES ${NN_TEST_SOURCES} tests/tensor/nn/test_saver.cpp)
+        set(NN_TEST_SOURCES ${NN_TEST_SOURCES} tests/tensor/nn/test_saver.cpp tests/tensor/nn/test_max_pool_2d.cpp tests/tensor/nn/test_conv_2d.cpp)
     endif ()
 
     add_executable(tests ${NN_TEST_SOURCES})

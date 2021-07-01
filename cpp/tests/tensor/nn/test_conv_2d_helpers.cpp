@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include <tensor/nn/functional_helpers.hpp>
+#include <tensor/nn/conv_2d_helpers.hpp>
 #include <tensor/tensor.hpp>
 
 TEST_CASE("_get_flatten_tile(Tensor<float, 3>, ...)")
