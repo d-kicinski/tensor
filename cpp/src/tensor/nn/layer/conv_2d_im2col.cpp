@@ -1,7 +1,7 @@
-#include "conv2d_im2col.hpp"
-#include "tensor/nn/functional.hpp"
+#include "conv_2d_im2col.hpp"
 #include "tensor/nn/im2col.hpp"
 #include "tensor/nn/initialization.hpp"
+#include <tensor/nn/conv_2d.hpp>
 
 ts::im2col::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size,
                            int stride, int pad, int dilatation, Activation activation)

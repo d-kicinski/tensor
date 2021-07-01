@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 
-#include <tensor/nn/feed_forward.hpp>
+#include <tensor/nn/layer/feed_forward.hpp>
 
 using namespace ts;
 

@@ -1,8 +1,8 @@
 #include <catch2/catch.hpp>
 
-#include <tensor/nn/conv2d_naive.hpp>
-#include <tensor/nn/conv2d_im2col.hpp>
-#include <tensor/nn/functional_helpers.hpp>
+#include <tensor/nn/conv_2d_helpers.hpp>
+#include <tensor/nn/layer/conv_2d_im2col.hpp>
+#include <tensor/nn/layer/conv_2d_naive.hpp>
 
 using namespace ts;
 

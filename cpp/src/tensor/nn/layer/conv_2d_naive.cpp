@@ -1,6 +1,6 @@
-#include "conv2d_naive.hpp"
-#include "tensor/nn/functional.hpp"
+#include "conv_2d_naive.hpp"
 #include "tensor/nn/initialization.hpp"
+#include <tensor/nn/conv_2d.hpp>
 
 ts::naive::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size,
                           int stride, Activation activation)
