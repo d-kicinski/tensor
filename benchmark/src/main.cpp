@@ -1,7 +1,8 @@
 #include <chrono>
-#include <tensor/nn/conv2d_naive.hpp>
-#include <tensor/nn/conv2d_im2col.hpp>
-#include <tensor/nn/feed_forward.hpp>
+
+#include <tensor/nn/layer/conv_2d_im2col.hpp>
+#include <tensor/nn/layer/conv_2d_naive.hpp>
+#include <tensor/nn/layer/feed_forward.hpp>
 #include <tensor/tensor.hpp>
 
 using namespace std::chrono;
@@ -17,7 +18,7 @@ auto benchmark(std::function<void(void)> const &fn, size_t const runs = 1000) ->
 {
     std::vector<uint> results(runs);
 
-    for (auto & r: results) {
+    for (auto &r : results) {
         auto time_start = high_resolution_clock::now();
         fn();
         auto time_end = high_resolution_clock::now();
@@ -31,26 +32,26 @@ auto benchmark_matrix_multiply() -> void
     std::cout << "ts::dot with blas: " << std::endl;
     {
         auto [a, b] = create_matrices(64, 512, 10);
-        auto time = benchmark([a=std::ref(a), b=std::ref(b)](){ ts::blas::dot(a, b);} );
+        auto time = benchmark([a = std::ref(a), b = std::ref(b)]() { ts::blas::dot(a, b); });
         std::cout << "\t[64, 512]x[512, 10]: " << time << " us" << std::endl;
     }
 
     {
         auto [a, b] = create_matrices(128, 1024, 10);
-        auto time = benchmark([a=std::ref(a), b=std::ref(b)](){ ts::blas::dot(a, b);} );
+        auto time = benchmark([a = std::ref(a), b = std::ref(b)]() { ts::blas::dot(a, b); });
         std::cout << "\t[128, 1024]x[1024, 10]: " << time << " us" << std::endl;
     }
 
     std::cout << "ts::dot with naive: " << std::endl;
     {
         auto [a, b] = create_matrices(64, 512, 10);
-        auto time = benchmark([a=std::ref(a), b=std::ref(b)](){ ts::naive::dot(a, b);} );
+        auto time = benchmark([a = std::ref(a), b = std::ref(b)]() { ts::naive::dot(a, b); });
         std::cout << "\t[64, 512]x[512, 10]: " << time << " us" << std::endl;
     }
 
     {
         auto [a, b] = create_matrices(128, 1024, 10);
-        auto time = benchmark([a=std::ref(a), b=std::ref(b)](){ ts::naive::dot(a, b);} );
+        auto time = benchmark([a = std::ref(a), b = std::ref(b)]() { ts::naive::dot(a, b); });
         std::cout << "\t[128, 1024]x[1024, 10]: " << time << " us" << std::endl;
     }
 }
@@ -61,15 +62,15 @@ auto benchmark_linear() -> void
     auto output = ts::MatrixF();
     {
         auto layer = ts::FeedForward::create(512, 10, ts::Activation::NONE);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
+        auto time_fw = benchmark([&]() { output = layer(input); }, 100);
+        auto time_bw = benchmark([&]() { layer.backward(output); }, 100);
         std::cout << "Linear::forward " << time_fw << " us" << std::endl;
         std::cout << "Linear::backward " << time_bw << " us" << std::endl;
     }
     {
         auto layer = ts::FeedForward::create(512, 10, ts::Activation::RELU);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
+        auto time_fw = benchmark([&]() { output = layer(input); }, 100);
+        auto time_bw = benchmark([&]() { layer.backward(output); }, 100);
         std::cout << "Linear[ReLU]::forward " << time_fw << " us" << std::endl;
         std::cout << "Linear[ReLU]::backward " << time_bw << " us" << std::endl;
     }
@@ -80,18 +81,16 @@ auto benchmark_conv2d_naive() -> void
     auto input = ts::Tensor<float, 4>(16, 64, 64, 3);
     auto output = ts::Tensor<float, 4>();
     {
-        auto layer = ts::naive::Conv2D::create(3, 24, 3, 1,
-                                        ts::Activation::NONE, false);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
+        auto layer = ts::naive::Conv2D::create(3, 24, 3, 1, ts::Activation::NONE, false);
+        auto time_fw = benchmark([&]() { output = layer(input); }, 100);
+        auto time_bw = benchmark([&]() { layer.backward(output); }, 100);
         std::cout << "naive::Conv2D::forward " << time_fw << " us" << std::endl;
         std::cout << "naive::Conv2D::backward " << time_bw << " us" << std::endl;
     }
     {
-        auto layer = ts::naive::Conv2D::create(3, 24, 3, 1,
-                                        ts::Activation::RELU, false);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
+        auto layer = ts::naive::Conv2D::create(3, 24, 3, 1, ts::Activation::RELU, false);
+        auto time_fw = benchmark([&]() { output = layer(input); }, 100);
+        auto time_bw = benchmark([&]() { layer.backward(output); }, 100);
         std::cout << "naive::Conv2D[ReLU]::forward " << time_fw << " us" << std::endl;
         std::cout << "naive::Conv2D[ReLU]::backward " << time_bw << " us" << std::endl;
     }
@@ -102,18 +101,16 @@ auto benchmark_conv2d_im2col() -> void
     auto input = ts::Tensor<float, 4>(16, 3, 64, 64);
     auto output = ts::Tensor<float, 4>();
     {
-        auto layer = ts::im2col::Conv2D::create(3, 24, 3, 1, 0, 1,
-                                               ts::Activation::NONE, false);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
+        auto layer = ts::im2col::Conv2D::create(3, 24, 3, 1, 0, 1, ts::Activation::NONE, false);
+        auto time_fw = benchmark([&]() { output = layer(input); }, 100);
+        auto time_bw = benchmark([&]() { layer.backward(output); }, 100);
         std::cout << "im2col::Conv2D::forward " << time_fw << " us" << std::endl;
         std::cout << "im2col::Conv2D::backward " << time_bw << " us" << std::endl;
     }
     {
-        auto layer = ts::im2col::Conv2D::create(3, 24, 3, 1, 0, 1,
-                                               ts::Activation::RELU, false);
-        auto time_fw = benchmark([&](){ output = layer(input); }, 100);
-        auto time_bw = benchmark([&](){ layer.backward(output); }, 100);
+        auto layer = ts::im2col::Conv2D::create(3, 24, 3, 1, 0, 1, ts::Activation::RELU, false);
+        auto time_fw = benchmark([&]() { output = layer(input); }, 100);
+        auto time_bw = benchmark([&]() { layer.backward(output); }, 100);
         std::cout << "im2col::Conv2D[ReLU]::forward " << time_fw << " us" << std::endl;
         std::cout << "im2col::Conv2D[ReLU]::backward " << time_bw << " us" << std::endl;
     }
