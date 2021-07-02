@@ -7,8 +7,6 @@
 
 namespace ts {
 
-namespace naive {
-
 class Conv2D : public LayerBase<float> {
   public:
     using Activations = ActivationFactory<float, 4>;
@@ -40,7 +38,5 @@ class Conv2D : public LayerBase<float> {
     int _stride;
     int _kernel_size;
 };
-
-} // namespace naive
 
 } // namespace ts

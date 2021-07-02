@@ -75,7 +75,9 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     Tensor(Tensor<Element, Dim + 1> const &tensor, size_type index);
 
-    Tensor(data_t data, std::array<size_type, Dim> shape);
+    Tensor(data_t data, std::array<size_type, Dim> shape, iterator begin, iterator end);
+
+    Tensor(data_t data, std::array<size_type, Dim> shape) : Tensor(data, shape, data->begin(), data->end()){};
 
     template <typename... Indices> auto operator()(size_type first, Indices... rest) -> decltype(auto);
 
@@ -139,7 +141,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     template <int AnyDim> auto reshape(std::array<size_type, AnyDim> shape) const -> Tensor<Element, AnyDim>
     {
-        return Tensor<Element, AnyDim>(_data, shape);
+        return Tensor<Element, AnyDim>(_data, shape, begin(), end());
     }
 
     auto at(std::array<int, Dim> indices) const -> Element &
@@ -170,13 +172,9 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
         return std::make_pair(begin, end);
     }
 
-    auto raw_data_mutable() -> float* {
-        return _data.get()->data();
-    }
+    auto raw_data_mutable() -> float * { return _data.get()->data(); }
 
-    auto raw_data() -> float const * {
-        return _data.get()->data();
-    }
+    auto raw_data() -> float const * { return _data.get()->data(); }
 
     auto static randn(std::vector<int> const &shape) -> Tensor;
 
@@ -437,13 +435,14 @@ template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(std::initializ
     _end = _data->end();
 }
 
-template <typename Element, int Dim> Tensor<Element, Dim>::Tensor(data_t data, std::array<size_type, Dim> shape)
+template <typename Element, int Dim>
+Tensor<Element, Dim>::Tensor(data_t data, std::array<size_type, Dim> shape, iterator begin, iterator end)
 {
     _data_size = std::reduce(shape.begin(), shape.end(), 1, std::multiplies());
     _dimensions = shape;
     _data = data;
-    _begin = _data->begin();
-    _end = _data->end();
+    _begin = begin;
+    _end = end;
 }
 
 template <typename Element, int Dim> auto Tensor<Element, Dim>::operator-() -> Tensor &

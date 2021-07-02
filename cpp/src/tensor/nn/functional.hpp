@@ -4,6 +4,10 @@
 
 namespace ts {
 
+auto conv_2d_im2col(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel,
+                    ts::Tensor<float, 2> &im2col_buffer, int kernel_size, int stride, int pad, int dilatation)
+    -> ts::Tensor<float, 4>;
+
 auto conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel, int kernel_size, size_type stride)
     -> ts::Tensor<float, 4>;
 

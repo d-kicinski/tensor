@@ -69,7 +69,7 @@ set(NN_SOURCES
         src/tensor/nn/layer_base.hpp
         src/tensor/nn/im2col.cpp
         src/tensor/nn/im2col.hpp
-        )
+        src/tensor/nn/conv2d_im2col.cpp src/tensor/nn/conv2d_im2col.hpp)
 
 if (TENSOR_USE_PROTOBUF)
     set(NN_PROTO_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src/tensor/nn/proto)

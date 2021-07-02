@@ -83,6 +83,41 @@ auto dot(MatrixF const &A, MatrixF const &B, bool A_T, bool B_T) -> MatrixF
     return C;
 }
 
+auto dot(MatrixF const &A, MatrixF const &B, MatrixF &C, bool A_T, bool B_T) -> MatrixF
+{
+    int m = A.shape(0);
+    int n = B.shape(1);
+    int k = A.shape(1);
+    int lda = k;
+    int ldb = n;
+    CBLAS_TRANSPOSE trans_A = CBLAS_TRANSPOSE::CblasNoTrans;
+    CBLAS_TRANSPOSE trans_B = CBLAS_TRANSPOSE::CblasNoTrans;
+
+    if (A_T) {
+        trans_A = CBLAS_TRANSPOSE::CblasTrans;
+        m = A.shape(1);
+        k = A.shape(0);
+        lda = m;
+    }
+    if (B_T) {
+        trans_B = CBLAS_TRANSPOSE::CblasTrans;
+        n = B.shape(0);
+        ldb = k;
+    }
+
+    // A or B could be just view on higher dimensional tensor, if I want to use raw pointer to
+    // underlining data I have to take that into account
+    auto A_data = A.data()->data() + std::distance(A.data().get()->begin(), A.begin());
+    auto B_data = B.data()->data() + std::distance(B.data().get()->begin(), B.begin());
+
+    if (C.shape() != std::array<ts::size_type, 2>{m, n}) {
+        return C;
+    }
+    cblas_sgemm(CBLAS_ORDER::CblasRowMajor, trans_A, trans_B, m, n, k, 1.0f, A_data, lda, B_data, ldb, 0.0f,
+                C.data()->data(), C.shape(1));
+    return C;
+}
+
 auto dot(Tensor<float, 3> const &A, MatrixF const &B) -> Tensor<float, 3>
 {
     int batch_size = A.shape(0);

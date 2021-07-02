@@ -1,6 +1,8 @@
 #include "functional.hpp"
 #include "functional_helpers.hpp"
 
+#include "im2col.hpp"
+
 auto ts::pad(ts::MatrixF const &matrix, int pad_row, int pad_col) -> ts::MatrixF
 {
     ts::MatrixF matrix_padded(matrix.shape(0) + 2 * pad_row, matrix.shape(1) + 2 * pad_col);
@@ -10,6 +12,33 @@ auto ts::pad(ts::MatrixF const &matrix, int pad_row, int pad_col) -> ts::MatrixF
         }
     }
     return matrix_padded;
+}
+
+auto ts::conv_2d_im2col(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel,
+                        ts::Tensor<float, 2> &im2col_buffer, int kernel_size, int stride, int pad, int dilatation)
+    -> ts::Tensor<float, 4>
+{
+    ts::size_type batch_size = images.shape(0);
+
+    // we assume CHW image format
+    ts::size_type C = images.shape(1);
+    ts::size_type H = images.shape(2);
+    ts::size_type W = images.shape(3);
+
+    ts::size_type dim_out = ts::_calculate_output_dim(H, kernel_size, pad, stride, dilatation);
+    ts::Tensor<float, 4> results(batch_size, C, dim_out, dim_out);
+
+#pragma omp parallel for
+    for (int b = 0; b < batch_size; ++b) {
+        auto image = images(b).reshape<3>({batch_size, C, H * W});
+        auto result = results(b);
+        im2col(image.raw_data(), C, H, W, kernel_size, kernel_size, pad, pad, stride, stride, dilatation, dilatation,
+                   im2col_buffer.raw_data_mutable());
+        auto result_reshaped = result.reshape<2>({C, dim_out * dim_out});
+        ts::dot(kernel, im2col_buffer, result_reshaped, false, false);
+        result = result_reshaped.reshape<3>({C, dim_out, dim_out});
+    }
+    return results;
 }
 
 auto ts::conv_2d(ts::Tensor<float, 4> const &images, ts::Tensor<float, 2> const &kernel, int kernel_size,
