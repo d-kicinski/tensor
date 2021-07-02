@@ -27,6 +27,13 @@ Features:
 * Python
     * wrapper for major of the `tensor` and `tensor/nn` functionalities
     * experimental autograd module
+    
+Coming soon:
+* `tensor`:
+    * improved naive GEMM implementation using AVX2 intrinsics
+* `tensor/nn`:
+    * layers: RNN, SelfAttention, BatchNorm, LayerNorm
+
 
 ### Examples
 * C++:
