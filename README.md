@@ -16,22 +16,35 @@ The design goal is to create a numpy/pytorch alike interface for interacting
 with multidimensional arrays packaged in a simple, relatively lightweight, library with limited external dependencies that
 could be used on platforms like android phones and microcontrollers.
 
+Features:
+* `tensor`:
+    * classes and utilities for interacting with nd-arrays
+    * sane interface to gemm routines
+* `tensor/nn`: 
+    * layers: FeedForward, Conv2D(naive/im2col), Pooling
+    * optimizers: SGD
+    * saving/restoring models using protobuf
+* Python
+    * wrapper for major of the `tensor` and `tensor/nn` functionalities
+    * experimental autograd module
 
-
+### Examples
+* C++:
+    * [nn-planar-data example](https://github.com/d-kicinski/tensor/tree/master/examples/nn-planar-data)
+    * [embedded application](https://github.com/d-kicinski/tensor-example-embedded)
+    
+* Python:
+    * [MNIST](https://github.com/d-kicinski/tensor/tree/master/python/examples/mnist)
+    * [autograd capabilities](https://github.com/d-kicinski/tensor/tree/master/python/examples/autograd)
+  
 ### How to use in your C++ project
 If you're using cmake see [tensor-example](https://github.com/dawidkski/tensor-example) for example usage.
 
-#### Usage of `tensor/nn` module
-For example usage jump to [nn-planar-data example](https://github.com/d-kicinski/tensor/tree/master/examples/nn-planar-data)
-
-#### Usage of `tensor` module in embedded application
-See this [repository](https://github.com/d-kicinski/tensor-example-embedded)
-
-#### Example usages of `tensor` module
-For basic usages see this [doc](https://tensor-library.readthedocs.io/en/latest/usage.html)
-
-### Usage of Python wrapper
+### How to use Python wrapper
 Install the latest release `pip install https://github.com/d-kicinski/tensor/releases/download/v0.2.0/tensor-0.2.0-cp38-cp38-linux_x86_64.whl`.
 Alternatively, clone this repo and build it by yourself.
 
-The current state of autgrad capabilities can be seen in [here](https://github.com/d-kicinski/tensor/tree/master/python/examples/autograd)
+
+### Documentation
+For basic usages see this [doc](https://tensor-library.readthedocs.io/en/latest/usage.html)
+
