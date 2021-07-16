@@ -10,29 +10,9 @@
 #include <vector>
 
 #include "ops.hpp"
-#include "tensor_forward.hpp"
+#include "data_holder.hpp"
 
 namespace ts {
-
-template <typename Element> class DataHolder {
-  public:
-    using vector_t = std::vector<Element>;
-    using data_t = std::shared_ptr<vector_t>;
-    using iterator = typename vector_t::iterator;
-    data_t _vector;
-
-    DataHolder() : _vector(nullptr){};
-
-    virtual auto get() const -> data_t { return _vector; }
-    virtual auto begin() const -> iterator { return _vector->begin(); }
-    virtual auto end() const -> iterator { return _vector->end(); }
-};
-
-/**
- *
- * @tparam Element is the type of array element
- * @tparam Dim is the number of dimensions
- */
 
 template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
@@ -40,7 +20,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
   public:
     using vector_t = typename DataHolder<Element>::vector_t;
-    using data_t = typename DataHolder<Element>::data_t;
+    using data_t = typename DataHolder<Element>::data_ptr_t;
     using iterator = typename DataHolder<Element>::iterator;
 
     auto data() const -> data_t { return _data; };

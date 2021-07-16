@@ -11,6 +11,9 @@
 #include <tensor/nn/softmax.hpp>
 #include <tensor/tensor.hpp>
 
+#include "py_data_holder.hpp"
+#include "py_grad_holder.hpp"
+
 #ifdef TENSOR_USE_PROTOBUF
 #include <tensor/nn/saver.hpp>
 #endif
@@ -273,12 +276,17 @@ template <typename Element, int Dim> auto wrap_nn_activations(pybind11::module &
         .def("backward", &ts::ReLU<Element, Dim>::backward);
 }
 
-template <typename Element> auto wrap_grad_holder(pybind11::module &m, char const *class_name)
+auto wrap_grad_holder(pybind11::module &m)
 {
-    py::class_<ts::GradHolder<Element>>(m, class_name)
+    py::class_<ts::GradHolder<float>, PyGradHolderFloat>(m, "GradHolderF")
         .def(py::init<>())
-        .def("tensor", &ts::GradHolder<Element>::tensor, py::return_value_policy::reference_internal)
-        .def("grad", &ts::GradHolder<Element>::grad, py::return_value_policy::reference_internal);
+        .def("tensor", &ts::GradHolder<float>::tensor, py::return_value_policy::reference_internal)
+        .def("grad", &ts::GradHolder<float>::grad, py::return_value_policy::reference_internal);
+
+    py::class_<ts::GradHolder<int>, PyGradHolderInt>(m, "GradHolderI")
+        .def(py::init<>())
+        .def("tensor", &ts::GradHolder<int>::tensor, py::return_value_policy::reference_internal)
+        .def("grad", &ts::GradHolder<int>::grad, py::return_value_policy::reference_internal);
 }
 
 template <typename Element, int Dim> auto wrap_variable(pybind11::module &m, char const *class_name)
@@ -291,8 +299,7 @@ template <typename Element, int Dim> auto wrap_variable(pybind11::module &m, cha
 
 auto wrap_nn(pybind11::module &m)
 {
-    wrap_grad_holder<float>(m, "GradHolderF");
-    wrap_grad_holder<int>(m, "GradHolderI");
+    wrap_grad_holder(m);
 
     wrap_variable<float, 1>(m, "Variable1F");
     wrap_variable<float, 2>(m, "Variable2F");
@@ -367,9 +374,8 @@ auto wrap_nn(pybind11::module &m)
 
 PYBIND11_MODULE(libtensor, m)
 {
-    py::class_<ts::DataHolder<int>>(m, "DataHolderI").def(py::init<>());
-
-    py::class_<ts::DataHolder<float>>(m, "DataHolderF").def(py::init<>());
+    py::class_<ts::DataHolder<int>, PyDataHolderInt>(m, "DataHolderI").def(py::init<>());
+    py::class_<ts::DataHolder<float>, PyDataHolderFloat>(m, "DataHolderF").def(py::init<>());
 
     wrap_tensor4D<int>(m, "Tensor4I");
     wrap_tensor4D<float>(m, "Tensor4F");

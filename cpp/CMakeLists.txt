@@ -2,11 +2,12 @@ set(COMPILE_OPTIONS -fno-exceptions -fno-rtti)
 
 set(SOURCES
         src/tensor/ts.hpp
-        src/tensor/tensor.hpp
+        src/tensor/data_holder.cpp
         src/tensor/tensor.cpp
+
         src/tensor/ops.hpp
-        src/tensor/ops_common.hpp
         src/tensor/ops_common.cpp
+
         src/tensor/statistics.hpp
         )
 
@@ -43,6 +44,9 @@ endif ()
 
 
 set(NN_SOURCES
+        src/tensor/nn/grad_holder.cpp
+        src/tensor/nn/variable.cpp
+
         src/tensor/nn/cross_entropy_loss.cpp
         src/tensor/nn/regularization.hpp
         src/tensor/nn/softmax.hpp
@@ -55,8 +59,6 @@ set(NN_SOURCES
         src/tensor/nn/activations.hpp
         src/tensor/nn/optimizers.cpp
         src/tensor/nn/optimizers.hpp
-        src/tensor/nn/variable.cpp
-        src/tensor/nn/variable.hpp
         src/tensor/nn/initialization.hpp
         src/tensor/nn/im2col.cpp
         src/tensor/nn/im2col.hpp
@@ -166,7 +168,10 @@ endif ()
 if (TENSOR_BUILD_PYTHON_WRAPPER)
     set(PYTHON_LIB libtensor)
     add_library(${PYTHON_LIB} MODULE
-            src/wrapper/tensor.cpp)
+            src/wrapper/tensor.cpp
+            src/wrapper/py_data_holder.hpp
+            src/wrapper/py_grad_holder.hpp
+            )
 
     pybind11_extension(${PYTHON_LIB})
     pybind11_strip(${PYTHON_LIB})
