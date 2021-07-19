@@ -3,7 +3,7 @@
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/data/planar_dataset.hpp>
 #include <tensor/nn/layer/feed_forward.hpp>
-#include <tensor/nn/optimizer/sgd.hpp>
+#include <tensor/nn/optimizer/adagrad.hpp>
 
 class Model {
 
@@ -46,7 +46,7 @@ class Model {
     auto _forward(ts::MatrixF const &inputs) -> ts::MatrixF { return _layer2(_layer1(inputs)); }
 };
 
-auto train(Model &model, ts::SGD<float> &optimizer, ts::PlanarDataset &dataset) -> float
+auto train(Model &model, ts::Optimizer<float> &optimizer, ts::PlanarDataset &dataset) -> float
 {
     constexpr int epoch_num = 100; // Let's overfit to validate our code
     float loss = std::numeric_limits<float>::max();
@@ -80,7 +80,7 @@ int main()
     ts::PlanarDataset dataset_train("resources/train_planar_data.tsv", true, 300);
     ts::PlanarDataset dataset_test("resources/test_planar_data.tsv", true, 1);
     Model model;
-    ts::SGD<float> optimizer(1e-0, model.weights());
+    ts::Adagrad<float> optimizer(5e-2, model.weights());
 
     std::cout << "Training... " << std::endl;
     float loss = train(model, optimizer, dataset_train);
