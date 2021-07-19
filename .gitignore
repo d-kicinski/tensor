@@ -12,3 +12,6 @@ build
 dist
 *.egg-info
 *.so
+*ubyte
+*.gz
+*.pt
