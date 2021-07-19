@@ -7,6 +7,7 @@
 #include <tensor/nn/layer/feed_forward.hpp>
 #include <tensor/nn/layer/max_pool_2d.hpp>
 #include <tensor/nn/max_pool_2d.hpp>
+#include <tensor/nn/optimizer/adagrad.hpp>
 #include <tensor/nn/optimizer/sgd.hpp>
 #include <tensor/nn/softmax.hpp>
 #include <tensor/tensor.hpp>
@@ -316,6 +317,15 @@ auto wrap_nn(pybind11::module &m)
         .def("step", &ts::SGD<float>::step)
         .def("register_params", py::overload_cast<ts::SGD<float>::VectorRef>(&ts::SGD<float>::register_params))
         .def("register_params", py::overload_cast<ts::SGD<float>::Ref>(&ts::SGD<float>::register_params));
+//        .def("register_params", [](ts::SGD<float> &sgd, ts::SGD<float>::VectorRef params){sgd.register_params(params);})
+//        .def("register_params", [](ts::SGD<float> &sgd, ts::SGD<float>::Ref params){sgd.register_params(params);});
+
+    py::class_<ts::Adagrad<float>>(m, "Adagrad")
+        .def(py::init<float>())
+        .def(py::init<float, std::vector<std::reference_wrapper<ts::GradHolder<float>>>>())
+        .def("step", &ts::Adagrad<float>::step)
+        .def("register_params", py::overload_cast<ts::Adagrad<float>::VectorRef>(&ts::Adagrad<float>::register_params))
+        .def("register_params", py::overload_cast<ts::Adagrad<float>::Ref>(&ts::Adagrad<float>::register_params));
 
     py::class_<ts::CrossEntropyLoss>(m, "CrossEntropyLoss")
         .def(py::init<>())

@@ -59,7 +59,9 @@ set(NN_SOURCES
         src/tensor/nn/conv_2d.cpp
         src/tensor/nn/max_pool_2d.cpp
 
+        src/tensor/nn/optimizer/optimizer.cpp
         src/tensor/nn/optimizer/sgd.cpp
+        src/tensor/nn/optimizer/adagrad.cpp
 
         src/tensor/nn/data/dataset_iterator.cpp
         src/tensor/nn/data/planar_dataset.cpp
@@ -121,6 +123,7 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/test_tensor.cpp
             tests/tensor/test_ops_common.cpp
             tests/tensor/test_ops_dot.cpp
+
             tests/tensor/nn/test_cross_entropy_loss.cpp
             tests/tensor/nn/test_softmax.cpp
             tests/tensor/nn/test_image_utils.cpp
@@ -130,10 +133,14 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/nn/test_im2col.cpp
             tests/tensor/nn/test_max_pool_2d.cpp
             tests/tensor/nn/test_conv_2d.cpp
+
+            tests/tensor/nn/optimizer/test_adagrad.cpp
+            tests/tensor/nn/optimizer/test_sgd.cpp
+
             tests/tensor/nn/data/test_planar_dataset.cpp
+
             tests/tensor/nn/layer/test_feed_forward.cpp
             tests/tensor/nn/layer/test_conv_2d.cpp
-            tests/tensor/nn/optimizer/test_sgd.cpp
             )
 
     if (TENSOR_USE_PROTOBUF)
