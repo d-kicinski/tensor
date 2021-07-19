@@ -47,7 +47,7 @@ def train() -> None:
 
     model = Net()
     loss_fn = ts.nn.CrossEntropyLoss()
-    optimizer = ts.libtensor.SGD(0.01)
+    optimizer = ts.libtensor.Adagrad(0.01)
     saver = ts.libtensor.Saver(model)
 
     for w in model.weights():
@@ -74,8 +74,7 @@ def train() -> None:
 
 
 def eval() -> None:
-    normalize = lambda images: (images - 0.1307) / 0.3081
-    dataset = MNISTDataset("./data", train=False, batch_size=32, transform=normalize)
+    dataset = MNISTDataset("./data", train=False, batch_size=32, transform=None)
     model = Net()
     saver = ts.libtensor.Saver(model)
     saver.load(MODEL_SAVE_NAME)
