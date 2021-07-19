@@ -1,8 +1,9 @@
 #pragma once
-#include <tensor/nn/variable.hpp>
-#include <tensor/tensor.hpp>
+
 #include <utility>
-#include <tensor/statistics.hpp>
+
+#include "tensor/nn/variable.hpp"
+#include "tensor/tensor.hpp"
 
 namespace ts {
 

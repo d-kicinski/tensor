@@ -7,7 +7,7 @@
 #include <tensor/nn/layer/feed_forward.hpp>
 #include <tensor/nn/layer/max_pool_2d.hpp>
 #include <tensor/nn/max_pool_2d.hpp>
-#include <tensor/nn/optimizers.hpp>
+#include <tensor/nn/optimizer/sgd.hpp>
 #include <tensor/nn/softmax.hpp>
 #include <tensor/tensor.hpp>
 

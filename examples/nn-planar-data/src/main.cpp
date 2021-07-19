@@ -3,7 +3,7 @@
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/data/planar_dataset.hpp>
 #include <tensor/nn/layer/feed_forward.hpp>
-#include <tensor/nn/optimizers.hpp>
+#include <tensor/nn/optimizer/sgd.hpp>
 
 class Model {
 

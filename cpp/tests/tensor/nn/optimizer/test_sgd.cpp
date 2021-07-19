@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
-#include <tensor/nn/optimizers.hpp>
+
+#include <tensor/nn/optimizer/sgd.hpp>
 
 using namespace ts;
 
