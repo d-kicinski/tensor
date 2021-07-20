@@ -37,18 +37,16 @@ template <typename Element> class Adagrad : public Optimizer<Element> {
 
     auto step() -> void override
     {
+        VectorRef params = Optimizer<Element>::params();
         for (int i = 0; i < _memory.size(); ++i) {
-            VectorRef params = Optimizer<Element>::params();
             DataHolder<Element> &tensor = params[i].get().tensor();
             DataHolder<Element> &grad = params[i].get().grad();
             std::vector<Element> &mem = _memory[i];
 
             ts::clip_(grad, -5.0f, 5.0f);
 
-            std::transform(mem.begin(), mem.end(), grad.begin(), mem.begin(),
-                           [&](Element &m, Element &d_w) { return m + d_w * d_w; });
-
             for (int j = 0; j < mem.size(); ++j) {
+                mem[j] += grad.begin()[j] * grad.begin()[j];
                 tensor.begin()[j] += -_lr * grad.begin()[j] / std::sqrt(mem[j] + 1e-8);
             }
         }
