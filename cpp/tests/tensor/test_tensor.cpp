@@ -184,7 +184,7 @@ TEST_CASE("operator<(Tensor, scalar)")
     MatrixF matrix = {{1, -1, 1},
                      {1, -1, 1}};
     auto result = matrix > 0;
-    Tensor<bool, 2> expected = {{true, false, true},
+    Tensor<char, 2> expected = {{true, false, true},
                                 {true, false, true}};
     REQUIRE(result == expected);
 }

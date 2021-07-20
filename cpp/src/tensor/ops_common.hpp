@@ -27,13 +27,13 @@ auto divide(MatrixF const &, VectorF const &) -> MatrixF;
 template <typename Element, int Dim> auto maximum(Element, Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
 
 template <typename Element, int Dim>
-auto mask(Tensor<Element, Dim> const &, std::function<bool(Element)>) -> Tensor<bool, Dim>;
+auto mask(Tensor<Element, Dim> const &, std::function<bool(Element)>) -> Tensor<char, Dim>;
 
 template <typename Element, int Dim>
-auto assign_if(Tensor<Element, Dim> const &, Tensor<bool, Dim> const &, Element) -> Tensor<Element, Dim>;
+auto assign_if(Tensor<Element, Dim> const &, Tensor<char, Dim> const &, Element) -> Tensor<Element, Dim>;
 
 template <typename Element, int Dim>
-auto apply_if(Tensor<Element, Dim>, Tensor<bool, Dim>, Fn<Element>) -> Tensor<Element, Dim>;
+auto apply_if(Tensor<Element, Dim>, Tensor<char, Dim>, Fn<Element>) -> Tensor<Element, Dim>;
 
 template <typename Element, int Dim> auto multiply(Tensor<Element, Dim> const &, Element) -> Tensor<Element, Dim>;
 
@@ -48,7 +48,7 @@ auto sum(MatrixF const &, int) -> VectorF;
 
 auto sum_v2(MatrixF const &, int) -> VectorF;
 
-auto to_one_hot(Tensor<int, 1> const &) -> Tensor<bool, 2>;
+auto to_one_hot(Tensor<int, 1> const &) -> Tensor<char, 2>;
 
 auto get(MatrixF const &, Tensor<int, 1> const &) -> VectorF;
 

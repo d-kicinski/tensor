@@ -21,7 +21,7 @@ TEST_CASE("max_pool_2d_hwc")
             {{1, 1}, {1, 1}},
         }};
 
-    ts::Tensor<bool, 4> expected_mask =
+    ts::Tensor<char, 4> expected_mask =
         {{
             {{false, false}, {true, false}, {true, false}, {false, false}},
             {{false, true}, {false, false}, {false, false}, {false, true}},

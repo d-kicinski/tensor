@@ -75,15 +75,15 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
 
     auto operator=(std::initializer_list<Element> list) -> Tensor &;
 
-    auto operator<(Element const &value) -> Tensor<bool, Dim>;
+    auto operator<(Element const &value) -> Tensor<char, Dim>;
 
-    auto operator<=(Element const &value) -> Tensor<bool, Dim>;
+    auto operator<=(Element const &value) -> Tensor<char, Dim>;
 
-    auto operator>(Element const &value) -> Tensor<bool, Dim>;
+    auto operator>(Element const &value) -> Tensor<char, Dim>;
 
-    auto operator>=(Element const &value) -> Tensor<bool, Dim>;
+    auto operator>=(Element const &value) -> Tensor<char, Dim>;
 
-    auto operator==(Element const &value) -> Tensor<bool, Dim>;
+    auto operator==(Element const &value) -> Tensor<char, Dim>;
 
     auto operator+=(Tensor const &tensor) -> Tensor &;
 
@@ -139,6 +139,7 @@ template <typename Element, int Dim> class Tensor : public DataHolder<Element> {
     {
         return _begin[index];
     }
+
 
     auto at(std::array<int, Dim> indices) const -> Element &
     {
@@ -309,27 +310,27 @@ template <typename Element, int Dim> auto Tensor<Element, Dim>::randn(const std:
     return tensor;
 }
 
-template <typename Element, int Dim> auto Tensor<Element, Dim>::operator<(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator<(const Element &value) -> Tensor<char, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e < value; });
 }
 
-template <typename Element, int Dim> auto Tensor<Element, Dim>::operator<=(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator<=(const Element &value) -> Tensor<char, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e <= value; });
 }
 
-template <typename Element, int Dim> auto Tensor<Element, Dim>::operator>(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator>(const Element &value) -> Tensor<char, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e > value; });
 }
 
-template <typename Element, int Dim> auto Tensor<Element, Dim>::operator>=(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator>=(const Element &value) -> Tensor<char, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e >= value; });
 }
 
-template <typename Element, int Dim> auto Tensor<Element, Dim>::operator==(const Element &value) -> Tensor<bool, Dim>
+template <typename Element, int Dim> auto Tensor<Element, Dim>::operator==(const Element &value) -> Tensor<char, Dim>
 {
     return ts::mask<Element, Dim>(*this, [&](Element e) { return e == value; });
 }

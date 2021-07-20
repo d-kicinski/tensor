@@ -30,14 +30,14 @@ auto find_max(ts::Tensor<float, 3> const &input) -> std::pair<ts::VectorF, std::
 }
 
 auto ts::max_pool_2d_hwc(ts::Tensor<float, 4> const &inputs, int kernel_size, int stride)
-    -> std::pair<ts::Tensor<float, 4>, ts::Tensor<bool, 4>>
+    -> std::pair<ts::Tensor<float, 4>, ts::Tensor<char, 4>>
 {
     int dim_out = ts::_calculate_output_dim(inputs.shape(1), kernel_size, 0, stride, 1);
     int C_in = inputs.shape(3);
     int batch_size = inputs.shape(0);
 
     ts::Tensor<float, 4> results(batch_size, dim_out, dim_out, C_in);
-    ts::Tensor<bool, 4> masks(inputs.shape());
+    ts::Tensor<char, 4> masks(inputs.shape());
 
 #pragma omp parallel for
     for (int b = 0; b < batch_size; ++b) {
@@ -118,7 +118,7 @@ auto ts::max_pool_2d(ts::Tensor<float, 4> const &inputs, int kernel_size, int st
     return std::make_pair(results, masks);
 }
 
-auto put_vector_to_tile(ts::Tensor<float, 3> &d_input_tile, ts::VectorF const &vector, ts::Tensor<bool, 3> const &mask)
+auto put_vector_to_tile(ts::Tensor<float, 3> &d_input_tile, ts::VectorF const &vector, ts::Tensor<char, 3> const &mask)
     -> void
 {
     for (int i = 0; i < d_input_tile.shape(0); ++i) {
@@ -159,7 +159,7 @@ auto ts::max_pool_2d_backward(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<
     return d_inputs;
 }
 
-auto ts::max_pool_2d_backward_hwc(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<bool, 4> const &masks,
+auto ts::max_pool_2d_backward_hwc(ts::Tensor<float, 4> const &d_outputs, ts::Tensor<char, 4> const &masks,
                                   int kernel_size, int stride) -> ts::Tensor<float, 4>
 {
     auto d_inputs = ts::Tensor<float, 4>(masks.shape());

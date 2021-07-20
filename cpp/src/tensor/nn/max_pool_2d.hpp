@@ -11,9 +11,9 @@ auto max_pool_2d_backward(ts::Tensor<float, 4> const &d_output, ts::Tensor<int, 
                           int kernel_size, int stride) -> ts::Tensor<float, 4>;
 
 auto max_pool_2d_hwc(ts::Tensor<float, 4> const &input, int kernel_size, int stride)
-    -> std::pair<ts::Tensor<float, 4>, ts::Tensor<bool, 4>>;
+    -> std::pair<ts::Tensor<float, 4>, ts::Tensor<char, 4>>;
 
-auto max_pool_2d_backward_hwc(ts::Tensor<float, 4> const &d_output, ts::Tensor<bool, 4> const &mask, int kernel_size,
+auto max_pool_2d_backward_hwc(ts::Tensor<float, 4> const &d_output, ts::Tensor<char, 4> const &mask, int kernel_size,
                               int stride) -> ts::Tensor<float, 4>;
 
 } // namespace ts

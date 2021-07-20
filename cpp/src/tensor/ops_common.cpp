@@ -6,10 +6,10 @@
 namespace ts {
 
 // To preserve my sanity:
-template auto mask<float, 1>(Tensor<float, 1> const &, std::function<bool(float)>) -> Tensor<bool, 1>;
-template auto mask<float, 2>(Tensor<float, 2> const &, std::function<bool(float)>) -> Tensor<bool, 2>;
-template auto mask<float, 3>(Tensor<float, 3> const &, std::function<bool(float)>) -> Tensor<bool, 3>;
-template auto mask<float, 4>(Tensor<float, 4> const &, std::function<bool(float)>) -> Tensor<bool, 4>;
+template auto mask<float, 1>(Tensor<float, 1> const &, std::function<bool(float)>) -> Tensor<char, 1>;
+template auto mask<float, 2>(Tensor<float, 2> const &, std::function<bool(float)>) -> Tensor<char, 2>;
+template auto mask<float, 3>(Tensor<float, 3> const &, std::function<bool(float)>) -> Tensor<char, 3>;
+template auto mask<float, 4>(Tensor<float, 4> const &, std::function<bool(float)>) -> Tensor<char, 4>;
 
 template auto add_(Tensor<float, 1> const &, Tensor<float, 1> const &) -> void;
 template auto add_(Tensor<float, 2> const &, Tensor<float, 2> const &) -> void;
@@ -51,14 +51,14 @@ template auto sum(Tensor<float, 1> const &) -> float;
 template auto sum(Tensor<float, 2> const &) -> float;
 template auto sum(Tensor<float, 3> const &) -> float;
 
-template auto assign_if(Tensor<float, 1> const &, Tensor<bool, 1> const &, float) -> Tensor<float, 1>;
-template auto assign_if(Tensor<float, 2> const &, Tensor<bool, 2> const &, float) -> Tensor<float, 2>;
-template auto assign_if(Tensor<float, 3> const &, Tensor<bool, 3> const &, float) -> Tensor<float, 3>;
-template auto assign_if(Tensor<float, 4> const &, Tensor<bool, 4> const &, float) -> Tensor<float, 4>;
+template auto assign_if(Tensor<float, 1> const &, Tensor<char, 1> const &, float) -> Tensor<float, 1>;
+template auto assign_if(Tensor<float, 2> const &, Tensor<char, 2> const &, float) -> Tensor<float, 2>;
+template auto assign_if(Tensor<float, 3> const &, Tensor<char, 3> const &, float) -> Tensor<float, 3>;
+template auto assign_if(Tensor<float, 4> const &, Tensor<char, 4> const &, float) -> Tensor<float, 4>;
 
-template auto apply_if(Tensor<float, 1>, Tensor<bool, 1>, Fn<float>) -> Tensor<float, 1>;
-template auto apply_if(Tensor<float, 2>, Tensor<bool, 2>, Fn<float>) -> Tensor<float, 2>;
-template auto apply_if(Tensor<float, 3>, Tensor<bool, 3>, Fn<float>) -> Tensor<float, 3>;
+template auto apply_if(Tensor<float, 1>, Tensor<char, 1>, Fn<float>) -> Tensor<float, 1>;
+template auto apply_if(Tensor<float, 2>, Tensor<char, 2>, Fn<float>) -> Tensor<float, 2>;
+template auto apply_if(Tensor<float, 3>, Tensor<char, 3>, Fn<float>) -> Tensor<float, 3>;
 
 template auto apply(Tensor<float, 1> const &, Fn<float>) -> Tensor<float, 1>;
 template auto apply(Tensor<float, 2> const &, Fn<float>) -> Tensor<float, 2>;
@@ -161,15 +161,15 @@ auto maximum(Element value, Tensor<Element, Dim> const &tensor) -> Tensor<Elemen
 }
 
 template <typename Element, int Dim>
-auto mask(Tensor<Element, Dim> const &tensor, std::function<bool(Element)> fn) -> Tensor<bool, Dim>
+auto mask(Tensor<Element, Dim> const &tensor, std::function<bool(Element)> fn) -> Tensor<char, Dim>
 {
-    Tensor<bool, Dim> mask(tensor.shape());
+    Tensor<char, Dim> mask(tensor.shape());
     std::transform(tensor.begin(), tensor.end(), mask.begin(), fn);
     return mask;
 }
 
 template <typename Element, int Dim>
-auto assign_if(Tensor<Element, Dim> const &tensor, Tensor<bool, Dim> const &predicate, Element value)
+auto assign_if(Tensor<Element, Dim> const &tensor, Tensor<char, Dim> const &predicate, Element value)
     -> Tensor<Element, Dim>
 {
     return apply_if(
@@ -177,7 +177,7 @@ auto assign_if(Tensor<Element, Dim> const &tensor, Tensor<bool, Dim> const &pred
 }
 
 template <typename Element, int Dim>
-auto apply_if(Tensor<Element, Dim> tensor, Tensor<bool, Dim> predicate, std::function<Element(Element)> fn)
+auto apply_if(Tensor<Element, Dim> tensor, Tensor<char, Dim> predicate, std::function<Element(Element)> fn)
     -> Tensor<Element, Dim>
 {
     Tensor<Element, Dim> result(tensor.shape());
@@ -270,10 +270,10 @@ template <typename Element, int Dim> auto sum(Tensor<Element, Dim> const &tensor
     return std::accumulate(tensor.begin(), tensor.end(), Element());
 }
 
-auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<bool, 2>
+auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<char, 2>
 {
     int max_index = *std::max_element(vector.begin(), vector.end());
-    Tensor<bool, 2> one_hot(vector.shape(0), max_index + 1);
+    Tensor<char, 2> one_hot(vector.shape(0), max_index + 1);
     for (size_type i = 0; i < one_hot.shape(0); ++i) {
         one_hot(i, vector(i)) = true;
     }

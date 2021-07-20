@@ -100,7 +100,7 @@ TEST_CASE("mask from tensor")
 {
     MatrixF matrix = {{1, -1, 1},
                      {1, -1, 1}};
-    Tensor<bool, 2> expected = {{true, false, true},
+    Tensor<char, 2> expected = {{true, false, true},
                                 {true, false, true}};
 
     auto mask = ts::mask<float>(matrix, [](float e) { return e >= 0; });
@@ -157,11 +157,11 @@ TEST_CASE("to_one_hot")
                      {1, 2, 3},
                      {1, 2, 3}};
 
-    Tensor<bool, 2> expected = {{false, false, true},
+    Tensor<char, 2> expected = {{false, false, true},
                                 {true, false, false},
                                 {false, true, false}
     };
-    Tensor<bool, 2> one_hot = ts::to_one_hot(vector);
+    Tensor<char, 2> one_hot = ts::to_one_hot(vector);
 
     REQUIRE(one_hot == expected);
 }
