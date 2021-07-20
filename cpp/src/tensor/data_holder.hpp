@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "tensor/tensor_forward.hpp"
+
 namespace ts {
 
 template <typename Element> class DataHolder {
@@ -14,6 +16,7 @@ template <typename Element> class DataHolder {
     virtual auto get() const -> data_ptr_t = 0;
     virtual auto begin() const -> iterator = 0;
     virtual auto end() const -> iterator = 0;
+    virtual auto at(size_type i) const -> Element & = 0;
 };
 
 } // namespace ts
