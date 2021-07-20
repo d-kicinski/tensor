@@ -2,8 +2,8 @@
 
 #include <fstream>
 
-#include "layer_base.hpp"
-#include "proto/array.pb.h"
+#include "tensor/nn/layer/layer_base.hpp"
+#include "tensor/nn/proto/array.pb.h"
 
 namespace ts {
 template <typename T> class Saver {

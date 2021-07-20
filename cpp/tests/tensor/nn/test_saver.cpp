@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
-#include <tensor/nn/feed_forward.hpp>
-#include <tensor/nn/conv2d.hpp>
+#include <tensor/nn/layer/feed_forward.hpp>
+#include <tensor/nn/layer/conv_2d.hpp>
 #include <tensor/nn/saver.hpp>
 
 class Model : public ts::LayerBase<float> {
@@ -8,7 +8,7 @@ class Model : public ts::LayerBase<float> {
     Model()
         : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)),
           _layer2(ts::Conv2D::create(3, 64, 3, 1, 0, 1, ts::Activation::NONE)),
-          _number()
+          _number({1})
     {
         _number.set_weight(std::make_unique<ts::VectorF>(ts::VectorF{1337}));
 
