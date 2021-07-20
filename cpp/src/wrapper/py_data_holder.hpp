@@ -11,9 +11,12 @@ class PyDataHolderFloat : public ts::DataHolder<float>{
 
     using ts::DataHolder<float>::DataHolder;
 
+    float const dummy = 0; // hack for at() method
+
     auto get() const -> data_ptr_t override { return ts::DataHolder<float>::data_ptr_t(); }
     auto begin() const -> iterator override { return ts::DataHolder<float>::iterator(); }
     auto end() const -> iterator override { return ts::DataHolder<float>::iterator(); }
+    auto at(ts::size_type i) const -> Element & override { return const_cast<Element &>(dummy); }
 };
 
 
@@ -26,7 +29,10 @@ class PyDataHolderInt : public ts::DataHolder<int>{
 
     using ts::DataHolder<int>::DataHolder;
 
+    int const dummy = 0; // hack for at() method
+
     auto get() const -> data_ptr_t override { return ts::DataHolder<int>::data_ptr_t(); }
     auto begin() const -> iterator override { return ts::DataHolder<int>::iterator(); }
     auto end() const -> iterator override { return ts::DataHolder<int>::iterator(); }
+    auto at(ts::size_type i) const -> Element & override { return const_cast<Element &>(dummy); }
 };
