@@ -14,18 +14,22 @@ template <typename Element> class RMSProp : public Optimizer<Element> {
     using VectorRef = std::vector<Ref>;
     using Optimizer<Element>::register_params;
 
-    explicit RMSProp(float lr, float alpha) : _lr(lr), _alpha(alpha) {}
+    RMSProp(float lr, float alpha) : _lr(lr), _alpha(alpha) {}
 
-    RMSProp(float lr, VectorRef variables, float alpha) : _lr(lr), _alpha(alpha)
-    {
-        _register_in_memory(variables);
-        Optimizer<Element>::register_params(std::move(variables));
-    }
+    RMSProp(VectorRef variables, float lr, float alpha) : RMSProp(lr, alpha) { register_params(std::move(variables)); }
+
+    RMSProp(VectorRef variables, float lr) : RMSProp(variables, lr, ALPHA) {}
+
+    explicit RMSProp(VectorRef variables) : RMSProp(variables, LEARNING_RATE, ALPHA) {}
+
+    explicit RMSProp(float lr) : RMSProp(lr, ALPHA) {}
+
+    RMSProp() : RMSProp(LEARNING_RATE, ALPHA) {}
 
     auto register_params(VectorRef variables) -> void override
     {
         _register_in_memory(variables);
-        Optimizer<Element>::register_params(variables);
+        Optimizer<Element>::register_params(std::move(variables));
     }
 
     auto step() -> void override
@@ -46,11 +50,14 @@ template <typename Element> class RMSProp : public Optimizer<Element> {
     }
 
   private:
-    float _lr;
-    std::vector<std::vector<Element>> _grad_moving_average;
-    float _alpha;
+    constexpr static double LEARNING_RATE = 1e-2;
+    constexpr static double ALPHA = 0.99;
 
-    auto _register_in_memory(VectorRef variables) -> void
+    float _lr{};
+    std::vector<std::vector<Element>> _grad_moving_average;
+    float _alpha{};
+
+    auto _register_in_memory(VectorRef const &variables) -> void
     {
         for (GradHolder<Element> &item : variables) {
             auto size = std::distance(item.tensor().begin(), item.tensor().end());

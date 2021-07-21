@@ -313,14 +313,14 @@ auto wrap_nn(pybind11::module &m)
 
     py::class_<ts::SGD<float>>(m, "SGD")
         .def(py::init<float, float>(), py::arg("lr"), py::arg("momentum") = 0.0)
-        .def(py::init<float, std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("lr"), py::arg("params"), py::arg("momentum") = 0.0)
+        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float, float>(), py::arg("params"), py::arg("lr"), py::arg("momentum") = 0.0)
         .def("step", &ts::SGD<float>::step)
         .def("register_params", py::overload_cast<ts::SGD<float>::VectorRef>(&ts::SGD<float>::register_params))
         .def("register_params", py::overload_cast<ts::SGD<float>::Ref>(&ts::SGD<float>::register_params));
 
     py::class_<ts::Adagrad<float>>(m, "Adagrad")
         .def(py::init<float>(), py::arg("lr"))
-        .def(py::init<float, std::vector<std::reference_wrapper<ts::GradHolder<float>>>>(), py::arg("lr"), py::arg("params"))
+        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"), py::arg("lr"))
         .def("step", &ts::Adagrad<float>::step)
         .def("register_params", py::overload_cast<ts::Adagrad<float>::VectorRef>(&ts::Adagrad<float>::register_params))
         .def("register_params", py::overload_cast<ts::Adagrad<float>::Ref>(&ts::Adagrad<float>::register_params));

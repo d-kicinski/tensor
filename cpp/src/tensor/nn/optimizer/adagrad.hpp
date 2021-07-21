@@ -14,21 +14,18 @@ template <typename Element> class Adagrad : public Optimizer<Element> {
     using VectorRef = std::vector<Ref>;
     using Optimizer<Element>::register_params;
 
-    float _lr;
-    std::vector<std::vector<Element>> _memory;
-
     explicit Adagrad(float lr) : _lr(lr) {}
 
-    Adagrad(float lr, VectorRef variables) : _lr(lr)
-    {
-        _register_in_memory(variables);
-        Optimizer<Element>::register_params(std::move(variables));
-    }
+    Adagrad(VectorRef variables, float lr) : Adagrad(lr) { register_params(std::move(variables)); }
+
+    explicit Adagrad(VectorRef variables) : Adagrad(variables, LEARNING_RATE) {}
+
+    Adagrad() : Adagrad(LEARNING_RATE) {}
 
     auto register_params(VectorRef variables) -> void override
     {
         _register_in_memory(variables);
-        Optimizer<Element>::register_params(variables);
+        Optimizer<Element>::register_params(std::move(variables));
     }
 
     auto step() -> void override
@@ -42,13 +39,18 @@ template <typename Element> class Adagrad : public Optimizer<Element> {
             ts::clip_(grad, -5.0f, 5.0f);
 
             for (int j = 0; j < mem.size(); ++j) {
-                mem[j] += grad.begin()[j] * grad.begin()[j];
-                tensor.begin()[j] += -_lr * grad.begin()[j] / std::sqrt(mem[j] + 1e-8);
+                mem[j] += grad.at(j) * grad.at(j);
+                tensor.at(j) += -_lr * grad.at(j) / std::sqrt(mem[j] + 1e-8);
             }
         }
     }
 
   private:
+    constexpr static double LEARNING_RATE = 1e-2;
+
+    float _lr{};
+    std::vector<std::vector<Element>> _memory;
+
     auto _register_in_memory(VectorRef variables) -> void
     {
         for (GradHolder<Element> &item : variables) {

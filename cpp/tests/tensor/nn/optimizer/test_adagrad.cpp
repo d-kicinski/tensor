@@ -13,7 +13,7 @@ TEST_CASE("Adagrad")
     vars.emplace_back(std::ref(weight));
 
     float learning_rate = 1e-3;
-    auto optimizer = Adagrad<float>(learning_rate, vars);
+    auto optimizer = Adagrad<float>(vars, learning_rate);
     optimizer.step();
     optimizer.step();
     optimizer.step();

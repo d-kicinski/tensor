@@ -14,28 +14,29 @@ template <typename Element> class SGD : public Optimizer<Element> {
     using VectorRef = std::vector<Ref>;
     using Optimizer<Element>::register_params;
 
-    explicit SGD(float lr, float momentum = 0.0) : _lr(lr), _momentum(momentum)
+    SGD(float lr, float momentum) : _lr(lr), _momentum(momentum)
     {
         if (_momentum > 0.0) {
             _previous_updates = std::make_optional(std::vector<std::vector<Element>>());
         }
     }
 
-    SGD(float lr, VectorRef variables, float momentum = 0.0) : _lr(lr), _momentum(momentum)
-    {
-        if (_momentum > 0.0) {
-            _previous_updates = std::make_optional(std::vector<std::vector<Element>>());
-            _update_momentum_buffer(variables);
-        }
-        Optimizer<Element>::register_params(std::move(variables));
-    }
+    SGD(VectorRef variables, float lr, float momentum) : SGD(lr, momentum) { register_params(variables); }
+
+    SGD(VectorRef variables, float lr) : SGD(variables, lr, MOMENTUM) {}
+
+    explicit SGD(VectorRef variables) : SGD(variables, LEARNING_RATE, MOMENTUM) {}
+
+    explicit SGD(float lr) : SGD(lr, MOMENTUM) {}
+
+    SGD() : SGD(LEARNING_RATE, MOMENTUM) {}
 
     auto register_params(VectorRef variables) -> void override
     {
         if (_momentum > 0) {
             _update_momentum_buffer(variables);
         }
-        Optimizer<Element>::register_params(variables);
+        Optimizer<Element>::register_params(std::move(variables));
     }
 
     auto step() -> void
@@ -50,8 +51,8 @@ template <typename Element> class SGD : public Optimizer<Element> {
             if (_previous_updates) {
                 std::vector<Element> &prev = _previous_updates.value()[i];
                 for (int j = 0; j < prev.size(); ++j) {
-                    prev[j] = _momentum * prev[j] + _lr * grad.begin()[j];
-                    tensor.begin()[j] += -prev[j];
+                    prev[j] = _momentum * prev[j] + _lr * grad.at(j);
+                    tensor.at(j) += -prev[j];
                 }
             } else {
                 std::transform(tensor.begin(), tensor.end(), grad.begin(), tensor.begin(),
@@ -61,8 +62,11 @@ template <typename Element> class SGD : public Optimizer<Element> {
     }
 
   private:
-    float _lr;
-    float const _momentum;
+    constexpr static double LEARNING_RATE = 1e-3;
+    constexpr static double MOMENTUM = 0.0;
+
+    float _lr{};
+    float const _momentum{};
     std::optional<std::vector<std::vector<Element>>> _previous_updates = std::nullopt;
 
     auto _update_momentum_buffer(VectorRef variables) -> void

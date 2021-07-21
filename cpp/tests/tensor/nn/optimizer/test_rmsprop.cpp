@@ -14,7 +14,7 @@ TEST_CASE("RMSProp")
 
     float learning_rate = 1e-3;
     float forgetting_factor = 0.99;
-    auto optimizer = RMSProp<float>(learning_rate, vars, forgetting_factor);
+    auto optimizer = RMSProp<float>(vars, learning_rate, forgetting_factor);
     optimizer.step();
     optimizer.step();
     optimizer.step();

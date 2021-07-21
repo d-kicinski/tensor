@@ -12,7 +12,6 @@ TEST_CASE("Adam")
     std::vector<std::reference_wrapper<GradHolder<float>>> vars;
     vars.emplace_back(std::ref(weight));
 
-    float forgetting_factor = 0.99;
     auto optimizer = Adam<float>(vars);
     optimizer.step();
     optimizer.step();
