@@ -63,6 +63,7 @@ set(NN_SOURCES
         src/tensor/nn/optimizer/sgd.cpp
         src/tensor/nn/optimizer/adagrad.cpp
         src/tensor/nn/optimizer/rmsprop.cpp
+        src/tensor/nn/optimizer/adam.cpp
 
         src/tensor/nn/data/dataset_iterator.cpp
         src/tensor/nn/data/planar_dataset.cpp
@@ -138,6 +139,8 @@ if (TENSOR_BUILD_TESTS)
             tests/tensor/nn/optimizer/test_sgd.cpp
             tests/tensor/nn/optimizer/test_adagrad.cpp
             tests/tensor/nn/optimizer/test_rmsprop.cpp
+            tests/tensor/nn/optimizer/test_rmsprop.cpp
+            tests/tensor/nn/optimizer/test_adam.cpp
 
             tests/tensor/nn/data/test_planar_dataset.cpp
 
