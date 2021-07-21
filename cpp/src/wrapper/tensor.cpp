@@ -8,6 +8,8 @@
 #include <tensor/nn/layer/max_pool_2d.hpp>
 #include <tensor/nn/max_pool_2d.hpp>
 #include <tensor/nn/optimizer/adagrad.hpp>
+#include <tensor/nn/optimizer/adam.hpp>
+#include <tensor/nn/optimizer/rmsprop.hpp>
 #include <tensor/nn/optimizer/sgd.hpp>
 #include <tensor/nn/softmax.hpp>
 #include <tensor/tensor.hpp>
@@ -313,17 +315,35 @@ auto wrap_nn(pybind11::module &m)
 
     py::class_<ts::SGD<float>>(m, "SGD")
         .def(py::init<float, float>(), py::arg("lr"), py::arg("momentum") = 0.0)
-        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float, float>(), py::arg("params"), py::arg("lr"), py::arg("momentum") = 0.0)
+        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float, float>(), py::arg("params"),
+             py::arg("lr"), py::arg("momentum") = 0.0)
         .def("step", &ts::SGD<float>::step)
         .def("register_params", py::overload_cast<ts::SGD<float>::VectorRef>(&ts::SGD<float>::register_params))
         .def("register_params", py::overload_cast<ts::SGD<float>::Ref>(&ts::SGD<float>::register_params));
 
     py::class_<ts::Adagrad<float>>(m, "Adagrad")
         .def(py::init<float>(), py::arg("lr"))
-        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"), py::arg("lr"))
+        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"),
+             py::arg("lr"))
         .def("step", &ts::Adagrad<float>::step)
         .def("register_params", py::overload_cast<ts::Adagrad<float>::VectorRef>(&ts::Adagrad<float>::register_params))
         .def("register_params", py::overload_cast<ts::Adagrad<float>::Ref>(&ts::Adagrad<float>::register_params));
+
+    py::class_<ts::RMSProp<float>>(m, "RMSProp")
+        .def(py::init<float>(), py::arg("lr"))
+        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"),
+             py::arg("lr"))
+        .def("step", &ts::RMSProp<float>::step)
+        .def("register_params", py::overload_cast<ts::RMSProp<float>::VectorRef>(&ts::RMSProp<float>::register_params))
+        .def("register_params", py::overload_cast<ts::RMSProp<float>::Ref>(&ts::RMSProp<float>::register_params));
+
+    py::class_<ts::Adam<float>>(m, "Adam")
+        .def(py::init<float>(), py::arg("lr"))
+        .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"),
+             py::arg("lr"))
+        .def("step", &ts::Adam<float>::step)
+        .def("register_params", py::overload_cast<ts::Adam<float>::VectorRef>(&ts::Adam<float>::register_params))
+        .def("register_params", py::overload_cast<ts::Adam<float>::Ref>(&ts::Adam<float>::register_params));
 
     py::class_<ts::CrossEntropyLoss>(m, "CrossEntropyLoss")
         .def(py::init<>())
