@@ -80,7 +80,7 @@ int main()
     ts::PlanarDataset dataset_train("resources/train_planar_data.tsv", true, 300);
     ts::PlanarDataset dataset_test("resources/test_planar_data.tsv", true, 1);
     Model model;
-    ts::Adagrad<float> optimizer(5e-2, model.weights());
+    ts::Adagrad<float> optimizer(model.weights(), 5e-2);
 
     std::cout << "Training... " << std::endl;
     float loss = train(model, optimizer, dataset_train);
