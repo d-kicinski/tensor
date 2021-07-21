@@ -12,6 +12,7 @@ template <typename Element> class Adam : public Optimizer<Element> {
   public:
     using Ref = std::reference_wrapper<GradHolder<Element>>;
     using VectorRef = std::vector<Ref>;
+    using Optimizer<Element>::register_params;
 
     Adam(VectorRef variables, float lr, float beta1, float beta2) : _lr(lr), _beta1(beta1), _beta2(beta2)
     {
@@ -32,11 +33,6 @@ template <typename Element> class Adam : public Optimizer<Element> {
     auto register_params(VectorRef variables) -> void override
     {
         _register_in_memory(variables);
-        Optimizer<Element>::register_params(variables);
-    }
-    auto register_params(Ref variables) -> void override
-    {
-        _register_in_memory(std::vector<Ref>{variables});
         Optimizer<Element>::register_params(variables);
     }
 

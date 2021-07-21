@@ -12,6 +12,7 @@ template <typename Element> class Adagrad : public Optimizer<Element> {
   public:
     using Ref = std::reference_wrapper<GradHolder<Element>>;
     using VectorRef = std::vector<Ref>;
+    using Optimizer<Element>::register_params;
 
     float _lr;
     std::vector<std::vector<Element>> _memory;
@@ -27,11 +28,6 @@ template <typename Element> class Adagrad : public Optimizer<Element> {
     auto register_params(VectorRef variables) -> void override
     {
         _register_in_memory(variables);
-        Optimizer<Element>::register_params(variables);
-    }
-    auto register_params(Ref variables) -> void override
-    {
-        _register_in_memory(std::vector<Ref>{variables});
         Optimizer<Element>::register_params(variables);
     }
 

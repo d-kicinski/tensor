@@ -12,6 +12,7 @@ template <typename Element> class SGD : public Optimizer<Element> {
   public:
     using Ref = std::reference_wrapper<GradHolder<Element>>;
     using VectorRef = std::vector<Ref>;
+    using Optimizer<Element>::register_params;
 
     explicit SGD(float lr, float momentum = 0.0) : _lr(lr), _momentum(momentum)
     {
@@ -33,13 +34,6 @@ template <typename Element> class SGD : public Optimizer<Element> {
     {
         if (_momentum > 0) {
             _update_momentum_buffer(variables);
-        }
-        Optimizer<Element>::register_params(variables);
-    }
-    auto register_params(Ref variables) -> void override
-    {
-        if (_momentum > 0) {
-            _update_momentum_buffer(std::vector<Ref>{variables});
         }
         Optimizer<Element>::register_params(variables);
     }
