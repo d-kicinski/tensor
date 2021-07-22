@@ -63,6 +63,7 @@ template auto apply_if(Tensor<float, 3>, Tensor<char, 3>, Fn<float>) -> Tensor<f
 template auto apply(Tensor<float, 1> const &, Fn<float>) -> Tensor<float, 1>;
 template auto apply(Tensor<float, 2> const &, Fn<float>) -> Tensor<float, 2>;
 template auto apply(Tensor<float, 3> const &, Fn<float>) -> Tensor<float, 3>;
+template auto apply(Tensor<float, 4> const &, Fn<float>) -> Tensor<float, 4>;
 
 template auto multiply(Tensor<float, 1> const &tensor, float value) -> Tensor<float, 1>;
 template auto multiply(Tensor<float, 2> const &tensor, float value) -> Tensor<float, 2>;
