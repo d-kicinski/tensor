@@ -13,6 +13,8 @@ class FeedForward : public LayerBase<float> {
     using Activations = ActivationFactory<float, 2>;
     using VectorRef = std::vector<std::reference_wrapper<GradHolder<float>>>;
 
+    FeedForward(int dim_in, int dim_out, Activation activation = Activation::NONE);
+
     static auto create(int dim_in, int dim_out, Activation activation = Activation::NONE) -> FeedForward;
 
     auto operator()(MatrixF const &) -> MatrixF;

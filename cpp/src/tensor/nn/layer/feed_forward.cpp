@@ -10,6 +10,17 @@ FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Act
     register_parameter(_bias.tensor());
 }
 
+FeedForward::FeedForward(int dim_in, int dim_out, Activation activation)
+    : _weight(std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
+              std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})), "FeedForward(weight)"),
+      _bias(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+            std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})), "FeedForward(bias)"),
+      _activation(Activations::get(activation))
+{
+    register_parameter(_weight.tensor());
+    register_parameter(_bias.tensor());
+}
+
 auto FeedForward::create(int dim_in, int dim_out, Activation activation) -> FeedForward
 {
     auto weight = Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
