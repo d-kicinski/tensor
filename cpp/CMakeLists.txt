@@ -59,6 +59,9 @@ set(NN_SOURCES
         src/tensor/nn/conv_2d.cpp
         src/tensor/nn/max_pool_2d.cpp
 
+        src/tensor/nn/autograd/relu.cpp
+        src/tensor/nn/autograd/tanh.cpp
+
         src/tensor/nn/optimizer/optimizer.cpp
         src/tensor/nn/optimizer/sgd.cpp
         src/tensor/nn/optimizer/adagrad.cpp
