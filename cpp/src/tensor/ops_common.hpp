@@ -180,8 +180,8 @@ template <typename Element, int Dim> auto saxpy_(Tensor<Element, Dim> const &x, 
 #endif
 }
 
-template <typename Element, int Dim>
-auto fill_(Tensor<Element, Dim> &x, Element value) -> void {
+template <typename Element>
+auto fill_(DataHolder<Element> &x, Element value) -> void {
     for (auto &v : x) {
         v = value;
     }
