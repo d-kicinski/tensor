@@ -4,7 +4,7 @@
 #include "rnn_cell.hpp"
 
 namespace ts {
-class RNN {
+class RNN : public LayerBase<float> {
   public:
     RNN(int hidden_size, int sequence_length, int vocab_size)
         : _hidden_size(hidden_size), _sequence_length(sequence_length), _vocab_size(vocab_size),
@@ -13,6 +13,9 @@ class RNN {
           _cells(sequence_length, RNNCell(_input2hidden, _hidden2hidden, _hidden2output, vocab_size)),
           _initial_state(hidden_size, 1)
     {
+        register_parameters(_input2hidden.parameters());
+        register_parameters(_hidden2hidden.parameters());
+        register_parameters(_hidden2output.parameters());
     }
 
     auto forward(std::vector<int> inputs, std::vector<int> targets, MatrixF previous_state) -> float

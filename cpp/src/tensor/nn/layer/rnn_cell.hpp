@@ -7,7 +7,7 @@
 
 namespace ts {
 
-class RNNCell : public LayerBase<float> {
+class RNNCell {
   public:
     RNNCell(FeedForward &input2hidden, FeedForward &hidden2hidden, FeedForward &hidden2output, int vocab_size)
         : _input2hidden(input2hidden), _hidden2hidden(hidden2hidden), _hidden2output(hidden2output),
