@@ -319,7 +319,8 @@ auto wrap_nn(pybind11::module &m)
              py::arg("lr"), py::arg("momentum") = 0.0)
         .def("step", &ts::SGD<float>::step)
         .def("register_params", py::overload_cast<ts::SGD<float>::VectorRef>(&ts::SGD<float>::register_params))
-        .def("register_params", py::overload_cast<ts::SGD<float>::Ref>(&ts::SGD<float>::register_params));
+        .def("register_params", py::overload_cast<ts::SGD<float>::Ref>(&ts::SGD<float>::register_params))
+        .def("zero_gradients", &ts::SGD<float>::zero_gradients);
 
     py::class_<ts::Adagrad<float>>(m, "Adagrad")
         .def(py::init<float>(), py::arg("lr"))
@@ -327,7 +328,8 @@ auto wrap_nn(pybind11::module &m)
              py::arg("lr"))
         .def("step", &ts::Adagrad<float>::step)
         .def("register_params", py::overload_cast<ts::Adagrad<float>::VectorRef>(&ts::Adagrad<float>::register_params))
-        .def("register_params", py::overload_cast<ts::Adagrad<float>::Ref>(&ts::Adagrad<float>::register_params));
+        .def("register_params", py::overload_cast<ts::Adagrad<float>::Ref>(&ts::Adagrad<float>::register_params))
+        .def("zero_gradients", &ts::Adagrad<float>::zero_gradients);
 
     py::class_<ts::RMSProp<float>>(m, "RMSProp")
         .def(py::init<float>(), py::arg("lr"))
@@ -335,7 +337,8 @@ auto wrap_nn(pybind11::module &m)
              py::arg("lr"))
         .def("step", &ts::RMSProp<float>::step)
         .def("register_params", py::overload_cast<ts::RMSProp<float>::VectorRef>(&ts::RMSProp<float>::register_params))
-        .def("register_params", py::overload_cast<ts::RMSProp<float>::Ref>(&ts::RMSProp<float>::register_params));
+        .def("register_params", py::overload_cast<ts::RMSProp<float>::Ref>(&ts::RMSProp<float>::register_params))
+        .def("zero_gradients", &ts::RMSProp<float>::zero_gradients);
 
     py::class_<ts::Adam<float>>(m, "Adam")
         .def(py::init<float>(), py::arg("lr"))
@@ -343,7 +346,8 @@ auto wrap_nn(pybind11::module &m)
              py::arg("lr"))
         .def("step", &ts::Adam<float>::step)
         .def("register_params", py::overload_cast<ts::Adam<float>::VectorRef>(&ts::Adam<float>::register_params))
-        .def("register_params", py::overload_cast<ts::Adam<float>::Ref>(&ts::Adam<float>::register_params));
+        .def("register_params", py::overload_cast<ts::Adam<float>::Ref>(&ts::Adam<float>::register_params))
+        .def("zero_gradients", &ts::Adam<float>::zero_gradients);
 
     py::class_<ts::CrossEntropyLoss>(m, "CrossEntropyLoss")
         .def(py::init<>())
@@ -360,7 +364,7 @@ auto wrap_nn(pybind11::module &m)
         .def(py::init<>())
         .def("register_parameter", &ts::LayerBase<float>::register_parameter)
         .def("register_parameters", &ts::LayerBase<float>::register_parameters)
-        .def("parameters", &ts::LayerBase<float>::parameters);
+        .def("parameters", &ts::LayerBase<float>::parameters, py::return_value_policy::reference_internal);
 
 #ifdef TENSOR_USE_PROTOBUF
     py::class_<ts::Saver<float>>(m, "Saver")
@@ -377,7 +381,7 @@ auto wrap_nn(pybind11::module &m)
         .def("bias", &ts::FeedForward::bias, py::return_value_policy::reference_internal)
         .def("weight", &ts::FeedForward::weight, py::return_value_policy::reference_internal)
         .def("weights", &ts::FeedForward::weights)
-        .def("parameters", &ts::FeedForward::parameters);
+        .def("parameters", &ts::FeedForward::parameters, py::return_value_policy::reference_internal);
 
     py::class_<ts::Conv2D, ts::LayerBase<float>>(m, "Conv2D")
         .def(py::init(&ts::Conv2D::create))
@@ -387,7 +391,7 @@ auto wrap_nn(pybind11::module &m)
         .def("bias", &ts::Conv2D::bias, py::return_value_policy::reference_internal)
         .def("weight", &ts::Conv2D::weight, py::return_value_policy::reference_internal)
         .def("weights", &ts::Conv2D::weights)
-        .def("parameters", &ts::Conv2D::parameters);
+        .def("parameters", &ts::Conv2D::parameters, py::return_value_policy::reference_internal);
 
     py::class_<ts::MaxPool2D>(m, "MaxPool2D")
         .def(py::init(&ts::MaxPool2D::create))
