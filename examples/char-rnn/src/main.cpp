@@ -1,14 +1,14 @@
+#include <cmath>
 #include <codecvt>
+#include <fstream>
 #include <iostream>
 #include <locale>
 #include <set>
 #include <unordered_map>
 #include <vector>
 
-#include <cmath>
-#include <fstream>
-#include <unordered_map>
-#include <utility>
+#include <tensor/nn/layer/rnn.hpp>
+#include <tensor/nn/optimizer/adagrad.hpp>
 
 class Vocabulary {
   public:
@@ -69,6 +69,8 @@ class Vocabulary {
         }
     }
 
+    auto size() -> ulong { return _char_to_id.size(); }
+
   private:
     std::unordered_map<int, char32_t> _id_to_char;
     std::unordered_map<char32_t, int> _char_to_id;
@@ -82,7 +84,6 @@ class Vocabulary {
 
 int main()
 {
-    int sequence_length = 30;
     auto path = "resources/pan-tadeusz-clean.txt";
     std::u32string buffer;
     std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
@@ -98,12 +99,32 @@ int main()
     auto vocabulary = Vocabulary(buffer);
     vocabulary.save("vocab.txt");
 
-    int chunk_num = std::floor(buffer.length() / sequence_length);
+    int hidden_size = 100;
+    int sequence_length = 25;
+    float learning_rate = 1e-1;
+    ulong vocab_size = vocabulary.size();
+    ts::RNN rnn(hidden_size, sequence_length, vocab_size);
+    ts::Adagrad<float> optimizer(rnn.parameters(), learning_rate);
+
+    int sample_length = sequence_length + 1;
+    int chunk_num = std::floor(buffer.length() / sample_length);
+
+    ts::MatrixF current_state(1, 128);
+
     for (int i = 0; i < chunk_num; ++i) {
-        auto current_chunk = buffer.substr(i * sequence_length, (i + 1) * sequence_length);
-        vocabulary.to_indices(current_chunk);
-        if (i % 50 == 0) {
-            std::cout << i << "/" << chunk_num << std::endl;
+        auto current_chunk = std::u32string(std::next(buffer.begin(), i * sample_length), std::next(buffer.begin(), (i + 1) * sample_length));
+        auto all_indices = vocabulary.to_indices(current_chunk);
+        auto indices = std::vector<int>(all_indices.begin(), all_indices.end() - 1);
+        auto targets = std::vector<int>(all_indices.begin() + 1, all_indices.end());
+
+        float loss = rnn.forward(indices, targets, current_state);
+        rnn.backward();
+        optimizer.step();
+        current_state = rnn.state();
+        optimizer.zero_gradients();
+
+        if (i % 100 == 0) {
+            std::cout << i << "/" << chunk_num << " loss: " << loss << std::endl;
         }
     }
     return 0;

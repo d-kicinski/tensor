@@ -10,34 +10,37 @@ class RNN : public LayerBase<float> {
         : _hidden_size(hidden_size), _sequence_length(sequence_length), _vocab_size(vocab_size),
           _input2hidden(vocab_size, hidden_size), _hidden2hidden(hidden_size, hidden_size),
           _hidden2output(hidden_size, vocab_size),
-          _cells(sequence_length, RNNCell(_input2hidden, _hidden2hidden, _hidden2output, vocab_size)),
-          _initial_state(hidden_size, 1)
+          _initial_state(1, hidden_size)
     {
+        for (int i = 0; i < sequence_length; ++i) {
+            _cells.emplace_back(_input2hidden, _hidden2hidden, _hidden2output, vocab_size);
+        }
         register_parameters(_input2hidden.parameters());
         register_parameters(_hidden2hidden.parameters());
         register_parameters(_hidden2output.parameters());
     }
 
-    auto forward(std::vector<int> inputs, std::vector<int> targets, MatrixF previous_state) -> float
+    auto forward(std::vector<int> inputs, std::vector<int> targets, MatrixF const &previous_state) -> float
     {
         _initial_state = previous_state.clone();
-        MatrixF &prev_state = previous_state;
+        _last_state = previous_state.clone();
         float loss = 0.0;
         for (int i = 0; i < inputs.size(); ++i) {
             auto &cell = _cells[i];
-            loss += cell.loss(inputs[i], targets[i], previous_state);
-            prev_state = cell.hidden_state();
+            loss += cell.loss(inputs[i], targets[i], _last_state);
+            _last_state = cell.hidden_state().clone();
         }
         return loss;
     }
 
     auto backward() -> void
     {
-        auto next_d_hidden_state = MatrixF(_hidden_size, 1);
+        auto next_d_hidden_state = MatrixF(1, _hidden_size);
+        auto previous_hidden_state = _initial_state.clone();
         for (int i = 0; i < _sequence_length; ++i) {
             auto &cell = _cells[i];
-            auto previous_hidden_state = i == 0 ? _initial_state : _cells[i - 1].hidden_state();
             next_d_hidden_state = cell.loss_backward(previous_hidden_state, next_d_hidden_state);
+            previous_hidden_state = cell.hidden_state().clone();
         }
     }
 
@@ -54,6 +57,8 @@ class RNN : public LayerBase<float> {
         return indices;
     }
 
+    auto state() -> MatrixF& {return _last_state;}
+
   private:
     int _hidden_size;
     int _sequence_length;
@@ -63,5 +68,6 @@ class RNN : public LayerBase<float> {
     FeedForward _hidden2output;
     std::vector<RNNCell> _cells;
     MatrixF _initial_state;
+    MatrixF _last_state;
 };
 } // namespace ts

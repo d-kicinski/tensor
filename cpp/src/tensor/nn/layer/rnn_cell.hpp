@@ -17,8 +17,8 @@ class RNNCell {
 
     auto forward(int input_index, MatrixF const &previous_hidden_state) -> MatrixF
     {
-        auto input = MatrixF(_vocab_size, 1);
-        input.at(input_index) = 1;
+        auto input = MatrixF(1, _vocab_size);
+        input.at({0, input_index}) = 1;
         _hidden_state = ts::tanh(ts::add(_input2hidden(input), _hidden2hidden(previous_hidden_state)));
         auto output = _hidden2output(_hidden_state);
         return output;
@@ -39,7 +39,7 @@ class RNNCell {
     auto loss(int input_index, int target_index, MatrixF const &previous_hidden_state) -> float
     {
         auto output = forward(input_index, previous_hidden_state);
-        auto targets = VectorI{target_index};
+        VectorI targets{target_index};
         return _loss_fn.forward(output, targets);
     }
 
