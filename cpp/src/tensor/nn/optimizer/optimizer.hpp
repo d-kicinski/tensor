@@ -13,6 +13,12 @@ template <typename Element> class Optimizer {
 
     auto params() -> VectorRef { return _variables; }
 
+    auto zero_gradients() -> void {
+        for (auto &item : _variables)  {
+            ts::fill_(item.get().grad(), Element(0));
+        }
+    }
+
     auto register_params(Ref variable_ref) -> void { register_params(std::vector<Ref>{variable_ref}); }
 
     virtual auto register_params(VectorRef variables_ref) -> void
