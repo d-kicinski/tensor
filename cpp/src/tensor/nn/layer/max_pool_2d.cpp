@@ -23,5 +23,6 @@ auto ts::MaxPool2D::forward(Tensor<float, 4> const &input) -> Tensor<float, 4>
 
 auto ts::MaxPool2D::backward(Tensor<float, 4> const &d_output) -> Tensor<float, 4>
 {
+    // TODO: how to do gradient accumulation here?
     return max_pool_2d_backward(d_output, _mask, _dim_in, _kernel_size, _stride);
 }

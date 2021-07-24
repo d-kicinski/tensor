@@ -59,7 +59,7 @@ auto ts::im2col::Conv2D::backward(ts::Tensor<float, 4> const &d_output) -> ts::T
     }
     auto [d_input, d_weight] = ts::conv_2d_backward_im2col(_input, _weight.tensor(), _im2col_buffer, d_output_,
                                                            _kernel_size, _stride, _pad, _dilatation);
-    _weight.grad() = std::move(d_weight);
+    _weight.grad() += d_weight;
 
     if (_bias.has_value()) {
         for (int b = 0; b < d_output.shape(0); ++b) {

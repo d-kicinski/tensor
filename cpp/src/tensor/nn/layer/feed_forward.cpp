@@ -51,8 +51,8 @@ auto FeedForward::backward(MatrixF const &d_y) -> MatrixF
     if (_activation) {
         d_output = _activation.value()->backward(d_output);
     }
-    _weight.grad() = ts::dot(_x, d_output, true);
-    _bias.grad() = ts::sum(d_output, 0);
+    _weight.grad() += ts::dot(_x, d_output, true);
+    _bias.grad() += ts::sum(d_output, 0);
 
     return ts::dot(d_output, _weight.tensor(), false, true);
 }

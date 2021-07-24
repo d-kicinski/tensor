@@ -51,7 +51,7 @@ auto ts::naive::Conv2D::backward(const ts::Tensor<float, 4> &d_output) -> ts::Te
         d_output_ = _activation.value()->backward(d_output_);
     }
     auto [d_input, d_weight] = ts::conv_2d_backward(_input, _weight.tensor(), d_output_, _kernel_size, _stride);
-    _weight.grad() = std::move(d_weight);
+    _weight.grad() += d_weight;
 
     if (_bias.has_value()) {
         for (int b = 0; b < d_output.shape(0); ++b) {
