@@ -17,7 +17,7 @@ template <typename T> class Saver {
         _proto_model.clear_variables();
         for (auto const &param : _model_base.parameters()) {
             auto *var = _proto_model.add_variables();
-            for (auto v : *param.get().get()) {
+            for (auto v : *param.get().tensor().get()) {
                 var->add_values(v);
             }
         }
@@ -41,7 +41,7 @@ template <typename T> class Saver {
 
         for (int i = 0; i < params.size(); ++i) {
             const auto &var = _proto_model.variables(i);
-            auto &buffer = *params[i].get().get();
+            auto &buffer = *params[i].get().tensor().get();
             if (buffer.size() != var.values_size()) {
                 std::cerr << "Model variable size is different than the loaded one. ";
                 std::cerr << buffer.size() << " != " << var.values_size() << std::endl;

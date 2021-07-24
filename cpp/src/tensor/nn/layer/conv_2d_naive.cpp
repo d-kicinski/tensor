@@ -7,9 +7,9 @@ ts::naive::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<floa
     : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)), _stride(stride),
       _kernel_size(kernel_size)
 {
-    register_parameter(_weight.tensor());
+    register_parameter(_weight);
     if (_bias) {
-        register_parameter(_bias.value().tensor());
+        register_parameter(_bias.value());
     }
 }
 

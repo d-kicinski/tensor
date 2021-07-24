@@ -6,8 +6,8 @@ namespace ts {
 FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Activation activation)
     : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation))
 {
-    register_parameter(_weight.tensor());
-    register_parameter(_bias.tensor());
+    register_parameter(_weight);
+    register_parameter(_bias);
 }
 
 FeedForward::FeedForward(int dim_in, int dim_out, Activation activation)
@@ -17,8 +17,8 @@ FeedForward::FeedForward(int dim_in, int dim_out, Activation activation)
             std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})), "FeedForward(bias)"),
       _activation(Activations::get(activation))
 {
-    register_parameter(_weight.tensor());
-    register_parameter(_bias.tensor());
+    register_parameter(_weight);
+    register_parameter(_bias);
 }
 
 auto FeedForward::create(int dim_in, int dim_out, Activation activation) -> FeedForward

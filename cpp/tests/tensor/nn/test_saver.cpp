@@ -14,7 +14,7 @@ class Model : public ts::LayerBase<float> {
 
        register_parameters(_layer1.parameters());
        register_parameters(_layer2.parameters());
-       register_parameter(_number.tensor());
+       register_parameter(_number);
     }
 
   private:

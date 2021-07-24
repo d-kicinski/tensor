@@ -1,16 +1,16 @@
 #pragma once
 
-#include <tensor/tensor.hpp>
+#include "tensor/nn/grad_holder.hpp"
 
 namespace ts {
 
 template <typename T> class LayerBase {
   private:
-    using params_t = std::vector<std::reference_wrapper<DataHolder<T>>>;
+    using params_t = std::vector<std::reference_wrapper<GradHolder<T>>>;
     params_t _params;
 
   public:
-    auto register_parameter(DataHolder<T> &param) -> void { _params.push_back(std::ref(param)); }
+    auto register_parameter(GradHolder<T> &param) -> void { _params.push_back(std::ref(param)); }
 
     auto register_parameters(params_t &params) -> void
     {
