@@ -5,13 +5,15 @@
 #include <tensor/nn/layer/feed_forward.hpp>
 #include <tensor/nn/optimizer/adagrad.hpp>
 
-class Model {
+class Model : public ts::LayerBase<float> {
 
   public:
     using VectorRef = std::vector<std::reference_wrapper<ts::GradHolder<float>>>;
 
     Model() : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)), _layer2(ts::FeedForward::create(100, 3))
     {
+        register_parameters(_layer1.parameters());
+        register_parameters(_layer2.parameters());
     }
 
     auto predict(ts::MatrixF const &inputs) -> ts::VectorI { return ts::argmax(_forward(inputs)); }
@@ -23,20 +25,6 @@ class Model {
     }
 
     auto backward() -> void { _layer1.backward(_layer2.backward(_loss.backward())); }
-
-    auto weights() -> VectorRef
-    {
-        std::vector<std::reference_wrapper<ts::GradHolder<float>>> vars;
-        // TODO: Why I'm getting std::length_error when using this:
-        //   vars.insert(vars.end(), _layer1.weights().begin(), _layer1.weights().end());
-        //   vars.insert(vars.end(), _layer2.weights().begin(), _layer2.weights().end());
-
-        vars.emplace_back(_layer1.weight());
-        vars.emplace_back(_layer1.bias());
-        vars.emplace_back(_layer2.weight());
-        vars.emplace_back(_layer2.bias());
-        return vars;
-    }
 
   private:
     ts::FeedForward _layer1;
@@ -56,6 +44,7 @@ auto train(Model &model, ts::Optimizer<float> &optimizer, ts::PlanarDataset &dat
             loss = model.loss(inputs, labels);
             model.backward();
             optimizer.step();
+            optimizer.zero_gradients();
             if (epoch_i % 10 == 0)
                 std::cout << "epoch: " << epoch_i << "/" << epoch_num << " loss: " << loss << std::endl;
         }
@@ -80,7 +69,7 @@ int main()
     ts::PlanarDataset dataset_train("resources/train_planar_data.tsv", true, 300);
     ts::PlanarDataset dataset_test("resources/test_planar_data.tsv", true, 1);
     Model model;
-    ts::Adagrad<float> optimizer(model.weights(), 5e-2);
+    ts::Adagrad<float> optimizer(model.parameters(), 5e-2);
 
     std::cout << "Training... " << std::endl;
     float loss = train(model, optimizer, dataset_train);
