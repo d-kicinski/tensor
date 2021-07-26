@@ -9,7 +9,6 @@
 
 #include <tensor/nn/layer/rnn.hpp>
 #include <tensor/nn/optimizer/adagrad.hpp>
-#include <tensor/nn/optimizer/sgd.hpp>
 
 class Vocabulary {
   public:
@@ -100,48 +99,49 @@ int main()
     auto vocabulary = Vocabulary(buffer);
     vocabulary.save("vocab.txt");
 
+    int epoch_num = 10;
     int hidden_size = 100;
     int sequence_length = 25;
     float learning_rate = 1e-1;
     ulong vocab_size = vocabulary.size();
+
     ts::RNN rnn(hidden_size, sequence_length, vocab_size);
     ts::Adagrad<float> optimizer(rnn.parameters(), learning_rate);
+    ts::MatrixF current_state(1, hidden_size);
 
     int sample_length = sequence_length + 1;
     int chunk_num = std::floor(buffer.length() / sample_length);
 
-    ts::MatrixF current_state(1, hidden_size);
+    float smooth_loss = -std::log(1.0 / vocab_size) * sequence_length;
+    for (int i_epoch = 0; i_epoch < epoch_num; ++i_epoch) {
+        for (int i = 0; i < chunk_num; ++i) {
+            auto current_chunk = std::u32string(std::next(buffer.begin(), i * sample_length),
+                                                std::next(buffer.begin(), (i + 1) * sample_length));
+            auto all_indices = vocabulary.to_indices(current_chunk);
+            auto indices = std::vector<int>(all_indices.begin(), all_indices.end() - 1);
+            auto targets = std::vector<int>(all_indices.begin() + 1, all_indices.end());
 
-//    for (int i = 0; i < chunk_num; ++i) {
-    float smooth_loss = -std::log(1.0/vocab_size) * sequence_length;
-    int i = 0;
-    while (true) {
-        auto current_chunk = std::u32string(std::next(buffer.begin(), i * sample_length), std::next(buffer.begin(), (i + 1) * sample_length));
-        auto all_indices = vocabulary.to_indices(current_chunk);
-        auto indices = std::vector<int>(all_indices.begin(), all_indices.end() - 1);
-        auto targets = std::vector<int>(all_indices.begin() + 1, all_indices.end());
+            if (i % 2000 == 0) {
+                auto sample_idx = rnn.sample(indices[0], current_state, 200);
+                auto text = converter.to_bytes(vocabulary.to_text(sample_idx));
 
-        if (i % 1000 == 0) {
-            auto sample_idx = rnn.sample(indices[0], current_state, 200);
-            auto text = converter.to_bytes(vocabulary.to_text(sample_idx));
-            std::cout << std::endl  << text << std::endl;
+                std::cout << std::endl << "Generated text:" << std::endl;
+                std::cout << text << std::endl << std::endl;
+            }
+
+            optimizer.zero_gradients();
+            float loss = rnn.forward(indices, targets, current_state);
+            rnn.backward();
+            optimizer.step();
+            current_state = rnn.state();
+
+            smooth_loss = smooth_loss * 0.999 + loss * 0.001;
+
+            if (i % 1000 == 0) {
+                std::cout << "epoch [" << i_epoch << "/" << epoch_num << "]   steps: [" << i << "/" << chunk_num
+                          << "]    loss: " << smooth_loss << std::endl;
+            }
         }
-
-        optimizer.zero_gradients();
-        float loss = rnn.forward(indices, targets, current_state);
-        rnn.backward(targets);
-        optimizer.step();
-        current_state = rnn.state().clone();
-
-        smooth_loss = smooth_loss * 0.999 + loss * 0.001;
-
-        if (i % 100 == 0) {
-            std::cout << i << "/" << chunk_num << " loss: " << smooth_loss << std::endl;
-        }
-
-        ++i;
-        if (i >= chunk_num)
-            i = 0;
     }
     return 0;
 }
