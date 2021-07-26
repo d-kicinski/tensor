@@ -362,8 +362,8 @@ auto wrap_nn(pybind11::module &m)
 
     py::class_<ts::LayerBase<float>>(m, "LayerBase")
         .def(py::init<>())
-        .def("register_parameters", &ts::LayerBase<float>::register_parameters)
-        .def("register_parameters", &ts::LayerBase<float>::register_parameters)
+        .def("register_parameters", py::overload_cast<ts::GradHolder<float>&>(&ts::LayerBase<float>::register_parameters))
+        .def("register_parameters", py::overload_cast<ts::LayerBase<float>::VectorRef&>(&ts::LayerBase<float>::register_parameters))
         .def("parameters", &ts::LayerBase<float>::parameters, py::return_value_policy::reference_internal);
 
 #ifdef TENSOR_USE_PROTOBUF
