@@ -10,7 +10,7 @@ template <typename T> class LayerBase {
     params_t _params;
 
   public:
-    auto register_parameter(GradHolder<T> &param) -> void { _params.push_back(std::ref(param)); }
+    auto register_parameters(GradHolder<T> &param) -> void { _params.push_back(std::ref(param)); }
 
     auto register_parameters(params_t &params) -> void
     {

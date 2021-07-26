@@ -8,9 +8,9 @@ ts::im2col::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<flo
     : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)), _stride(stride),
       _pad(pad), _dilatation(dilatation), _kernel_size(kernel_size)
 {
-    register_parameter(_weight);
+    register_parameters(_weight);
     if (_bias) {
-        register_parameter(_bias.value());
+        register_parameters(_bias.value());
     }
 }
 
