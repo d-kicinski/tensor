@@ -8,33 +8,32 @@
 
 namespace ts {
 
-template <typename Element> class Adagrad : public Optimizer<Element> {
+template <typename T> class Adagrad : public Optimizer<T> {
   public:
-    using Ref = std::reference_wrapper<GradHolder<Element>>;
-    using VectorRef = std::vector<Ref>;
-    using Optimizer<Element>::register_params;
+    using Optimizer<T>::register_parameters;
+    using VectorRef = typename Optimizer<T>::VectorRef;
 
     explicit Adagrad(float lr) : _lr(lr) {}
 
-    Adagrad(VectorRef variables, float lr) : Adagrad(lr) { register_params(std::move(variables)); }
+    Adagrad(VectorRef variables, float lr) : Adagrad(lr) { register_parameters(std::move(variables)); }
 
     explicit Adagrad(VectorRef variables) : Adagrad(variables, LEARNING_RATE) {}
 
     Adagrad() : Adagrad(LEARNING_RATE) {}
 
-    auto register_params(VectorRef variables) -> void override
+    auto register_parameters(VectorRef variables) -> void override
     {
         _register_in_memory(variables);
-        Optimizer<Element>::register_params(std::move(variables));
+        Optimizer<T>::register_parameters(std::move(variables));
     }
 
     auto step() -> void override
     {
-        VectorRef params = Optimizer<Element>::params();
+        VectorRef params = Optimizer<T>::parameters();
         for (int i = 0; i < _memory.size(); ++i) {
-            DataHolder<Element> &tensor = params[i].get().tensor();
-            DataHolder<Element> &grad = params[i].get().grad();
-            std::vector<Element> &mem = _memory[i];
+            DataHolder<T> &tensor = params[i].get().tensor();
+            DataHolder<T> &grad = params[i].get().grad();
+            std::vector<T> &mem = _memory[i];
 
             ts::clip_(grad, -5.0f, 5.0f);
 
@@ -49,13 +48,13 @@ template <typename Element> class Adagrad : public Optimizer<Element> {
     constexpr static double LEARNING_RATE = 1e-2;
 
     float _lr{};
-    std::vector<std::vector<Element>> _memory;
+    std::vector<std::vector<T>> _memory;
 
     auto _register_in_memory(VectorRef variables) -> void
     {
-        for (GradHolder<Element> &item : variables) {
+        for (GradHolder<T> &item : variables) {
             auto size = std::distance(item.tensor().begin(), item.tensor().end());
-            _memory.push_back(std::vector<Element>(size));
+            _memory.push_back(std::vector<T>(size));
         }
     }
 };

@@ -2,13 +2,13 @@
 
 #include <tensor/tensor.hpp>
 
-#include "layer_base.hpp"
 #include "tensor/nn/activations.hpp"
+#include "tensor/nn/parameters_registry.hpp"
 #include "tensor/nn/variable.hpp"
 
 namespace ts::im2col {
 
-class Conv2D : public LayerBase<float> {
+class Conv2D : public ParameterRegistry<float> {
   public:
     using Activations = ActivationFactory<float, 4>;
     using VectorRef = std::vector<std::reference_wrapper<GradHolder<float>>>;

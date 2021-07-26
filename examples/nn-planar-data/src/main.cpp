@@ -5,7 +5,7 @@
 #include <tensor/nn/layer/feed_forward.hpp>
 #include <tensor/nn/optimizer/adagrad.hpp>
 
-class Model : public ts::LayerBase<float> {
+class Model : public ts::ParameterRegistry<float> {
   public:
     Model() : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)), _layer2(ts::FeedForward::create(100, 3))
     {

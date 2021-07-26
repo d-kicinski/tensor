@@ -318,8 +318,8 @@ auto wrap_nn(pybind11::module &m)
         .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float, float>(), py::arg("params"),
              py::arg("lr"), py::arg("momentum") = 0.0)
         .def("step", &ts::SGD<float>::step)
-        .def("register_params", py::overload_cast<ts::SGD<float>::VectorRef>(&ts::SGD<float>::register_params))
-        .def("register_params", py::overload_cast<ts::SGD<float>::Ref>(&ts::SGD<float>::register_params))
+        .def("register_parameters", py::overload_cast<ts::SGD<float>::VectorRef>(&ts::SGD<float>::register_parameters))
+        .def("register_parameters", py::overload_cast<ts::GradHolder<float>&>(&ts::SGD<float>::register_parameters))
         .def("zero_gradients", &ts::SGD<float>::zero_gradients);
 
     py::class_<ts::Adagrad<float>>(m, "Adagrad")
@@ -327,8 +327,8 @@ auto wrap_nn(pybind11::module &m)
         .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"),
              py::arg("lr"))
         .def("step", &ts::Adagrad<float>::step)
-        .def("register_params", py::overload_cast<ts::Adagrad<float>::VectorRef>(&ts::Adagrad<float>::register_params))
-        .def("register_params", py::overload_cast<ts::Adagrad<float>::Ref>(&ts::Adagrad<float>::register_params))
+        .def("register_parameters", py::overload_cast<ts::Adagrad<float>::VectorRef>(&ts::Adagrad<float>::register_parameters))
+        .def("register_parameters", py::overload_cast<ts::GradHolder<float>&>(&ts::Adagrad<float>::register_parameters))
         .def("zero_gradients", &ts::Adagrad<float>::zero_gradients);
 
     py::class_<ts::RMSProp<float>>(m, "RMSProp")
@@ -336,8 +336,8 @@ auto wrap_nn(pybind11::module &m)
         .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"),
              py::arg("lr"))
         .def("step", &ts::RMSProp<float>::step)
-        .def("register_params", py::overload_cast<ts::RMSProp<float>::VectorRef>(&ts::RMSProp<float>::register_params))
-        .def("register_params", py::overload_cast<ts::RMSProp<float>::Ref>(&ts::RMSProp<float>::register_params))
+        .def("register_parameters", py::overload_cast<ts::RMSProp<float>::VectorRef>(&ts::RMSProp<float>::register_parameters))
+        .def("register_parameters", py::overload_cast<ts::GradHolder<float>&>(&ts::RMSProp<float>::register_parameters))
         .def("zero_gradients", &ts::RMSProp<float>::zero_gradients);
 
     py::class_<ts::Adam<float>>(m, "Adam")
@@ -345,8 +345,8 @@ auto wrap_nn(pybind11::module &m)
         .def(py::init<std::vector<std::reference_wrapper<ts::GradHolder<float>>>, float>(), py::arg("params"),
              py::arg("lr"))
         .def("step", &ts::Adam<float>::step)
-        .def("register_params", py::overload_cast<ts::Adam<float>::VectorRef>(&ts::Adam<float>::register_params))
-        .def("register_params", py::overload_cast<ts::Adam<float>::Ref>(&ts::Adam<float>::register_params))
+        .def("register_parameters", py::overload_cast<ts::Adam<float>::VectorRef>(&ts::Adam<float>::register_parameters))
+        .def("register_parameters", py::overload_cast<ts::GradHolder<float>&>(&ts::Adam<float>::register_parameters))
         .def("zero_gradients", &ts::Adam<float>::zero_gradients);
 
     py::class_<ts::CrossEntropyLoss>(m, "CrossEntropyLoss")
@@ -360,20 +360,20 @@ auto wrap_nn(pybind11::module &m)
     wrap_nn_activations<float, 2>(m, "_f2");
     wrap_nn_activations<float, 3>(m, "_f3");
 
-    py::class_<ts::LayerBase<float>>(m, "LayerBase")
+    py::class_<ts::ParameterRegistry<float>>(m, "ParameterRegistry")
         .def(py::init<>())
-        .def("register_parameters", py::overload_cast<ts::GradHolder<float>&>(&ts::LayerBase<float>::register_parameters))
-        .def("register_parameters", py::overload_cast<ts::LayerBase<float>::VectorRef&>(&ts::LayerBase<float>::register_parameters))
-        .def("parameters", &ts::LayerBase<float>::parameters, py::return_value_policy::reference_internal);
+        .def("register_parameters", py::overload_cast<ts::GradHolder<float>&>(&ts::ParameterRegistry<float>::register_parameters))
+        .def("register_parameters", py::overload_cast<ts::ParameterRegistry<float>::VectorRef>(&ts::ParameterRegistry<float>::register_parameters))
+        .def("parameters", &ts::ParameterRegistry<float>::parameters, py::return_value_policy::reference_internal);
 
 #ifdef TENSOR_USE_PROTOBUF
     py::class_<ts::Saver<float>>(m, "Saver")
-        .def(py::init<ts::LayerBase<float> &>())
+        .def(py::init<ts::ParameterRegistry<float> &>())
         .def("save", &ts::Saver<float>::save)
         .def("load", &ts::Saver<float>::load);
 #endif
 
-    py::class_<ts::FeedForward, ts::LayerBase<float>>(m, "FeedForward")
+    py::class_<ts::FeedForward, ts::ParameterRegistry<float>>(m, "FeedForward")
         .def(py::init(&ts::FeedForward::create))
         .def("__call__", &ts::FeedForward::operator())
         .def("forward", &ts::FeedForward::forward)
@@ -383,7 +383,7 @@ auto wrap_nn(pybind11::module &m)
         .def("weights", &ts::FeedForward::weights)
         .def("parameters", &ts::FeedForward::parameters, py::return_value_policy::reference_internal);
 
-    py::class_<ts::Conv2D, ts::LayerBase<float>>(m, "Conv2D")
+    py::class_<ts::Conv2D, ts::ParameterRegistry<float>>(m, "Conv2D")
         .def(py::init(&ts::Conv2D::create))
         .def("__call__", &ts::Conv2D::operator())
         .def("forward", &ts::Conv2D::forward)

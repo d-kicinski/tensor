@@ -2,15 +2,15 @@
 
 #include <fstream>
 
-#include "tensor/nn/layer/layer_base.hpp"
+#include "tensor/nn/parameters_registry.hpp"
 #include "tensor/nn/proto/array.pb.h"
 
 namespace ts {
 template <typename T> class Saver {
   public:
-    LayerBase<T> &_model_base;
+    ParameterRegistry<T> &_model_base;
     proto::Model _proto_model;
-    explicit Saver(LayerBase<T> &model) : _model_base(model), _proto_model() {}
+    explicit Saver(ParameterRegistry<T> &model) : _model_base(model), _proto_model() {}
 
     auto save(std::string const &output_path) -> void
     {

@@ -8,16 +8,15 @@
 
 namespace ts {
 
-template <typename Element> class Adam : public Optimizer<Element> {
+template <typename T> class Adam : public Optimizer<T> {
   public:
-    using Ref = std::reference_wrapper<GradHolder<Element>>;
-    using VectorRef = std::vector<Ref>;
-    using Optimizer<Element>::register_params;
+    using Optimizer<T>::register_parameters;
+    using VectorRef = typename Optimizer<T>::VectorRef;
 
     Adam(VectorRef variables, float lr, float beta1, float beta2) : _lr(lr), _beta1(beta1), _beta2(beta2)
     {
         _register_in_memory(variables);
-        Optimizer<Element>::register_params(std::move(variables));
+        Optimizer<T>::register_parameters(std::move(variables));
     }
 
     Adam(float lr, float beta1, float beta2) : _lr(lr), _beta1(beta1), _beta2(beta2) {}
@@ -30,10 +29,10 @@ template <typename Element> class Adam : public Optimizer<Element> {
 
     Adam() : Adam(LEARNING_RATE, BETA1, BETA2) {}
 
-    auto register_params(VectorRef variables) -> void override
+    auto register_parameters(VectorRef variables) -> void override
     {
         _register_in_memory(variables);
-        Optimizer<Element>::register_params(variables);
+        Optimizer<T>::register_parameters(variables);
     }
 
     auto step() -> void override
@@ -42,12 +41,12 @@ template <typename Element> class Adam : public Optimizer<Element> {
         float bias_correction1 = 1 - std::pow(_beta1, _step);
         float bias_correction2 = 1 - std::pow(_beta1, _step);
 
-        VectorRef params = Optimizer<Element>::params();
+        VectorRef params = Optimizer<T>::parameters();
         for (int i = 0; i < _grad_moving_average.size(); ++i) {
             ts::DataHolder<float> &tensor = params[i].get().tensor();
             ts::DataHolder<float> &grad = params[i].get().grad();
-            std::vector<Element> &grad_avg = _grad_moving_average[i];
-            std::vector<Element> &grad2_avg = _grad_squared_moving_average[i];
+            std::vector<T> &grad_avg = _grad_moving_average[i];
+            std::vector<T> &grad2_avg = _grad_squared_moving_average[i];
 
             ts::clip_(grad, -5.0f, 5.0f);
 
@@ -68,18 +67,18 @@ template <typename Element> class Adam : public Optimizer<Element> {
     constexpr static double BETA2 = 0.999;
 
     float _lr{};
-    std::vector<std::vector<Element>> _grad_moving_average;
-    std::vector<std::vector<Element>> _grad_squared_moving_average;
+    std::vector<std::vector<T>> _grad_moving_average;
+    std::vector<std::vector<T>> _grad_squared_moving_average;
     float _beta1{};
     float _beta2{};
     int _step = 1;
 
     auto _register_in_memory(VectorRef variables) -> void
     {
-        for (GradHolder<Element> &item : variables) {
+        for (GradHolder<T> &item : variables) {
             auto size = std::distance(item.tensor().begin(), item.tensor().end());
-            _grad_moving_average.push_back(std::vector<Element>(size));
-            _grad_squared_moving_average.push_back(std::vector<Element>(size));
+            _grad_moving_average.push_back(std::vector<T>(size));
+            _grad_squared_moving_average.push_back(std::vector<T>(size));
         }
     }
 };

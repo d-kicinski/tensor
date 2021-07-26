@@ -58,6 +58,7 @@ set(NN_SOURCES
         src/tensor/nn/im2col.cpp
         src/tensor/nn/conv_2d.cpp
         src/tensor/nn/max_pool_2d.cpp
+        src/tensor/nn/parameters_registry.cpp
 
         src/tensor/nn/autograd/relu.cpp
         src/tensor/nn/autograd/tanh.cpp
@@ -73,7 +74,6 @@ set(NN_SOURCES
 
         src/tensor/nn/layer/feed_forward.cpp
         src/tensor/nn/layer/max_pool_2d.cpp
-        src/tensor/nn/layer/layer_base.cpp
         src/tensor/nn/layer/conv_2d_naive.cpp
         src/tensor/nn/layer/conv_2d_im2col.cpp
         src/tensor/nn/layer/rnn_cell.cpp
@@ -143,7 +143,6 @@ if (TENSOR_BUILD_TESTS)
 
             tests/tensor/nn/optimizer/test_sgd.cpp
             tests/tensor/nn/optimizer/test_adagrad.cpp
-            tests/tensor/nn/optimizer/test_rmsprop.cpp
             tests/tensor/nn/optimizer/test_rmsprop.cpp
             tests/tensor/nn/optimizer/test_adam.cpp
 

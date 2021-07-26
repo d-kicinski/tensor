@@ -3,7 +3,7 @@
 #include <tensor/nn/layer/conv_2d.hpp>
 #include <tensor/nn/saver.hpp>
 
-class Model : public ts::LayerBase<float> {
+class Model : public ts::ParameterRegistry<float> {
   public:
     Model()
         : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)),
