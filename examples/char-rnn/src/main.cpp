@@ -9,6 +9,7 @@
 
 #include <tensor/nn/layer/rnn.hpp>
 #include <tensor/nn/optimizer/adagrad.hpp>
+#include <tensor/nn/optimizer/sgd.hpp>
 
 class Vocabulary {
   public:
@@ -109,23 +110,38 @@ int main()
     int sample_length = sequence_length + 1;
     int chunk_num = std::floor(buffer.length() / sample_length);
 
-    ts::MatrixF current_state(1, 128);
+    ts::MatrixF current_state(1, hidden_size);
 
-    for (int i = 0; i < chunk_num; ++i) {
+//    for (int i = 0; i < chunk_num; ++i) {
+    float smooth_loss = -std::log(1.0/vocab_size) * sequence_length;
+    int i = 0;
+    while (true) {
         auto current_chunk = std::u32string(std::next(buffer.begin(), i * sample_length), std::next(buffer.begin(), (i + 1) * sample_length));
         auto all_indices = vocabulary.to_indices(current_chunk);
         auto indices = std::vector<int>(all_indices.begin(), all_indices.end() - 1);
         auto targets = std::vector<int>(all_indices.begin() + 1, all_indices.end());
 
-        float loss = rnn.forward(indices, targets, current_state);
-        rnn.backward();
-        optimizer.step();
-        current_state = rnn.state();
+        if (i % 1000 == 0) {
+            auto sample_idx = rnn.sample(indices[0], current_state, 200);
+            auto text = converter.to_bytes(vocabulary.to_text(sample_idx));
+            std::cout << std::endl  << text << std::endl;
+        }
+
         optimizer.zero_gradients();
+        float loss = rnn.forward(indices, targets, current_state);
+        rnn.backward(targets);
+        optimizer.step();
+        current_state = rnn.state().clone();
+
+        smooth_loss = smooth_loss * 0.999 + loss * 0.001;
 
         if (i % 100 == 0) {
-            std::cout << i << "/" << chunk_num << " loss: " << loss << std::endl;
+            std::cout << i << "/" << chunk_num << " loss: " << smooth_loss << std::endl;
         }
+
+        ++i;
+        if (i >= chunk_num)
+            i = 0;
     }
     return 0;
 }
