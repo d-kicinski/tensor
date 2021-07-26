@@ -20,6 +20,19 @@ template <typename Element, int Dim> auto kaiming_uniform(std::vector<int> const
     return tensor;
 }
 
+template <typename Element, int Dim>
+auto standard_normal(std::vector<int> const &shape, Element scale) -> Tensor<Element, Dim>
+{
+    std::default_random_engine random(69);
+    std::normal_distribution<Element> dist;
+
+    std::array<size_type, Dim> array_shape;
+    std::copy(shape.begin(), shape.end(), array_shape.begin());
+    Tensor<Element, Dim> tensor(array_shape);
+    std::generate(tensor.begin(), tensor.end(), [&dist, &random, &scale]() { return scale * dist(random); });
+    return tensor;
+}
+
 template <typename Element, int Dim> auto bias_init(std::vector<int> const &shape) -> Tensor<Element, Dim>
 {
     std::default_random_engine random(69);
