@@ -3,35 +3,40 @@
 
 namespace ts {
 
-FeedForward::FeedForward(Variable<float, 2> weight, Variable<float, 1> bias, Activation activation)
+FeedForward::FeedForward(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, Activation activation)
     : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation))
 {
     register_parameters(_weight);
-    register_parameters(_bias);
+    if (_bias.has_value()) {
+        register_parameters(_bias.value());
+    }
 }
 
-FeedForward::FeedForward(int dim_in, int dim_out, Activation activation)
+FeedForward::FeedForward(int dim_in, int dim_out, Activation activation, bool use_bias)
     : _weight(std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
               std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})), "FeedForward(weight)"),
-      _bias(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
-            std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})), "FeedForward(bias)"),
       _activation(Activations::get(activation))
 {
     register_parameters(_weight);
     if (use_bias) {
-        register_parameters(_bias);
+        _bias = std::make_optional(ts::Variable<float, 1>(
+            std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+            std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})), "FeedForward(bias)"));
+        register_parameters(_bias.value());
     }
 }
 
-auto FeedForward::create(int dim_in, int dim_out, Activation activation) -> FeedForward
+auto FeedForward::create(int dim_in, int dim_out, Activation activation, bool use_bias) -> FeedForward
 {
     auto weight = Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
                                      std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
                                      "FeedForward(weight)");
-
-    auto bias =
-        Variable<float, 1>(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
-                           std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})), "FeedForward(bias)  ");
+    std::optional<Variable<float, 1>> bias = std::nullopt;
+    if (use_bias) {
+        bias = std::make_optional(Variable<float, 1>(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+                                                     std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+                                                     "FeedForward(bias)"));
+    }
     return FeedForward(std::move(weight), std::move(bias), activation);
 }
 
@@ -39,8 +44,12 @@ auto FeedForward::operator()(MatrixF const &inputs) -> MatrixF { return forward(
 
 auto FeedForward::forward(MatrixF const &inputs) -> MatrixF
 {
-    _x = inputs;
-    auto _y = ts::add(ts::dot(_x, _weight.tensor()), _bias.tensor());
+    _x = inputs.clone();
+    auto _y = ts::dot(_x, _weight.tensor());
+    if (_use_bias) {
+        _y = ts::add(_y, _bias.value().tensor());
+    }
+
     if (_activation) {
         _y = _activation.value()->forward(_y);
     }
@@ -54,20 +63,32 @@ auto FeedForward::backward(MatrixF const &d_y) -> MatrixF
         d_output = _activation.value()->backward(d_output);
     }
     _weight.grad() += ts::dot(_x, d_output, true);
-    _bias.grad() += ts::sum(d_output, 0);
+
+    if (_use_bias) {
+        _bias.value().grad() += ts::sum(d_output, 0);
+    }
 
     return ts::dot(d_output, _weight.tensor(), false, true);
 }
 
 auto FeedForward::weight() -> Variable<float, 2> & { return _weight; }
 
-auto FeedForward::bias() -> Variable<float, 1> & { return _bias; }
+auto FeedForward::bias() -> std::optional<std::reference_wrapper<Variable<float, 1>>>
+{
+    if (_bias.has_value()) {
+        return std::make_optional(std::ref(_bias.value()));
+    } else {
+        return std::nullopt;
+    }
+}
 
 auto FeedForward::weights() -> VectorRef
 {
     std::vector<std::reference_wrapper<ts::GradHolder<float>>> vars;
     vars.emplace_back(std::ref(weight()));
-    vars.emplace_back(std::ref(bias()));
+    if (_use_bias) {
+        vars.emplace_back(std::ref(bias().value()));
+    }
     return vars;
 }
 
