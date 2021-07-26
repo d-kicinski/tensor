@@ -12,9 +12,9 @@ class RNN : public ParameterRegistry<float> {
 
     auto forward(std::vector<int> inputs, std::vector<int> targets, MatrixF const &previous_state) -> float;
 
-    auto backward(std::vector<int> targets) -> void;
+    auto backward() -> void;
 
-    auto sample(int idx, MatrixF previous_state, int sample_size) -> std::vector<int>;
+    auto sample(int idx, MatrixF const &previous_state, int sample_size) -> std::vector<int>;
 
     auto state() -> MatrixF &;
 
@@ -24,7 +24,6 @@ class RNN : public ParameterRegistry<float> {
     int _vocab_size;
     RNNCell::Parameters _p;
     std::vector<RNNCell> _cells;
-    MatrixF _initial_state;
     MatrixF _last_state;
 };
 

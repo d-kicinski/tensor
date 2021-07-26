@@ -25,9 +25,7 @@ class RNNCell {
 
     auto hidden_state() -> MatrixF &;
 
-    auto loss(int input_index, MatrixF const &previous_hidden_state) -> MatrixF;
-
-    auto loss_backward(int target_index, MatrixF const &next_d_hidden_state) -> MatrixF;
+    auto loss() -> CrossEntropyLoss &;
 
   private:
     Parameters &_p;
@@ -36,6 +34,5 @@ class RNNCell {
     CrossEntropyLoss _loss_fn;
     MatrixF _input;
     MatrixF _previous_hidden_state;
-    MatrixF _probs;
 };
 } // namespace ts
