@@ -274,6 +274,11 @@ template <typename Element, int Dim> auto sum(Tensor<Element, Dim> const &tensor
 auto to_one_hot(Tensor<int, 1> const &vector) -> Tensor<char, 2>
 {
     int max_index = *std::max_element(vector.begin(), vector.end());
+    return to_one_hot(vector, max_index);
+}
+
+auto to_one_hot(Tensor<int, 1> const &vector, int max_index) -> Tensor<char, 2>
+{
     Tensor<char, 2> one_hot(vector.shape(0), max_index + 1);
     for (size_type i = 0; i < one_hot.shape(0); ++i) {
         one_hot(i, vector(i)) = true;

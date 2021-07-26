@@ -48,6 +48,8 @@ auto sum(MatrixF const &, int) -> VectorF;
 
 auto sum_v2(MatrixF const &, int) -> VectorF;
 
+auto to_one_hot(Tensor<int, 1> const &, int) -> Tensor<char, 2>;
+
 auto to_one_hot(Tensor<int, 1> const &) -> Tensor<char, 2>;
 
 auto get(MatrixF const &, Tensor<int, 1> const &) -> VectorF;
