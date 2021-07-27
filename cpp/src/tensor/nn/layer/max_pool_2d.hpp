@@ -19,11 +19,12 @@ class MaxPool2D {
     auto backward(Tensor<float, 4> const &) -> Tensor<float, 4>;
 
   private:
-    Tensor<int, 4> _mask;
-    int _dim_in{};
     int _kernel_size;
     int _stride;
     int _pad;
+
+    int _dim_in{};
+    Tensor<int, 4> _mask{};
 };
 
 } // namespace ts
