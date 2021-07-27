@@ -12,13 +12,13 @@ from dataset import MNISTDataset
 MODEL_SAVE_NAME = "mnist_model.ts"
 
 
-class Net(ts.libtensor.LayerBase):
+class Net(ts.libtensor.ParameterRegistry):
     def __init__(self):
         super().__init__()
         self.conv1 = ts.nn.Conv2D(1, 32, 3, 1, 0, 1, activation=ts.nn.Activation.RELU, use_bias=False)
         self.conv2 = ts.nn.Conv2D(32, 64, 3, 1, 0, 1, activation=ts.nn.Activation.RELU, use_bias=False)
-        self.fc1 = ts.nn.Linear(9216, 128, activation=ts.nn.Activation.RELU)
-        self.fc2 = ts.nn.Linear(128, 10)
+        self.fc1 = ts.nn.Linear(9216, 128, activation=ts.nn.Activation.RELU, use_bias=True)
+        self.fc2 = ts.nn.Linear(128, 10, use_bias=False)
         self.max_pool = ts.nn.MaxPool2D(2, 2, 0)
 
         self._register()

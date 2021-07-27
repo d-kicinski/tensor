@@ -35,9 +35,10 @@ class Conv2D(Op):
 
 
 class Linear(Op):
-    def __init__(self, dim_in: int, dim_out: int, activation: Activation = Activation.NONE):
+    def __init__(self, dim_in: int, dim_out: int, activation: Activation = Activation.NONE,
+                 use_bias: bool = True):
         super().__init__()
-        self._layer = _ts.FeedForward(dim_in, dim_out, activation)
+        self._layer = _ts.FeedForward(dim_in, dim_out, activation, use_bias)
 
     def forward(self, *inputs: Variable):
         tensor: Variable
