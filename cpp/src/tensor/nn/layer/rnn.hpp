@@ -23,8 +23,9 @@ class RNN : public ParameterRegistry<float> {
     int _sequence_length;
     int _vocab_size;
     RNNCell::Parameters _p;
-    std::vector<RNNCell> _cells;
-    MatrixF _last_state;
+
+    std::vector<RNNCell> _cells{};
+    MatrixF _last_state{};
 };
 
 } // namespace ts

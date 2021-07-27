@@ -30,9 +30,10 @@ class RNNCell {
   private:
     Parameters &_p;
     int _vocab_size;
-    MatrixF _hidden_state;
-    CrossEntropyLoss _loss_fn;
-    MatrixF _input;
-    MatrixF _previous_hidden_state;
+
+    MatrixF _hidden_state{};
+    CrossEntropyLoss _loss_fn{};
+    MatrixF _input{};
+    MatrixF _previous_hidden_state{};
 };
 } // namespace ts
