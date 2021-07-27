@@ -6,7 +6,7 @@
 ts::im2col::Conv2D::Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size,
                            int stride, int pad, int dilatation, Activation activation)
     : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)), _stride(stride),
-      _pad(pad), _dilatation(dilatation), _kernel_size(kernel_size)
+      _kernel_size(kernel_size), _pad(pad), _dilatation(dilatation)
 {
     register_parameters(_weight);
     if (_bias) {
@@ -19,12 +19,12 @@ auto ts::im2col::Conv2D::create(int in_channels, int out_channels, int kernel_si
 {
     std::vector<int> shape = {out_channels, kernel_size * kernel_size * in_channels};
     Variable<float, 2> weight(std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)),
-                              std::make_unique<MatrixF>(ts::kaiming_uniform<float, 2>(shape)), "Conv2D(weight)");
+                              std::make_unique<MatrixF>(ts::zeros<float, 2>(shape)), "Conv2D(weight)");
     std::optional<Variable<float, 1>> bias = std::nullopt;
     if (use_bias)
         bias = std::make_optional(Variable<float, 1>(std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
-                                                     std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
-                                                     "Conv2D(bias)  "));
+                                                     std::make_unique<VectorF>(ts::zeros<float, 1>({out_channels})),
+                                                     "Conv2D(bias)"));
     return Conv2D(std::move(weight), std::move(bias), kernel_size, stride, pad, dilatation, activation);
 }
 

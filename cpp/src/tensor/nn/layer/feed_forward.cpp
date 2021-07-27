@@ -4,7 +4,8 @@
 namespace ts {
 
 FeedForward::FeedForward(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, Activation activation)
-    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation))
+    : _weight(std::move(weight)), _bias(std::move(bias)), _activation(Activations::get(activation)),
+      _use_bias(_bias.has_value())
 {
     register_parameters(_weight);
     if (_bias.has_value()) {
@@ -14,14 +15,14 @@ FeedForward::FeedForward(Variable<float, 2> weight, std::optional<Variable<float
 
 FeedForward::FeedForward(int dim_in, int dim_out, Activation activation, bool use_bias)
     : _weight(std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
-              std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})), "FeedForward(weight)"),
-      _activation(Activations::get(activation))
+              std::make_unique<ts::MatrixF>(ts::zeros<float, 2>({dim_in, dim_out})), "FeedForward(weight)"),
+      _bias(std::nullopt), _activation(Activations::get(activation)), _use_bias(use_bias)
 {
     register_parameters(_weight);
     if (use_bias) {
-        _bias = std::make_optional(ts::Variable<float, 1>(
-            std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
-            std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})), "FeedForward(bias)"));
+        _bias = std::make_optional(
+            ts::Variable<float, 1>(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+                                   std::make_unique<ts::VectorF>(ts::zeros<float, 1>({dim_out})), "FeedForward(bias)"));
         register_parameters(_bias.value());
     }
 }
@@ -29,12 +30,12 @@ FeedForward::FeedForward(int dim_in, int dim_out, Activation activation, bool us
 auto FeedForward::create(int dim_in, int dim_out, Activation activation, bool use_bias) -> FeedForward
 {
     auto weight = Variable<float, 2>(std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
-                                     std::make_unique<ts::MatrixF>(ts::kaiming_uniform<float, 2>({dim_in, dim_out})),
+                                     std::make_unique<ts::MatrixF>(ts::zeros<float, 2>({dim_in, dim_out})),
                                      "FeedForward(weight)");
     std::optional<Variable<float, 1>> bias = std::nullopt;
     if (use_bias) {
         bias = std::make_optional(Variable<float, 1>(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
-                                                     std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+                                                     std::make_unique<ts::VectorF>(ts::zeros<float, 1>({dim_out})),
                                                      "FeedForward(bias)"));
     }
     return FeedForward(std::move(weight), std::move(bias), activation);

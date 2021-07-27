@@ -32,8 +32,6 @@ class Conv2D : public ParameterRegistry<float> {
     Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size, int stride, int pad,
            int dilatation, Activation activation = Activation::NONE);
 
-    Tensor<float, 4> _input;
-    Tensor<float, 2> _im2col_buffer;
     Variable<float, 2> _weight;
     std::optional<Variable<float, 1>> _bias;
     Activations::OptActivationPtr _activation;
@@ -41,6 +39,9 @@ class Conv2D : public ParameterRegistry<float> {
     int _kernel_size;
     int _pad;
     int _dilatation;
+
+    Tensor<float, 4> _input{};
+    Tensor<float, 2> _im2col_buffer{};
 };
 
 } // namespace ts::im2col

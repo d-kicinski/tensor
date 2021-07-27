@@ -35,11 +35,12 @@ class FeedForward : public ParameterRegistry<float> {
     FeedForward(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias,
                 Activation activation = Activation::NONE);
 
-    MatrixF _x;
     Variable<float, 2> _weight;
     std::optional<Variable<float, 1>> _bias = std::nullopt;
     Activations::OptActivationPtr _activation;
     bool _use_bias;
+
+    MatrixF _x{};
 };
 
 } // namespace ts

@@ -48,4 +48,12 @@ template <typename Element, int Dim> auto bias_init(std::vector<int> const &shap
     return tensor;
 }
 
+template <typename Element, int Dim> auto zeros(std::vector<int> const &shape) -> Tensor<Element, Dim>
+{
+    std::array<size_type, Dim> array_shape;
+    std::copy(shape.begin(), shape.end(), array_shape.begin());
+    Tensor<Element, Dim> tensor(array_shape);
+    return tensor;
+}
+
 } // namespace ts

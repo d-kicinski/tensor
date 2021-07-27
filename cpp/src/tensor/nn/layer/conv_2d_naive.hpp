@@ -34,12 +34,13 @@ class Conv2D : public ParameterRegistry<float> {
     Conv2D(Variable<float, 2> weight, std::optional<Variable<float, 1>> bias, int kernel_size, int stride,
            Activation activation = Activation::NONE);
 
-    Tensor<float, 4> _input;
     Variable<float, 2> _weight;
     std::optional<Variable<float, 1>> _bias;
     Activations::OptActivationPtr _activation;
     int _stride;
     int _kernel_size;
+
+    Tensor<float, 4> _input{};
 };
 
 } // namespace naive
