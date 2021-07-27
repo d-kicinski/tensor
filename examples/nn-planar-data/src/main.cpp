@@ -7,7 +7,8 @@
 
 class Model : public ts::ParameterRegistry<float> {
   public:
-    Model() : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU)), _layer2(ts::FeedForward::create(100, 3))
+    Model() : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU, true)),
+              _layer2(ts::FeedForward::create(100, 3, ts::Activation::NONE, false))
     {
         register_parameters(_layer1.parameters());
         register_parameters(_layer2.parameters());
