@@ -1,7 +1,6 @@
 #pragma once
 
-#include "tensor/nn/initialization.hpp"
-#include "tensor/nn/layer/feed_forward.hpp"
+#include "tensor/nn/parameters_registry.hpp"
 #include "tensor/nn/layer/rnn_cell.hpp"
 
 namespace ts {

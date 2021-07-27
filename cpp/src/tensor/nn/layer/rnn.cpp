@@ -1,5 +1,8 @@
 #include "rnn.hpp"
 
+#include "tensor/nn/initialization.hpp"
+#include "tensor/nn/softmax.hpp"
+
 ts::RNN::RNN(int hidden_size, int sequence_length, int vocab_size)
     : _hidden_size(hidden_size), _sequence_length(sequence_length), _vocab_size(vocab_size),
       _p{Variable<float, 2>::create(ts::standard_normal<float, 2>({vocab_size, hidden_size}, 0.01)),

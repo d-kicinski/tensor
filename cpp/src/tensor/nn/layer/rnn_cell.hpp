@@ -1,9 +1,7 @@
 #pragma once
 
 #include "tensor/nn/cross_entropy_loss.hpp"
-#include "tensor/nn/layer/feed_forward.hpp"
-#include "tensor/nn/parameters_registry.hpp"
-#include "tensor/nn/softmax.hpp"
+#include "tensor/nn/variable.hpp"
 
 namespace ts {
 

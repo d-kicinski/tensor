@@ -1,5 +1,7 @@
 #include "rnn_cell.hpp"
 
+#include "tensor/nn/autograd/tanh.hpp"
+
 ts::RNNCell::RNNCell(ts::RNNCell::Parameters &p, int vocab_size) : _p(p), _vocab_size(vocab_size) {}
 
 auto ts::RNNCell::forward(int input_index, ts::MatrixF const &previous_hidden_state) -> ts::MatrixF
