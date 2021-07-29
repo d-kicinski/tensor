@@ -62,6 +62,7 @@ set(NN_SOURCES
 
         src/tensor/nn/autograd/relu.cpp
         src/tensor/nn/autograd/tanh.cpp
+        src/tensor/nn/autograd/sigmoid.cpp
 
         src/tensor/nn/optimizer/optimizer.cpp
         src/tensor/nn/optimizer/sgd.cpp
@@ -78,6 +79,8 @@ set(NN_SOURCES
         src/tensor/nn/layer/conv_2d_im2col.cpp
         src/tensor/nn/layer/rnn_cell.cpp
         src/tensor/nn/layer/rnn.cpp
+        src/tensor/nn/layer/lstm_cell.cpp
+        src/tensor/nn/layer/lstm.cpp
         )
 
 if (TENSOR_USE_PROTOBUF)
