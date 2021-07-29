@@ -85,12 +85,12 @@ template <typename Element, int axis> auto concatenate(std::vector<Tensor<Elemen
         }
         return tensor;
     } else if constexpr (axis == 0) {
-        int vector_size = 0;
+        int rows = 0;
         for (auto const &v : list) {
-            vector_size += v.shape(0);
+            rows += v.shape(0);
         }
 
-        Tensor<Element, 1> tensor(vector_size);
+        Tensor<Element, 1> tensor(rows);
         int offset = 0;
         for (auto const &v : list) {
             std::copy(v.begin(), v.end(), tensor.begin() + offset);
@@ -102,31 +102,80 @@ template <typename Element, int axis> auto concatenate(std::vector<Tensor<Elemen
     }
 }
 
-template <typename Element> auto slice(Tensor<Element, 2> tensor, int from, int to) -> Tensor<Element, 2>
+template <typename Element> auto concatenate(std::vector<Tensor<Element, 2>> list, int axis) -> Tensor<Element, 2>
 {
-    std::array<size_type, 2> shape(tensor.shape());
-    shape[0] = to - from;
-    int row_size = tensor.shape(1);
+    using vec_size_type = typename std::vector<Tensor<Element, 1>>::size_type;
 
-    Tensor<Element, 2> slice(shape);
-    int begin_offset = from * row_size;
-    int end_offset = to * row_size;
-    std::copy(tensor.begin() + begin_offset, tensor.begin() + end_offset, slice.begin());
+    if (axis == 1) {
+        int rows = list[0].shape(0);
+        int columns = 0;
+        for (auto const &v : list) {
+            assert(rows == v.shape(0));
+            columns += v.shape(1);
+        }
 
-    return slice;
+        Tensor<Element, 2> output(rows, columns);
+        for (size_type i = 0; i < rows; ++i) {
+            auto output_row = output(i);
+            int offset = 0;
+            for (vec_size_type j = 0; j < list.size(); ++j) {
+                auto row = list[j](i);
+                std::copy(row.begin(), row.end(), std::next(output_row.begin(), offset));
+                offset += row.data_size();
+            }
+        }
+        return output;
+    } else if (axis == 0) {
+        int columns = list[0].shape(1);
+        int rows = 0;
+        for (auto const &v : list) {
+            assert(columns == v.shape(1));
+            rows += v.shape(0);
+        }
+
+        Tensor<Element, 2> output(rows, columns);
+        int offset = 0;
+        for (Tensor<Element, 2> const &v : list) {
+            std::copy(v.begin(), v.end(), std::next(output.begin(), offset));
+            offset += v.data_size();
+        }
+        return output;
+    } else {
+        assert(false);
+    }
+}
+
+template <typename Element> auto slice(Tensor<Element, 2> const &tensor, int from, int to, int axis) -> Tensor<Element, 2>
+{
+    if (axis == 0) {
+        std::array<size_type, 2> shape(tensor.shape());
+        shape[0] = to - from;
+        int row_size = tensor.shape(1);
+
+        Tensor<Element, 2> slice(shape);
+        int begin_offset = from * row_size;
+        int end_offset = to * row_size;
+        std::copy(tensor.begin() + begin_offset, tensor.begin() + end_offset, slice.begin());
+        return slice;
+    } else if (axis == 1) {
+        int rows = tensor.shape(0);
+        int columns = to - from;
+        Tensor<Element, 2> output(rows, columns);
+        for (int i = 0; i < rows; ++ i){
+            auto vec = slice(tensor(i), from, to);
+            auto out_vec = output(i);
+            std::copy(vec.begin(), vec.end(), out_vec.begin());
+        }
+        return output;
+    } else {
+        assert(false);
+    }
 }
 
 template <typename Element> auto slice(Tensor<Element, 1> tensor, int from, int to) -> Tensor<Element, 1>
 {
-    std::array<size_type, 1> shape(tensor.shape());
-    shape[0] = to - from;
-    int row_size = 1;
-
-    Tensor<Element, 1> slice(shape);
-    int begin_offset = from * row_size;
-    int end_offset = to * row_size;
-    std::copy(tensor.begin() + begin_offset, tensor.begin() + end_offset, slice.begin());
-
+    Tensor<Element, 1> slice(to - from);
+    std::copy(std::next(tensor.begin(), from), std::next(tensor.begin(), to), slice.begin());
     return slice;
 }
 
@@ -182,8 +231,8 @@ template <typename Element, int Dim> auto saxpy_(Tensor<Element, Dim> const &x, 
 #endif
 }
 
-template <typename Element>
-auto fill_(DataHolder<Element> &x, Element value) -> void {
+template <typename Element> auto fill_(DataHolder<Element> &x, Element value) -> void
+{
     for (auto &v : x) {
         v = value;
     }

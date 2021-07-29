@@ -266,23 +266,78 @@ TEST_CASE("concatenate vectors with axis = 0 and different sizes")
     REQUIRE(result == expected);
 }
 
+TEST_CASE("concatenate matrices")
+{
+    MatrixF expected = {{0, 0, 0, 0},
+                        {-10, 1, 10, 100},
+                        {-20, 2, 20, 200},
+                        {-30, 3, 30, 300}};
+    // axis = 0
+    {
+        std::vector<MatrixF> matrices =
+            {
+            {{0, 0, 0, 0},
+             {-10, 1, 10, 100}},
+
+            {{-20, 2, 20, 200},
+            {-30, 3, 30, 300}}
+            };
+        MatrixF result = ts::concatenate(matrices, 0);
+        REQUIRE(result == expected);
+    }
+
+    {
+        std::vector<MatrixF> matrices =
+            {
+                {{0, 0},
+                 {-10, 1},
+                 {-20, 2},
+                 {-30, 3}},
+                {{0, 0},
+                 {10, 100},
+                 {20, 200},
+                 {30, 300}},
+
+            };
+        MatrixF result = ts::concatenate(matrices, 1);
+        REQUIRE(result == expected);
+    }
+}
+
 TEST_CASE("slice")
 {
     MatrixF matrix = {{0, 0, 0},
-                     {1, 1, 1},
-                     {2, 2, 2}};
-
+                      {1, 10, 100},
+                      {2, 20, 200}};
+    // axis = 0
     {
-        MatrixF slice = ts::slice(matrix, 0, 2);
+        MatrixF slice = ts::slice(matrix, 0, 2, 0);
         MatrixF expected = {{0, 0, 0},
-                           {1, 1, 1}};
+                           {1, 10, 100}};
         REQUIRE(slice == expected);
     }
 
     {
-        MatrixF slice = ts::slice(matrix, 1, 3);
-        MatrixF expected = {{1, 1, 1},
-                           {2, 2, 2}};
+        MatrixF slice = ts::slice(matrix, 1, 3, 0);
+        MatrixF expected = {{1, 10, 100},
+                            {2, 20, 200}};
+        REQUIRE(slice == expected);
+    }
+
+    // axis = 1
+    {
+        MatrixF slice = ts::slice(matrix, 0, 2, 1);
+        MatrixF expected = {{0, 0},
+                            {1, 10},
+                            {2, 20}};
+        REQUIRE(slice == expected);
+    }
+
+    {
+        MatrixF slice = ts::slice(matrix, 1, 3, 1);
+        MatrixF expected = {{0, 0},
+                            {10, 100},
+                            {20, 200}};
         REQUIRE(slice == expected);
     }
 }

@@ -28,19 +28,19 @@ auto ts::DatasetIterator::operator++(int) -> ts::DatasetIterator
 
 auto ts::DatasetIterator::operator*() -> ts::DatasetIterator::return_type
 {
-    return std::make_pair(ts::slice(_inputs, _index, _index + _batch_size),
+    return std::make_pair(ts::slice(_inputs, _index, _index + _batch_size, 0),
                           ts::slice(_labels, _index, _index + _batch_size));
 }
 
 auto ts::DatasetIterator::make_pair() -> ts::DatasetIterator::return_type
 {
-    return std::make_pair(ts::slice(_inputs, _index, _index + _batch_size),
+    return std::make_pair(ts::slice(_inputs, _index, _index + _batch_size, 0),
                           ts::slice(_labels, _index, _index + _batch_size));
 }
 
 auto ts::DatasetIterator::make_pair() const -> ts::DatasetIterator::return_type
 {
-    return std::make_pair(ts::slice(_inputs, _index, _index + _batch_size),
+    return std::make_pair(ts::slice(_inputs, _index, _index + _batch_size, 0),
                           ts::slice(_labels, _index, _index + _batch_size));
 }
 
