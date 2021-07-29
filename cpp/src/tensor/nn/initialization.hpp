@@ -33,12 +33,10 @@ auto standard_normal(std::vector<int> const &shape, Element scale) -> Tensor<Ele
     return tensor;
 }
 
-template <typename Element, int Dim> auto bias_init(std::vector<int> const &shape) -> Tensor<Element, Dim>
+template <typename Element, int Dim> auto uniform(std::vector<int> const &shape, int fan_out) -> Tensor<Element, Dim>
 {
     std::default_random_engine random(69);
-    float fan_in = shape[0];
-
-    float bound = 1.0f / std::sqrt(fan_in);
+    float bound = 1.0f / std::sqrt(fan_out);
     std::uniform_real_distribution<Element> dist{-bound, bound};
 
     std::array<size_type, Dim> array_shape;

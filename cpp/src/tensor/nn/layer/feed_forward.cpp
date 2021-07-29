@@ -21,7 +21,7 @@ FeedForward::FeedForward(int dim_in, int dim_out, Activation activation, bool us
     register_parameters(_weight);
     if (use_bias) {
         _bias = std::make_optional(
-            ts::Variable<float, 1>(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+            ts::Variable<float, 1>(std::make_unique<ts::VectorF>(ts::uniform<float, 1>({dim_out}, dim_out)),
                                    std::make_unique<ts::VectorF>(ts::zeros<float, 1>({dim_out})), "FeedForward(bias)"));
         register_parameters(_bias.value());
     }
@@ -34,7 +34,7 @@ auto FeedForward::create(int dim_in, int dim_out, Activation activation, bool us
                                      "FeedForward(weight)");
     std::optional<Variable<float, 1>> bias = std::nullopt;
     if (use_bias) {
-        bias = std::make_optional(Variable<float, 1>(std::make_unique<ts::VectorF>(ts::bias_init<float, 1>({dim_out})),
+        bias = std::make_optional(Variable<float, 1>(std::make_unique<ts::VectorF>(ts::uniform<float, 1>({dim_out}, dim_out)),
                                                      std::make_unique<ts::VectorF>(ts::zeros<float, 1>({dim_out})),
                                                      "FeedForward(bias)"));
     }
@@ -68,6 +68,9 @@ auto FeedForward::backward(MatrixF const &d_y) -> MatrixF
     if (_use_bias) {
         _bias.value().grad() += ts::sum(d_output, 0);
     }
+//    auto [min_x, max_x] = std::minmax_element(_x.begin(), _x.end());
+//    auto [min_y, max_y] = std::minmax_element(d_y.begin(), d_y.end());
+//    auto [min_g, max_g] = std::minmax_element(_weight.grad().begin(), _weight.grad().end());
 
     return ts::dot(d_output, _weight.tensor(), false, true);
 }

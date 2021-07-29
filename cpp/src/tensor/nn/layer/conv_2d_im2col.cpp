@@ -22,7 +22,7 @@ auto ts::im2col::Conv2D::create(int in_channels, int out_channels, int kernel_si
                               std::make_unique<MatrixF>(ts::zeros<float, 2>(shape)), "Conv2D(weight)");
     std::optional<Variable<float, 1>> bias = std::nullopt;
     if (use_bias)
-        bias = std::make_optional(Variable<float, 1>(std::make_unique<VectorF>(ts::bias_init<float, 1>({out_channels})),
+        bias = std::make_optional(Variable<float, 1>(std::make_unique<VectorF>(ts::uniform<float, 1>({out_channels}, out_channels)),
                                                      std::make_unique<VectorF>(ts::zeros<float, 1>({out_channels})),
                                                      "Conv2D(bias)"));
     return Conv2D(std::move(weight), std::move(bias), kernel_size, stride, pad, dilatation, activation);
