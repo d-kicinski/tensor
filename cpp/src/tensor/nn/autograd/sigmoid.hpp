@@ -17,7 +17,7 @@ auto sigmoid_backward(Tensor<T, Dim> const &output, Tensor<T, Dim> const &d_outp
 {
     Tensor<T, Dim> result(output.shape());
     for (int i = 0; i < output.data_size(); ++i) {
-        auto o = output.at(1);
+        auto o = output.at(i);
         result.at(i) = o * (1 - o) * d_output.at(i);
     }
     return result;
