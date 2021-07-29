@@ -21,8 +21,8 @@ Features:
     * classes and utilities for interacting with nd-arrays
     * sane interface to gemm routines
 * `tensor/nn`: 
-    * layers: FeedForward, Conv2D(naive/im2col), Pooling
-    * optimizers: SGD
+    * layers: FeedForward, Conv2D(naive/im2col), RNN, LSTM, Pooling
+    * optimizers: SGD(with momentum), Adagrad, RMSProp, Adam
     * saving/restoring models using protobuf
 * Python
     * wrapper for major of the `tensor` and `tensor/nn` functionalities
@@ -32,12 +32,13 @@ Coming soon:
 * `tensor`:
     * improved naive GEMM implementation using AVX2 intrinsics
 * `tensor/nn`:
-    * layers: RNN, SelfAttention, BatchNorm, LayerNorm
+    * layers: SelfAttention, BatchNorm, LayerNorm
 
 
 ### Examples
 * C++:
     * [nn-planar-data example](https://github.com/d-kicinski/tensor/tree/master/examples/nn-planar-data)
+    * [char-rnn example](https://github.com/d-kicinski/tensor/tree/master/examples/char-rnn)
     * [embedded application](https://github.com/d-kicinski/tensor-example-embedded)
     
 * Python:
