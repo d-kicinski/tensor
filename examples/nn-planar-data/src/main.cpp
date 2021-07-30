@@ -38,15 +38,15 @@ class Model : public ts::ParameterRegistry<float> {
 
 auto train(Model &model, ts::Optimizer<float> &optimizer, ts::PlanarDataset &dataset) -> float
 {
-    constexpr int epoch_num = 100; // Let's overfit to validate our code
+    constexpr int epoch_num = 200; // Let's overfit to validate our code
     float loss = std::numeric_limits<float>::max();
 
     for (int epoch_i = 0; epoch_i < epoch_num; ++epoch_i) {
         for (auto [inputs, labels] : dataset) {
+            optimizer.zero_gradients();
             loss = model.loss(inputs, labels);
             model.backward();
             optimizer.step();
-            optimizer.zero_gradients();
             if (epoch_i % 10 == 0)
                 std::cout << "epoch: " << epoch_i << "/" << epoch_num << " loss: " << loss << std::endl;
         }
