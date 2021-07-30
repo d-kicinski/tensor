@@ -26,7 +26,7 @@ Features:
     * saving/restoring models using protobuf
 * Python
     * wrapper for major of the `tensor` and `tensor/nn` functionalities
-    * experimental autograd module
+    * experimental autograd module (PyTorch alike)
     
 Coming soon:
 * `tensor`:
