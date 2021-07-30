@@ -21,7 +21,7 @@ Features:
     * classes and utilities for interacting with nd-arrays
     * sane interface to gemm routines
 * `tensor/nn`: 
-    * layers: FeedForward, Conv2D(naive/im2col), RNN, LSTM, Pooling
+    * layers: FeedForward, Conv2D(naive/im2col), RNN, LSTM, Pooling, Dropout
     * optimizers: SGD(with momentum), Adagrad, RMSProp, Adam
     * saving/restoring models using protobuf
 * Python
