@@ -81,6 +81,7 @@ set(NN_SOURCES
         src/tensor/nn/layer/rnn.cpp
         src/tensor/nn/layer/lstm_cell.cpp
         src/tensor/nn/layer/lstm.cpp
+        src/tensor/nn/layer/dropout.cpp
         )
 
 if (TENSOR_USE_PROTOBUF)
@@ -153,6 +154,7 @@ if (TENSOR_BUILD_TESTS)
 
             tests/tensor/nn/layer/test_feed_forward.cpp
             tests/tensor/nn/layer/test_conv_2d.cpp
+            tests/tensor/nn/layer/test_dropout.cpp
             )
 
     if (TENSOR_USE_PROTOBUF)

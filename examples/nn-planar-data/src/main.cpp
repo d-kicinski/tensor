@@ -2,13 +2,15 @@
 #include <tensor/nn/activations.hpp>
 #include <tensor/nn/cross_entropy_loss.hpp>
 #include <tensor/nn/data/planar_dataset.hpp>
+#include <tensor/nn/layer/dropout.hpp>
 #include <tensor/nn/layer/feed_forward.hpp>
 #include <tensor/nn/optimizer/adagrad.hpp>
 
 class Model : public ts::ParameterRegistry<float> {
   public:
     Model() : _layer1(ts::FeedForward::create(2, 100, ts::Activation::RELU, true)),
-              _layer2(ts::FeedForward::create(100, 3, ts::Activation::NONE, false))
+              _layer2(ts::FeedForward::create(100, 3, ts::Activation::NONE, false)),
+              _dropout(0.5)
     {
         register_parameters(_layer1.parameters());
         register_parameters(_layer2.parameters());
@@ -22,14 +24,16 @@ class Model : public ts::ParameterRegistry<float> {
         return _loss(logits, labels);
     }
 
-    auto backward() -> void { _layer1.backward(_layer2.backward(_loss.backward())); }
+    auto backward() -> void { _layer1.backward(_dropout.backward(_layer2.backward(_loss.backward()))); }
 
   private:
     ts::FeedForward _layer1;
     ts::FeedForward _layer2;
-    ts::CrossEntropyLoss _loss;
+    ts::Dropout _dropout;
 
-    auto _forward(ts::MatrixF const &inputs) -> ts::MatrixF { return _layer2(_layer1(inputs)); }
+    ts::CrossEntropyLoss _loss{};
+
+    auto _forward(ts::MatrixF const &inputs) -> ts::MatrixF { return _layer2(_dropout(_layer1(inputs))); }
 };
 
 auto train(Model &model, ts::Optimizer<float> &optimizer, ts::PlanarDataset &dataset) -> float
