@@ -56,6 +56,10 @@ auto get(MatrixF const &, Tensor<int, 1> const &) -> VectorF;
 
 template <typename Element, int Dim> auto apply(Tensor<Element, Dim> const &, Fn<Element>) -> Tensor<Element, Dim>;
 
+template <typename Element, int Dim> auto apply(Tensor<Element, Dim> const &, Tensor<Element, Dim> const &, std::function<Element(Element, Element)> fn) -> Tensor<Element, Dim>;
+
+template <typename Element, int Dim> auto apply_(Tensor<Element, Dim> const &, Fn<Element>) -> void;
+
 template <typename Element, int Dim> auto log(Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
 
 template <typename Element, int Dim> auto pow(Tensor<Element, Dim> const &tensor, float) -> Tensor<Element, Dim>;
@@ -219,6 +223,22 @@ template <typename Element, int Dim> auto subtract_(Tensor<Element, Dim> const &
 {
     std::transform(tensor.begin(), tensor.end(), tensor.begin(), [value](Element e) { return e - value; });
 }
+
+
+template <typename Element, int Dim> auto add(Tensor<Element, Dim> &tensor, Element value) -> Tensor<Element, Dim>
+{
+    auto output = tensor.clone();
+    std::transform(tensor.begin(), tensor.end(), output.begin(), [value](Element e) { return e + value; });
+    return output;
+}
+
+template <typename Element, int Dim> auto subtract(Tensor<Element, Dim> const &tensor, Element value) -> Tensor<Element, Dim>
+{
+    auto output = tensor.clone();
+    std::transform(tensor.begin(), tensor.end(), output.begin(), [value](Element e) { return e - value; });
+    return output;
+}
+
 
 template <typename Element, int Dim> auto saxpy_(Tensor<Element, Dim> const &x, Tensor<Element, Dim> const &y) -> void
 {

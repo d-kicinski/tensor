@@ -65,12 +65,25 @@ template auto apply(Tensor<float, 2> const &, Fn<float>) -> Tensor<float, 2>;
 template auto apply(Tensor<float, 3> const &, Fn<float>) -> Tensor<float, 3>;
 template auto apply(Tensor<float, 4> const &, Fn<float>) -> Tensor<float, 4>;
 
+template auto apply(Tensor<float, 1> const &, Tensor<float, 1> const &, std::function<float(float, float)>) -> Tensor<float, 1>;
+template auto apply(Tensor<float, 2> const &, Tensor<float, 2> const &, std::function<float(float, float)>) -> Tensor<float, 2>;
+template auto apply(Tensor<float, 3> const &, Tensor<float, 3> const &, std::function<float(float, float)>) -> Tensor<float, 3>;
+template auto apply(Tensor<float, 4> const &, Tensor<float, 4> const &, std::function<float(float, float)>) -> Tensor<float, 4>;
+
+template auto apply_(Tensor<float, 1> const &, Fn<float>) -> void;
+template auto apply_(Tensor<float, 2> const &, Fn<float>) -> void;
+template auto apply_(Tensor<float, 3> const &, Fn<float>) -> void;
+template auto apply_(Tensor<float, 4> const &, Fn<float>) -> void;
+
 template auto multiply(Tensor<float, 1> const &tensor, float value) -> Tensor<float, 1>;
 template auto multiply(Tensor<float, 2> const &tensor, float value) -> Tensor<float, 2>;
 template auto multiply(Tensor<float, 3> const &tensor, float value) -> Tensor<float, 3>;
+template auto multiply(Tensor<float, 4> const &tensor, float value) -> Tensor<float, 4>;
 
 template auto multiply(Tensor<float, 1> const &, Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto multiply(Tensor<float, 2> const &, Tensor<float, 2> const &) -> Tensor<float, 2>;
+template auto multiply(Tensor<float, 3> const &, Tensor<float, 3> const &) -> Tensor<float, 3>;
+template auto multiply(Tensor<float, 4> const &, Tensor<float, 4> const &) -> Tensor<float, 4>;
 
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 1>;
 template auto randint(int, int, std::vector<int> const &) -> Tensor<int, 2>;
@@ -303,6 +316,20 @@ auto apply(Tensor<Element, Dim> const &tensor, Fn<Element> fn) -> Tensor<Element
     return result;
 }
 
+template <typename Element, int Dim>
+auto apply_(Tensor<Element, Dim> const &tensor, Fn<Element> fn) -> void
+{
+    std::transform(tensor.begin(), tensor.end(), tensor.begin(), fn);
+}
+
+template <typename Element, int Dim>
+auto apply(Tensor<Element, Dim> const &t1, Tensor<Element, Dim> const &t2, std::function<Element(Element, Element)> fn) -> Tensor<Element, Dim>
+{
+    Tensor<Element, Dim> result(t1.shape());
+    std::transform(t1.begin(), t1.end(), t2.begin(), result.begin(), fn);
+    return result;
+}
+
 template <typename Element, int Dim> auto log(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>
 {
     constexpr float epsilon = 1e-10;
@@ -319,7 +346,7 @@ auto exp(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>
     return ts::apply(tensor, exp);
 }
 
-template <typename Element, int Dim> auto pow(Tensor<Element, Dim> const &tensor, int value) -> Tensor<Element, Dim>
+template <typename Element, int Dim> auto pow(Tensor<Element, Dim> const &tensor, float value) -> Tensor<Element, Dim>
 {
     Fn<float> pow = [&value](Element e) { return std::pow(e, value); };
     return ts::apply(tensor, pow);
