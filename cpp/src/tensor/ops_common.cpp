@@ -43,9 +43,9 @@ template auto exp(Tensor<float, 1> const &) -> Tensor<float, 1>;
 template auto exp(Tensor<float, 2> const &) -> Tensor<float, 2>;
 template auto exp(Tensor<float, 3> const &) -> Tensor<float, 3>;
 
-template auto pow(Tensor<float, 1> const &, int) -> Tensor<float, 1>;
-template auto pow(Tensor<float, 2> const &, int) -> Tensor<float, 2>;
-template auto pow(Tensor<float, 3> const &, int) -> Tensor<float, 3>;
+template auto pow(Tensor<float, 1> const &, float) -> Tensor<float, 1>;
+template auto pow(Tensor<float, 2> const &, float) -> Tensor<float, 2>;
+template auto pow(Tensor<float, 3> const &, float) -> Tensor<float, 3>;
 
 template auto sum(Tensor<float, 1> const &) -> float;
 template auto sum(Tensor<float, 2> const &) -> float;

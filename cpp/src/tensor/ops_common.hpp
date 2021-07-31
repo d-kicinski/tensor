@@ -58,7 +58,7 @@ template <typename Element, int Dim> auto apply(Tensor<Element, Dim> const &, Fn
 
 template <typename Element, int Dim> auto log(Tensor<Element, Dim> const &) -> Tensor<Element, Dim>;
 
-template <typename Element, int Dim> auto pow(Tensor<Element, Dim> const &tensor, int) -> Tensor<Element, Dim>;
+template <typename Element, int Dim> auto pow(Tensor<Element, Dim> const &tensor, float) -> Tensor<Element, Dim>;
 
 template <typename Element, int Dim> auto exp(Tensor<Element, Dim> const &tensor) -> Tensor<Element, Dim>;
 
