@@ -82,6 +82,7 @@ set(NN_SOURCES
         src/tensor/nn/layer/lstm_cell.cpp
         src/tensor/nn/layer/lstm.cpp
         src/tensor/nn/layer/dropout.cpp
+        src/tensor/nn/layer/batch_normalization.cpp
         )
 
 if (TENSOR_USE_PROTOBUF)
@@ -158,7 +159,7 @@ if (TENSOR_BUILD_TESTS)
             )
 
     if (TENSOR_USE_PROTOBUF)
-        set(NN_TEST_SOURCES ${NN_TEST_SOURCES} tests/tensor/nn/test_saver.cpp tests/tensor/nn/test_max_pool_2d.cpp tests/tensor/nn/test_conv_2d.cpp)
+        set(NN_TEST_SOURCES ${NN_TEST_SOURCES} tests/tensor/nn/test_saver.cpp tests/tensor/nn/test_max_pool_2d.cpp tests/tensor/nn/test_conv_2d.cpp tests/tensor/nn/layer/test_batch_normalization.cpp)
     endif ()
 
     add_executable(tests ${NN_TEST_SOURCES})
