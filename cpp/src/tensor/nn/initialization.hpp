@@ -54,6 +54,15 @@ template <typename Element, int Dim> auto zeros(std::vector<int> const &shape) -
     return tensor;
 }
 
+template <typename Element, int Dim> auto ones(std::vector<int> const &shape) -> Tensor<Element, Dim>
+{
+    std::array<size_type, Dim> array_shape;
+    std::copy(shape.begin(), shape.end(), array_shape.begin());
+    Tensor<Element, Dim> tensor(array_shape);
+    ts::fill_(tensor, Element(1));
+    return tensor;
+}
+
 template <typename Element, int Dim> auto bernoulli(std::vector<int> const &shape, float p) -> Tensor<Element, Dim>
 {
     std::default_random_engine random(69);
