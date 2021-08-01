@@ -239,12 +239,12 @@ auto wrap_ops(pybind11::module &m)
     m.def("dot", py::overload_cast<ts::Tensor<float, 3> const &, ts::MatrixF const &>(&ts::dot));
 
     // ops_common.hpp
-    m.def("add_matrixf_matrixf", &ts::add<float, 2>);
-    m.def("add_matrixi_matrixi", &ts::add<int, 2>);
-    m.def("add_vectorf_vectorf", &ts::add<float, 1>);
-    m.def("add_vectori_vectori", &ts::add<int, 1>);
-    m.def("add_matrixf_vectorf", &ts::add<float>);
-    m.def("add_matrixi_vectori", &ts::add<int>);
+    m.def("add_matrixf_matrixf", py::overload_cast<ts::MatrixF const &, ts::MatrixF const &>(&ts::add<float, 2>));
+    m.def("add_matrixi_matrixi", py::overload_cast<ts::MatrixI const &, ts::MatrixI const &>(&ts::add<int, 2>));
+    m.def("add_vectorf_vectorf", py::overload_cast<ts::VectorF const &, ts::VectorF const &>(&ts::add<float, 1>));
+    m.def("add_vectori_vectori", py::overload_cast<ts::VectorI const &, ts::VectorI const &>(&ts::add<int, 1>));
+    m.def("add_matrixf_vectorf", py::overload_cast<ts::MatrixF const &, ts::VectorF const &>(&ts::add<float>));
+    m.def("add_matrixi_vectori", py::overload_cast<ts::MatrixI const &, ts::VectorI const &>(&ts::add<int>));
 
     m.def("multiply_vectorf_vectorf",
           py::overload_cast<ts::VectorF const &, ts::VectorF const &>(&ts::multiply<float, 1>));
