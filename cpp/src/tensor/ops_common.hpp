@@ -144,9 +144,8 @@ template <typename Element> auto concatenate(std::vector<Tensor<Element, 2>> lis
             offset += v.data_size();
         }
         return output;
-    } else {
-        assert(false);
     }
+    return ts::Tensor<Element, 2>();
 }
 
 template <typename Element> auto slice(Tensor<Element, 2> const &tensor, int from, int to, int axis) -> Tensor<Element, 2>
@@ -165,15 +164,14 @@ template <typename Element> auto slice(Tensor<Element, 2> const &tensor, int fro
         int rows = tensor.shape(0);
         int columns = to - from;
         Tensor<Element, 2> output(rows, columns);
-        for (int i = 0; i < rows; ++ i){
+        for (int i = 0; i < rows; ++i) {
             auto vec = slice(tensor(i), from, to);
             auto out_vec = output(i);
             std::copy(vec.begin(), vec.end(), out_vec.begin());
         }
         return output;
-    } else {
-        assert(false);
     }
+    return ts::Tensor<Element, 2>();
 }
 
 template <typename Element> auto slice(Tensor<Element, 1> tensor, int from, int to) -> Tensor<Element, 1>
